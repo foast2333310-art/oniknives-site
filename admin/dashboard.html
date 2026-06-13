@@ -137,9 +137,9 @@
         <div class="form-group">
           <label for="prodImage">Image du produit</label>
           <input type="file" id="prodImage" accept="image/png,image/jpeg,image/gif,image/webp">
-          <div id="uploadProgress" style="color:#888;font-size:13px;margin-top:4px;display:none;">Upload en cours...</div>
+          <div id="uploadProgress" style="color:#888;font-size:13px;margin-top:4px;display:none;">Chargement...</div>
           <div id="imagePreview" style="margin-top:8px;display:none;"><img id="previewImg" style="max-height:100px;border-radius:4px;"></div>
-          <input type="hidden" id="prodImageName" value="">
+          <input type="hidden" id="prodImageData" value="">
         </div>
         <div class="form-group">
           <label for="prodDesc">Description</label>
@@ -161,33 +161,23 @@
     }
 
     const API = '/api/products';
-    let uploadedImage = '';
 
     function getAdminKey() {
       return localStorage.getItem('admin_api_key');
     }
 
-    document.getElementById('prodImage').addEventListener('change', async (e) => {
+    document.getElementById('prodImage').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const p = document.getElementById('uploadProgress');
-      p.style.display = 'block'; p.textContent = 'Upload en cours...';
+      p.style.display = 'block'; p.textContent = 'Compression...';
       const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const preview = document.getElementById('previewImg');
-        preview.src = ev.target.result;
+      reader.onload = (ev) => {
+        document.getElementById('previewImg').src = ev.target.result;
         document.getElementById('imagePreview').style.display = 'block';
-        const b64 = ev.target.result.split(',')[1];
-        try {
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
-            body: JSON.stringify({ filename: file.name, data: b64 })
-          });
-          const r = await res.json();
-          if (res.ok) { uploadedImage = r.filename; p.textContent = '✓ Uploadé: ' + r.filename; p.style.color = '#27ae60'; }
-          else { p.textContent = '✗ Erreur: ' + (r.error || ''); p.style.color = '#e74c3c'; }
-        } catch (err) { p.textContent = '✗ Erreur réseau'; p.style.color = '#e74c3c'; }
+        document.getElementById('prodImageData').value = ev.target.result;
+        p.textContent = '✓ Image prête';
+        p.style.color = '#27ae60';
       };
       reader.readAsDataURL(file);
     });
@@ -198,9 +188,11 @@
         grid.innerHTML = '<div class="empty-state"><h3>Aucun produit</h3><p>Cliquez sur "Ajouter un produit" pour commencer.</p></div>';
         return;
       }
-      grid.innerHTML = products.map(p => `
+      grid.innerHTML = products.map(p => {
+        const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
+        return `
         <div class="product-card">
-          <img src="/api/images/${p.image || 'placeholder.svg'}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22/%3E%3C/svg%3E'">
+          <img src="${img}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22/%3E%3C/svg%3E'">
           <div class="info">
             <h3>${p.name}</h3>
             <div class="price">${p.price} €</div>
@@ -211,8 +203,8 @@
             <button class="btn btn-primary" onclick="editProduct(${p.id})">Modifier</button>
             <button class="btn btn-danger" onclick="deleteProduct(${p.id})">Supprimer</button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     function openAddModal() {
@@ -223,11 +215,10 @@
       document.getElementById('prodPrice').value = '';
       document.getElementById('prodCategory').value = 'Couteaux de cuisine';
       document.getElementById('prodImage').value = '';
-      document.getElementById('prodImageName').value = '';
+      document.getElementById('prodImageData').value = '';
       document.getElementById('imagePreview').style.display = 'none';
       document.getElementById('uploadProgress').style.display = 'none';
       document.getElementById('prodDesc').value = '';
-      uploadedImage = '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -241,12 +232,12 @@
       document.getElementById('prodPrice').value = p.price;
       document.getElementById('prodCategory').value = p.category;
       document.getElementById('prodImage').value = '';
-      document.getElementById('prodImageName').value = p.image || '';
+      document.getElementById('prodImageData').value = p.image || '';
       document.getElementById('uploadProgress').style.display = 'none';
+      const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
       document.getElementById('imagePreview').style.display = p.image ? 'block' : 'none';
-      document.getElementById('previewImg').src = '/api/images/' + (p.image || '');
+      document.getElementById('previewImg').src = img;
       document.getElementById('prodDesc').value = p.description;
-      uploadedImage = p.image || '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -267,12 +258,13 @@
     document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
+      const imgData = document.getElementById('prodImageData').value;
       const data = {
         name: document.getElementById('prodName').value.trim(),
         slug: document.getElementById('prodSlug').value.trim(),
         price: parseFloat(document.getElementById('prodPrice').value).toFixed(2),
         category: document.getElementById('prodCategory').value,
-        image: uploadedImage || document.getElementById('prodImageName').value,
+        image: imgData,
         description: document.getElementById('prodDesc').value.trim()
       };
       if (editId) data.id = parseInt(editId);

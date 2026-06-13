@@ -53,7 +53,6 @@ module.exports = async (req, res) => {
 
     // === PRODUCTS CRUD ===
     if (url.startsWith('/api/products')) {
-      // GET
       if (req.method === 'GET') {
         const products = load();
         if (req.query.slug) {
@@ -64,7 +63,6 @@ module.exports = async (req, res) => {
         res.json(products); return;
       }
 
-      // Auth check for writes
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
 
       let raw = '';
@@ -72,7 +70,6 @@ module.exports = async (req, res) => {
       const body = JSON.parse(raw);
       let products = load();
 
-      // POST
       if (req.method === 'POST') {
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
@@ -80,7 +77,6 @@ module.exports = async (req, res) => {
         res.status(201).json(body); return;
       }
 
-      // PUT
       if (req.method === 'PUT') {
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
@@ -89,7 +85,6 @@ module.exports = async (req, res) => {
         res.json(products[idx]); return;
       }
 
-      // DELETE
       if (req.method === 'DELETE') {
         const id = parseInt(req.query.id);
         if (!id) { res.status(400).json({ error: 'id requis' }); return; }
