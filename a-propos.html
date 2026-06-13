@@ -7,6 +7,17 @@
   <meta name="description" content="Découvrez l'histoire et le savoir-faire d'Oni Knives, artisan coutelier.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗡️</text></svg>">
+  <style>
+    .modal-overlay { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;z-index:9999; }
+    .modal-overlay.active { display:flex; }
+    .modal { background:#2a2a2a;border-radius:12px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto;padding:32px;position:relative; }
+    .modal-close { position:absolute;top:12px;right:16px;background:none;border:none;color:#aaa;font-size:28px;cursor:pointer; }
+    .modal h2 { color:#d4a853;font-size:1.3rem;margin-bottom:20px; }
+    .modal-body h3 { color:#e5e5e5;font-size:1rem;margin:16px 0 6px; }
+    .modal-body p { color:#aaa;font-size:0.85rem;line-height:1.5; }
+    .footer-links a { color:#888; }
+    .footer-links a:hover { color:#d4a853; }
+  </style>
 </head>
 <body>
   <header class="header">
@@ -47,10 +58,33 @@
         <a href="a-propos.html">À propos</a>
         <a href="contact.html">Contact</a>
       </div>
+      <div class="footer-links"><a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">Mentions légales &amp; CGV</a></div>
       <p>&copy; 2026 Oni Knives — Couteaux de cuisine artisanaux</p>
     </div>
   </footer>
 
   <script src="js/app.js"></script>
+<div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
+    <h2>Mentions légales &amp; CGV</h2>
+    <div class="modal-body">
+      <h3>1. Éditeur du site</h3>
+      <p>Oni Knives — SAS au capital de 1 000 €<br>Siège social : France<br>Email : contact@oniknives.com</p>
+      <h3>2. Propriété intellectuelle</h3>
+      <p>Tous les contenus présents sur ce site (textes, images, logos) sont la propriété exclusive d'Oni Knives. Toute reproduction est interdite sans autorisation.</p>
+      <h3>3. Produits</h3>
+      <p>Les couteaux proposés sont fabriqués artisanalement. Les délais de fabrication sont indiqués sur chaque fiche produit. Les photos sont non contractuelles.</p>
+      <h3>4. Commandes</h3>
+      <p>Les commandes se font par email à contact@oniknives.com. Le paiement est effectué par virement bancaire. La livraison est offerte en France métropolitaine.</p>
+      <h3>5. Droit de rétractation</h3>
+      <p>Conformément à l'article L221-18 du Code de la consommation, le client dispose d'un délai de 14 jours pour exercer son droit de rétractation.</p>
+      <h3>6. Responsabilité</h3>
+      <p>Oni Knives ne saurait être tenu responsable des dommages résultant d'une mauvaise utilisation des produits vendus.</p>
+      <h3>7. Données personnelles</h3>
+      <p>Aucune donnée personnelle n'est collectée sans consentement. Les emails reçus via les formulaires de contact ne sont pas conservés à des fins commerciales.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
