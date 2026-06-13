@@ -41,9 +41,9 @@ img { max-width: 100%; height: auto; display: block; }
 .product-card { background: #1a1a1a; border-radius: 3px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
 .product-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.4); }
 .product-card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #222; }
-.product-card-body { padding: 4px 6px 8px; }
-.product-card-title { font-size: 0.6rem; font-weight: 500; margin-bottom: 1px; color: #e5e5e5; }
-.product-card-price { font-size: 0.65rem; color: #d4a853; font-weight: 600; }
+.product-card-body { padding: 5px 8px 10px; }
+.product-card-title { font-size: 0.75rem; font-weight: 500; margin-bottom: 2px; color: #e5e5e5; }
+.product-card-price { font-size: 0.7rem; color: #d4a853; font-weight: 600; }
 .product-card .btn { margin-top: 12px; }
 
 /* Buttons */
@@ -54,13 +54,13 @@ img { max-width: 100%; height: auto; display: block; }
 .btn-outline:hover { background: #d4a853; color: #0d0d0d; }
 
 /* Product detail page */
-.product-detail { display: flex; gap: 16px; padding: 20px 0; align-items: flex-start; }
-.product-detail-img { width: 70px; border-radius: 4px; background: #1a1a1a; }
+.product-detail { display: flex; gap: 20px; padding: 30px 0; align-items: flex-start; }
+.product-detail-img { width: 50px; border-radius: 4px; background: #1a1a1a; }
 .product-detail-info { flex: 1; min-width: 0; }
-.product-detail-info h1 { font-size: 1rem; font-weight: 500; margin-bottom: 4px; }
-.product-detail-price { font-size: 0.9rem; color: #d4a853; font-weight: 600; margin-bottom: 10px; }
-.product-detail-desc { color: #aaa; margin-bottom: 14px; line-height: 1.5; font-size: 0.8rem; }
-.product-detail .btn { padding: 6px 14px; font-size: 0.75rem; display: inline-block; width: auto; }
+.product-detail-info h1 { font-size: 1.3rem; font-weight: 500; margin-bottom: 6px; }
+.product-detail-price { font-size: 1.1rem; color: #d4a853; font-weight: 600; margin-bottom: 14px; }
+.product-detail-desc { color: #aaa; margin-bottom: 16px; line-height: 1.6; font-size: 0.95rem; }
+.product-detail .btn { padding: 8px 18px; font-size: 0.85rem; display: inline-block; width: auto; }
 
 /* Categories */
 .categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 600px; margin: 0 auto; }
