@@ -93,7 +93,7 @@
   <div class="header">
     <h1>Oni Knives - Administration</h1>
     <div class="links">
-      <a href="../data/products.json" target="_blank">Voir products.json</a>
+      <a href="/data/products.json" target="_blank">Voir products.json</a>
       <a href="/">Voir le site</a>
       <a href="#" id="logoutBtn">Déconnexion</a>
     </div>
@@ -103,7 +103,6 @@
     <div class="toolbar">
       <h2>Gestion des produits</h2>
       <div>
-        <button class="btn btn-secondary" onclick="downloadJSON()">Exporter JSON</button>
         <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un produit</button>
       </div>
     </div>
@@ -158,38 +157,23 @@
       window.location.href = 'index.html';
     }
 
-    let products = [];
+    const API = '/api/products';
 
-    function saveProducts() {
-      localStorage.setItem('oni_products', JSON.stringify(products));
+    function getAdminKey() {
+      return localStorage.getItem('admin_api_key');
     }
 
     async function loadProducts() {
-      const stored = localStorage.getItem('oni_products');
-      if (stored) {
-        try {
-          products = JSON.parse(stored);
-          renderProducts();
-          return;
-        } catch(e) {}
-      }
       try {
-        const res = await fetch('../data/products.json?v=' + Date.now());
-        if (!res.ok) throw new Error('Erreur chargement');
-        const text = await res.text();
-        products = JSON.parse(text);
-        saveProducts();
-        renderProducts();
-      } catch (e) {
-        showToast('Erreur de chargement des produits', true);
-        products = [];
-        renderProducts();
-      }
+        const res = await fetch(API + '?v=' + Date.now());
+        const data = await res.json();
+        renderProducts(data);
+      } catch { renderProducts([]); }
     }
 
-    function renderProducts() {
+    function renderProducts(products) {
       const grid = document.getElementById('productGrid');
-      if (products.length === 0) {
+      if (!products || products.length === 0) {
         grid.innerHTML = '<div class="empty-state"><h3>Aucun produit</h3><p>Cliquez sur "Ajouter un produit" pour commencer.</p></div>';
         return;
       }
@@ -240,7 +224,17 @@
       document.getElementById('productModal').classList.remove('active');
     }
 
-    document.getElementById('productForm').addEventListener('submit', (e) => {
+    let products = [];
+
+    async function refreshProducts() {
+      try {
+        const res = await fetch(API);
+        products = await res.json();
+        renderProducts(products);
+      } catch { showToast('Erreur chargement', true); }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
       const data = {
@@ -251,40 +245,38 @@
         image: document.getElementById('prodImage').value.trim(),
         description: document.getElementById('prodDesc').value.trim()
       };
+      if (editId) data.id = parseInt(editId);
 
-      if (editId) {
-        const idx = products.findIndex(x => x.id === parseInt(editId));
-        if (idx >= 0) {
-          products[idx] = { ...products[idx], ...data };
-        }
-      } else {
-        data.id = Math.max(0, ...products.map(p => p.id)) + 1;
-        products.push(data);
+      try {
+        const res = await fetch(API, {
+          method: editId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        closeModal();
+        await refreshProducts();
+        showToast('✓ ' + (editId ? 'Modifié' : 'Ajouté'));
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
       }
-
-      saveProducts();
-      renderProducts();
-      closeModal();
-      showToast('Produit enregistré ! Pensez à exporter le JSON.');
     });
 
-    function deleteProduct(id) {
+    async function deleteProduct(id) {
       if (!confirm('Supprimer ce produit ?')) return;
-      products = products.filter(p => p.id !== id);
-      saveProducts();
-      renderProducts();
-      showToast('Produit supprimé');
-    }
-
-    function downloadJSON() {
-      const data = JSON.stringify(products, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'products.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-      showToast('Fichier products.json téléchargé !');
+      try {
+        const res = await fetch(API + '?id=' + id, {
+          method: 'DELETE',
+          headers: { 'x-admin-key': getAdminKey() }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        await refreshProducts();
+        showToast('Supprimé');
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
+      }
     }
 
     function showToast(msg, isError = false) {
@@ -297,6 +289,7 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('admin_api_key');
       window.location.href = 'index.html';
     });
 
@@ -304,7 +297,7 @@
       if (e.target === e.currentTarget) closeModal();
     });
 
-    loadProducts();
+    refreshProducts();
   </script>
 </body>
 </html>

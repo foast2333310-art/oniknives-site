@@ -1,4 +1,3 @@
-// Mobile nav
 document.addEventListener('DOMContentLoaded', () => {
   const hamburger = document.querySelector('.hamburger');
   const nav = document.querySelector('.nav');
@@ -7,14 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+const API = '/api/products';
+
 async function loadProducts() {
   try {
-    const res = await fetch('data/products.json?v=' + Date.now());
+    const res = await fetch(API + '?v=' + Date.now());
+    if (!res.ok) throw new Error();
     return await res.json();
-  } catch (e) {
-    console.error('Failed to load products:', e);
-    return [];
-  }
+  } catch { return []; }
 }
 
 function renderProducts(products, containerId) {
