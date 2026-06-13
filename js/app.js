@@ -16,12 +16,16 @@ async function loadProducts() {
   } catch { return []; }
 }
 
+function imgSrc(name) {
+  return name ? '/api/images/' + name : 'images/placeholder.svg';
+}
+
 function renderProducts(products, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = products.map(p => `
     <a href="produit.html?slug=${p.slug}" class="product-card">
-      <img src="images/${p.image || 'placeholder.svg'}" alt="${p.name}" class="product-card-img" loading="lazy"
+      <img src="${imgSrc(p.image)}" alt="${p.name}" class="product-card-img" loading="lazy"
            onerror="this.src='images/placeholder.svg'">
       <div class="product-card-body">
         <div class="product-card-title">${p.name}</div>
@@ -39,7 +43,7 @@ async function initProductPage() {
   const product = products.find(p => p.slug === slug);
   if (product) {
     document.title = `${product.name} — Oni Knives`;
-    document.getElementById('product-image').src = 'images/' + (product.image || 'placeholder.svg');
+    document.getElementById('product-image').src = imgSrc(product.image);
     document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };
     document.getElementById('product-name').textContent = product.name;
     document.getElementById('product-price').textContent = String(product.price).replace('.', ',') + ' €';

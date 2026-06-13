@@ -212,7 +212,7 @@
       }
       grid.innerHTML = products.map(p => `
         <div class="product-card">
-          <img src="../images/${p.image || 'placeholder.svg'}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23333%22 width=%22200%22 height=%22200%22/><text fill=%22%23666%22 font-size=%2214%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>Image</text></svg>'">
+          <img src="/api/images/${p.image || 'placeholder.svg'}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23333%22 width=%22200%22 height=%22200%22/><text fill=%22%23666%22 font-size=%2214%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>Image</text></svg>'">
           <div class="info">
             <h3>${p.name}</h3>
             <div class="price">${p.price} €</div>
@@ -254,7 +254,7 @@
       document.getElementById('prodImage').value = '';
       document.getElementById('prodImageName').value = p.image || '';
       document.getElementById('imagePreview').style.display = p.image ? 'block' : 'none';
-      document.getElementById('previewImg').src = '../images/' + (p.image || '');
+      document.getElementById('previewImg').src = '/api/images/' + (p.image || '');
       document.getElementById('prodDesc').value = p.description;
       uploadedImage = p.image || '';
       document.getElementById('productModal').classList.add('active');
