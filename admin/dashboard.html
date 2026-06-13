@@ -216,9 +216,31 @@
       <div>
         <button class="btn btn-secondary" onclick="downloadJSON()">Exporter JSON</button>
         <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un produit</button>
+        <button class="btn btn-success" onclick="publishToGitHub()">📤 Publier</button>
+        <button class="btn btn-secondary" onclick="openSettings()">⚙</button>
       </div>
     </div>
     <div id="productGrid" class="product-grid"></div>
+  </div>
+
+  <!-- Modal Settings (GitHub Token) -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <h2>Configuration GitHub</h2>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px;">Entrez un <strong>Personal Access Token</strong> GitHub pour publier automatiquement les produits sur le site.</p>
+      <div class="form-group">
+        <label for="githubToken">GitHub Token</label>
+        <input type="password" id="githubToken" placeholder="ghp_...">
+      </div>
+      <p style="color:#888;font-size:12px;margin-bottom:16px;">
+        Créer un token : GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+        (accès: "Contents" en lecture/écriture sur le repo foast2333310-art/oniknives-site)
+      </p>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeSettings()">Fermer</button>
+        <button class="btn btn-success" onclick="saveToken()">Enregistrer</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Ajout/Modification -->
@@ -417,6 +439,85 @@
     document.getElementById('productModal').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) closeModal();
     });
+    document.getElementById('settingsModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeSettings();
+    });
+
+    // --- GitHub API ---
+    const GIT_OWNER = 'foast2333310-art';
+    const GIT_REPO = 'oniknives-site';
+    const GIT_PATH = 'data/products.json';
+    const GIT_BRANCH = 'master';
+
+    function getToken() { return localStorage.getItem('github_token'); }
+
+    function openSettings() {
+      document.getElementById('githubToken').value = getToken() || '';
+      document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function saveToken() {
+      const token = document.getElementById('githubToken').value.trim();
+      localStorage.setItem('github_token', token);
+      closeSettings();
+      showToast('Token GitHub enregistré');
+    }
+
+    async function publishToGitHub() {
+      const token = getToken();
+      if (!token) {
+        showToast('Configurez d\'abord un token GitHub (⚙)', true);
+        openSettings();
+        return;
+      }
+
+      const content = JSON.stringify(products, null, 2);
+
+      try {
+        // 1. Récupérer le fichier actuel (pour obtenir le SHA)
+        const getRes = await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/${GIT_PATH}?ref=${GIT_BRANCH}`, {
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+
+        let sha = null;
+        if (getRes.ok) {
+          const data = await getRes.json();
+          sha = data.sha;
+        } else if (getRes.status !== 404) {
+          const err = await getRes.json();
+          showToast(`Erreur GitHub: ${err.message}`, true);
+          return;
+        }
+
+        // 2. Encoder le contenu en base64
+        const encoded = btoa(unescape(encodeURIComponent(content)));
+
+        // 3. Pusher le nouveau fichier
+        const putRes = await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/${GIT_PATH}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+          body: JSON.stringify({
+            message: 'Mise à jour produits depuis admin',
+            content: encoded,
+            sha: sha,
+            branch: GIT_BRANCH
+          })
+        });
+
+        if (putRes.ok) {
+          showToast('✅ Publié ! Le site sera à jour dans 1-2 minutes.');
+        } else {
+          const err = await putRes.json();
+          showToast(`Erreur: ${err.message}`, true);
+        }
+      } catch (e) {
+        showToast(`Erreur réseau: ${e.message}`, true);
+      }
+    }
 
     loadProducts();
   </script>

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load products
 async function loadProducts() {
   try {
-    const res = await fetch('data/products.json');
+    const res = await fetch('data/products.json?v=' + Date.now());
     return await res.json();
   } catch (e) {
     console.error('Failed to load products:', e);
