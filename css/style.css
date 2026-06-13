@@ -18,6 +18,10 @@ img { max-width: 100%; height: auto; display: block; }
 .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 5px; }
 .hamburger span { width: 25px; height: 2px; background: #e5e5e5; transition: 0.3s; }
 
+/* Admin icon */
+.admin-icon { font-size: 1.2rem; text-decoration: none; opacity: 0.3; transition: opacity 0.2s; line-height: 1; padding: 4px; }
+.admin-icon:hover { opacity: 0.8; }
+
 /* Hero */
 .hero { padding: 80px 0; text-align: center; background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%); }
 .hero h1 { font-size: 3rem; font-weight: 300; margin-bottom: 15px; letter-spacing: 3px; }
