@@ -17,7 +17,7 @@ async function loadProducts() {
 }
 
 function imgSrc(name) {
-  return name || 'images/placeholder.svg';
+  return name ? '/api/images/' + name : 'images/placeholder.svg';
 }
 
 function renderProducts(products, containerId) {
