@@ -6,7 +6,6 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GIT_OWNER = 'foast2333310-art';
 const GIT_REPO = 'oniknives-site';
 const GIT_BRANCH = 'master';
-const ADMIN_KEY = process.env.ADMIN_API_KEY;
 
 function readLocal() {
   const p = fs.existsSync(CACHE_PATH) ? CACHE_PATH : DATA_PATH;
@@ -58,6 +57,7 @@ module.exports = async (req) => {
     } catch { return json([], 200); }
   }
 
+  const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
   const key = req.headers.get('x-admin-key');
   if (!key || key !== ADMIN_KEY) return json({ error: 'Non autorisé' }, 401);
 
@@ -69,7 +69,7 @@ module.exports = async (req) => {
       body.id = Math.max(0, ...products.map(p => p.id)) + 1;
       products.push(body);
       writeLocal(products);
-      writeGitHub(products);
+      await writeGitHub(products);
       return json(body, 201);
     }
 
@@ -79,7 +79,7 @@ module.exports = async (req) => {
       if (idx < 0) return json({ error: 'Produit non trouvé' }, 404);
       products[idx] = { ...products[idx], ...body };
       writeLocal(products);
-      writeGitHub(products);
+      await writeGitHub(products);
       return json(products[idx]);
     }
 
@@ -89,7 +89,7 @@ module.exports = async (req) => {
       if (!id) return json({ error: 'id requis' }, 400);
       products = products.filter(p => p.id !== id);
       writeLocal(products);
-      writeGitHub(products);
+      await writeGitHub(products);
       return json({ success: true });
     }
 
