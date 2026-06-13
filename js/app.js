@@ -7,12 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-const API = '/api/products';
-
 async function loadProducts() {
   try {
-    const res = await fetch(API + '?v=' + Date.now());
-    if (!res.ok) throw new Error('Erreur');
+    const res = await fetch('data/products.json?v=' + Date.now());
     return await res.json();
   } catch (e) {
     console.error('Failed to load products:', e);
@@ -35,20 +32,13 @@ function renderProducts(products, containerId) {
   `).join('');
 }
 
-async function loadSingleProduct(slug) {
-  try {
-    const res = await fetch(API + '?slug=' + encodeURIComponent(slug));
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
-}
-
 async function initProductPage() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
   if (!slug) { document.getElementById('product-name').textContent = 'Produit non trouvé'; return; }
-  const product = await loadSingleProduct(slug);
-  if (product && !product.error) {
+  const products = await loadProducts();
+  const product = products.find(p => p.slug === slug);
+  if (product) {
     document.title = `${product.name} — Oni Knives`;
     document.getElementById('product-image').src = 'images/' + (product.image || 'placeholder.svg');
     document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };

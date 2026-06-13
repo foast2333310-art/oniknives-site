@@ -87,7 +87,6 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     .empty-state { text-align: center; padding: 60px 20px; color: #666; }
     .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
-    .badge { display: inline-block; background: #444; color: #aaa; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
   </style>
 </head>
 <body>
@@ -102,8 +101,9 @@
 
   <div class="container">
     <div class="toolbar">
-      <h2 id="productCount">Gestion des produits <span class="badge" id="countBadge">0</span></h2>
+      <h2>Gestion des produits</h2>
       <div>
+        <button class="btn btn-secondary" onclick="downloadJSON()">Exporter JSON</button>
         <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un produit</button>
       </div>
     </div>
@@ -153,42 +153,42 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="../admin/js/admin-config.js"></script>
   <script>
     if (!sessionStorage.getItem('admin_logged_in')) {
       window.location.href = 'index.html';
     }
 
-    const API = '/api/products';
     let products = [];
 
-    function getAdminKey() {
-      return localStorage.getItem('admin_api_key') || 'default-key-change-me';
-    }
-
-    async function api(path, options = {}) {
-      const headers = { 'Content-Type': 'application/json', ...options.headers };
-      if (options.method && options.method !== 'GET') {
-        headers['x-admin-key'] = getAdminKey();
-      }
-      const res = await fetch(path, { ...options, headers });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur API');
-      return data;
+    function saveProducts() {
+      localStorage.setItem('oni_products', JSON.stringify(products));
     }
 
     async function loadProducts() {
+      const stored = localStorage.getItem('oni_products');
+      if (stored) {
+        try {
+          products = JSON.parse(stored);
+          renderProducts();
+          return;
+        } catch(e) {}
+      }
       try {
-        products = await api(API);
+        const res = await fetch('../data/products.json?v=' + Date.now());
+        if (!res.ok) throw new Error('Erreur chargement');
+        const text = await res.text();
+        products = JSON.parse(text);
+        saveProducts();
         renderProducts();
       } catch (e) {
-        showToast('Erreur chargement: ' + e.message, true);
+        showToast('Erreur de chargement des produits', true);
+        products = [];
+        renderProducts();
       }
     }
 
     function renderProducts() {
       const grid = document.getElementById('productGrid');
-      document.getElementById('countBadge').textContent = products.length;
       if (products.length === 0) {
         grid.innerHTML = '<div class="empty-state"><h3>Aucun produit</h3><p>Cliquez sur "Ajouter un produit" pour commencer.</p></div>';
         return;
@@ -240,7 +240,7 @@
       document.getElementById('productModal').classList.remove('active');
     }
 
-    document.getElementById('productForm').addEventListener('submit', async (e) => {
+    document.getElementById('productForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
       const data = {
@@ -252,31 +252,39 @@
         description: document.getElementById('prodDesc').value.trim()
       };
 
-      try {
-        if (editId) {
-          data.id = parseInt(editId);
-          await api(API, { method: 'PUT', body: JSON.stringify(data) });
-          showToast('Produit modifié ✓');
-        } else {
-          await api(API, { method: 'POST', body: JSON.stringify(data) });
-          showToast('Produit ajouté ✓');
+      if (editId) {
+        const idx = products.findIndex(x => x.id === parseInt(editId));
+        if (idx >= 0) {
+          products[idx] = { ...products[idx], ...data };
         }
-        closeModal();
-        await loadProducts();
-      } catch (e) {
-        showToast('Erreur: ' + e.message, true);
+      } else {
+        data.id = Math.max(0, ...products.map(p => p.id)) + 1;
+        products.push(data);
       }
+
+      saveProducts();
+      renderProducts();
+      closeModal();
+      showToast('Produit enregistré ! Pensez à exporter le JSON.');
     });
 
-    async function deleteProduct(id) {
+    function deleteProduct(id) {
       if (!confirm('Supprimer ce produit ?')) return;
-      try {
-        await api(API + '?id=' + id, { method: 'DELETE' });
-        showToast('Produit supprimé');
-        await loadProducts();
-      } catch (e) {
-        showToast('Erreur: ' + e.message, true);
-      }
+      products = products.filter(p => p.id !== id);
+      saveProducts();
+      renderProducts();
+      showToast('Produit supprimé');
+    }
+
+    function downloadJSON() {
+      const data = JSON.stringify(products, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'products.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('Fichier products.json téléchargé !');
     }
 
     function showToast(msg, isError = false) {
