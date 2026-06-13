@@ -10,7 +10,8 @@ img { max-width: 100%; height: auto; display: block; }
 /* Header */
 .header { background: #111; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; gap: 20px; }
-.logo { font-size: 1.5rem; font-weight: 700; color: #d4a853; letter-spacing: 2px; text-transform: uppercase; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #d4a853; letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; }
+.logo img { height: 40px; display: block; }
 .logo span { color: #e5e5e5; font-weight: 300; }
 .nav { display: flex; gap: 25px; align-items: center; }
 .nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #aaa; transition: color 0.2s; }
