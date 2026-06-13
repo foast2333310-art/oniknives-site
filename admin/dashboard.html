@@ -87,6 +87,12 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     .empty-state { text-align: center; padding: 60px 20px; color: #666; }
     .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+    .badge {
+      position: absolute; top: 8px; padding: 4px 10px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; z-index: 2;
+    }
+    .badge-promo { background: #e74c3c; color: #fff; left: 8px; }
+    .badge-epuise { background: #555; color: #ccc; right: 8px; }
   </style>
 </head>
 <body>
@@ -145,6 +151,17 @@
           <label for="prodDesc">Description</label>
           <textarea id="prodDesc"></textarea>
         </div>
+        <div class="form-group" style="display:flex;gap:24px;">
+          <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="prodEpuise" style="width:auto;"> Épuisé
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="prodPromoCheck" style="width:auto;"> Promo
+          </label>
+          <div id="promoInput" style="display:none;">
+            <label style="color:#ccc;font-size:13px;">-<input type="number" id="prodPromoVal" min="1" max="99" style="width:60px;padding:6px 8px;background:#1a1a1a;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;"> %</label>
+          </div>
+        </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
           <button type="submit" class="btn btn-success">Enregistrer</button>
@@ -182,6 +199,21 @@
       reader.readAsDataURL(file);
     });
 
+    document.getElementById('prodPromoCheck').addEventListener('change', function() {
+      document.getElementById('promoInput').style.display = this.checked ? 'inline-block' : 'none';
+    });
+
+    function promoBadge(v) { return v ? `<span class="badge badge-promo">-${v}%</span>` : ''; }
+    function epuiseBadge(v) { return v ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''; }
+
+    function priceHtml(p, promo) {
+      if (promo) {
+        const reduced = (p * (100 - promo) / 100).toFixed(2);
+        return `<span style="text-decoration:line-through;color:#888;font-size:13px;">${p} €</span> <span style="color:#e74c3c;font-size:18px;">${reduced.replace('.', ',')} €</span>`;
+      }
+      return `<span>${p} €</span>`;
+    }
+
     function renderProducts(products) {
       const grid = document.getElementById('productGrid');
       if (!products || products.length === 0) {
@@ -191,11 +223,13 @@
       grid.innerHTML = products.map(p => {
         const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
         return `
-        <div class="product-card">
+        <div class="product-card" style="position:relative">
+          ${promoBadge(p.promo)}
+          ${epuiseBadge(p.epuise)}
           <img src="${img}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22/%3E%3C/svg%3E'">
           <div class="info">
             <h3>${p.name}</h3>
-            <div class="price">${p.price} €</div>
+            <div class="price">${priceHtml(p.price, p.promo)}</div>
             <div class="cat">${p.category}</div>
             <div class="desc">${p.description || ''}</div>
           </div>
@@ -219,6 +253,10 @@
       document.getElementById('imagePreview').style.display = 'none';
       document.getElementById('uploadProgress').style.display = 'none';
       document.getElementById('prodDesc').value = '';
+      document.getElementById('prodEpuise').checked = false;
+      document.getElementById('prodPromoCheck').checked = false;
+      document.getElementById('prodPromoVal').value = '';
+      document.getElementById('promoInput').style.display = 'none';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -238,6 +276,10 @@
       document.getElementById('imagePreview').style.display = p.image ? 'block' : 'none';
       document.getElementById('previewImg').src = img;
       document.getElementById('prodDesc').value = p.description;
+      document.getElementById('prodEpuise').checked = !!p.epuise;
+      document.getElementById('prodPromoCheck').checked = !!p.promo;
+      document.getElementById('prodPromoVal').value = p.promo || '';
+      document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -259,12 +301,15 @@
       e.preventDefault();
       const editId = document.getElementById('editId').value;
       const imgData = document.getElementById('prodImageData').value;
+      const promoVal = parseInt(document.getElementById('prodPromoVal').value);
       const data = {
         name: document.getElementById('prodName').value.trim(),
         slug: document.getElementById('prodSlug').value.trim(),
         price: parseFloat(document.getElementById('prodPrice').value).toFixed(2),
         category: document.getElementById('prodCategory').value,
         image: imgData,
+        epuise: document.getElementById('prodEpuise').checked,
+        promo: document.getElementById('prodPromoCheck').checked && promoVal > 0 ? promoVal : 0,
         description: document.getElementById('prodDesc').value.trim()
       };
       if (editId) data.id = parseInt(editId);
