@@ -37,7 +37,7 @@ img { max-width: 100%; height: auto; display: block; }
 .section { padding: 60px 0; }
 
 /* Product grid */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
 .product-card { background: #1a1a1a; border-radius: 8px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
 .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
 .product-card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #222; }
