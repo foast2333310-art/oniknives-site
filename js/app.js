@@ -70,7 +70,7 @@ async function initProductPage() {
     const btn = document.getElementById('product-btn');
     if (btn) {
       const effectivePrice = product.promo ? (product.price * (100 - product.promo) / 100).toFixed(2) : product.price;
-      btn.href = `mailto:contact@oniknives.com?subject=Commande : ${product.name}&body=Bonjour, je souhaite commander : ${encodeURIComponent(product.name)} (${effectivePrice} €)`;
+      btn.href = `mailto:oni.knives33@gmail.com?subject=Commande : ${product.name}&body=Bonjour, je souhaite commander : ${encodeURIComponent(product.name)} (${effectivePrice} €)`;
       if (product.epuise) {
         btn.textContent = 'Produit épuisé';
         btn.style.pointerEvents = 'none';
