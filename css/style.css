@@ -37,13 +37,13 @@ img { max-width: 100%; height: auto; display: block; }
 .section { padding: 30px 0; }
 
 /* Product grid */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, 120px); gap: 8px; justify-content: center; }
-.product-card { background: #1a1a1a; border-radius: 4px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
-.product-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 6px; justify-content: center; }
+.product-card { background: #1a1a1a; border-radius: 3px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.product-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.4); }
 .product-card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #222; }
-.product-card-body { padding: 5px 8px 10px; }
-.product-card-title { font-size: 0.7rem; font-weight: 500; margin-bottom: 2px; color: #e5e5e5; }
-.product-card-price { font-size: 0.75rem; color: #d4a853; font-weight: 600; }
+.product-card-body { padding: 4px 6px 8px; }
+.product-card-title { font-size: 0.6rem; font-weight: 500; margin-bottom: 1px; color: #e5e5e5; }
+.product-card-price { font-size: 0.65rem; color: #d4a853; font-weight: 600; }
 .product-card .btn { margin-top: 12px; }
 
 /* Buttons */
@@ -54,13 +54,13 @@ img { max-width: 100%; height: auto; display: block; }
 .btn-outline:hover { background: #d4a853; color: #0d0d0d; }
 
 /* Product detail page */
-.product-detail { display: flex; gap: 20px; padding: 20px 0; align-items: flex-start; }
-.product-detail-img { width: 180px; border-radius: 4px; background: #1a1a1a; }
+.product-detail { display: flex; gap: 14px; padding: 14px 0; align-items: flex-start; }
+.product-detail-img { width: 100px; border-radius: 4px; background: #1a1a1a; }
 .product-detail-info { flex: 1; min-width: 0; }
-.product-detail-info h1 { font-size: 1rem; font-weight: 500; margin-bottom: 4px; }
-.product-detail-price { font-size: 0.9rem; color: #d4a853; font-weight: 600; margin-bottom: 10px; }
-.product-detail-desc { color: #aaa; margin-bottom: 14px; line-height: 1.5; font-size: 0.8rem; }
-.product-detail .btn { padding: 8px 16px; font-size: 0.75rem; display: inline-block; width: auto; }
+.product-detail-info h1 { font-size: 0.85rem; font-weight: 500; margin-bottom: 2px; }
+.product-detail-price { font-size: 0.8rem; color: #d4a853; font-weight: 600; margin-bottom: 6px; }
+.product-detail-desc { color: #aaa; margin-bottom: 8px; line-height: 1.4; font-size: 0.7rem; }
+.product-detail .btn { padding: 5px 12px; font-size: 0.65rem; display: inline-block; width: auto; }
 
 /* Categories */
 .categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 600px; margin: 0 auto; }
