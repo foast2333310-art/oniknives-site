@@ -58,6 +58,27 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   try {
+    // GET /api/images/filename -> sert l'image uploadée
+    if (req.method === 'GET' && req.url.includes('/api/images/')) {
+      const name = path.basename(req.url.split('/api/images/')[1].split('?')[0]);
+      const filePath = imgPath(name);
+      if (fs.existsSync(filePath)) {
+        const ext = path.extname(name).toLowerCase();
+        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.send(fs.readFileSync(filePath)); return;
+      }
+      const repoPath = path.join(process.cwd(), 'images', name);
+      if (fs.existsSync(repoPath)) {
+        const ext = path.extname(name).toLowerCase();
+        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
+        res.send(fs.readFileSync(repoPath)); return;
+      }
+      res.status(404).end(); return;
+    }
+
     // GET /api/products
     if (req.method === 'GET') {
       const products = readLocal();
@@ -69,30 +90,8 @@ module.exports = async (req, res) => {
       res.json(products); return;
     }
 
-    // GET /api/images/filename -> sert l'image uploadée
-    if (req.method === 'GET' && req.url.startsWith('/api/images/')) {
-      const name = path.basename(req.url.replace('/api/images/', ''));
-      const filePath = imgPath(name);
-      if (fs.existsSync(filePath)) {
-        const ext = path.extname(name).toLowerCase();
-        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
-        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
-        res.setHeader('Cache-Control', 'public, max-age=31536000');
-        res.send(fs.readFileSync(filePath)); return;
-      }
-      // Fallback: servir depuis le repo
-      const repoPath = path.join(process.cwd(), 'images', name);
-      if (fs.existsSync(repoPath)) {
-        const ext = path.extname(name).toLowerCase();
-        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
-        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
-        res.send(fs.readFileSync(repoPath)); return;
-      }
-      res.status(404).json({ error: 'not found' }); return;
-    }
-
     // POST /api/upload (upload image)
-    if (req.method === 'POST' && req.url === '/api/upload') {
+    if (req.method === 'POST' && req.url.includes('/api/upload')) {
       const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
       if (!req.headers['x-admin-key'] || req.headers['x-admin-key'] !== ADMIN_KEY) {
         res.status(401).json({ error: 'Non autorisé' }); return;
