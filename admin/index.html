@@ -96,10 +96,6 @@
         <label for="password">Mot de passe</label>
         <input type="password" id="password" placeholder="Entrez le mot de passe" autofocus>
       </div>
-      <div class="form-group">
-        <label for="apiKey">Clé API (ADMIN_API_KEY sur Vercel)</label>
-        <input type="password" id="apiKey" placeholder="Entrez la clé d'API">
-      </div>
       <button type="submit" class="btn">Connexion</button>
       <div class="error" id="errorMsg">Mot de passe incorrect</div>
     </form>
@@ -118,12 +114,11 @@
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const password = document.getElementById('password').value;
-      const apiKey = document.getElementById('apiKey').value;
       const hash = await hashPassword(password);
 
       if (hash === ADMIN_CONFIG.passwordHash) {
         sessionStorage.setItem('admin_logged_in', 'true');
-        localStorage.setItem('admin_api_key', apiKey);
+        localStorage.setItem('admin_api_key', password);
         window.location.href = 'dashboard.html';
       } else {
         document.getElementById('errorMsg').style.display = 'block';
