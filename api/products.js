@@ -2,99 +2,88 @@ const fs = require('fs');
 const path = require('path');
 const DATA_PATH = path.join(process.cwd(), 'data', 'products.json');
 const CACHE_PATH = '/tmp/oni_products.json';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GIT_OWNER = 'foast2333310-art';
-const GIT_REPO = 'oniknives-site';
-const GIT_BRANCH = 'master';
 
 function readLocal() {
-  const p = fs.existsSync(CACHE_PATH) ? CACHE_PATH : DATA_PATH;
-  return JSON.parse(fs.readFileSync(p, 'utf-8'));
+  if (fs.existsSync(CACHE_PATH)) return JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
+  if (fs.existsSync(DATA_PATH)) return JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  return [];
 }
 
 function writeLocal(data) {
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(data));
+  try { fs.writeFileSync(CACHE_PATH, JSON.stringify(data)); } catch {}
 }
 
 async function writeGitHub(data) {
-  if (!GITHUB_TOKEN) return;
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return;
   const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
-  const getRes = await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/data/products.json?ref=${GIT_BRANCH}`, {
-    headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' }
-  });
+  const url = 'https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/products.json';
+  const opts = { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } };
+  const getRes = await fetch(url + '?ref=master', opts);
   let sha = null;
   if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
-  await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/data/products.json`, {
-    method: 'PUT',
-    headers: { Authorization: `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: 'Mise à jour produits', content, sha, branch: GIT_BRANCH })
+  await fetch(url, {
+    method: 'PUT', headers: { ...opts.headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'Mise à jour produits', content, sha, branch: 'master' })
   });
 }
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-  });
-}
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-admin-key');
 
-function cors() {
-  return new Response(null, {
-    headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,x-admin-key' }
-  });
-}
-
-module.exports = async (req) => {
-  if (req.method === 'OPTIONS') return cors();
-
-  if (req.method === 'GET') {
-    try {
-      const products = readLocal();
-      const url = new URL(req.url);
-      const slug = url.searchParams.get('slug');
-      if (slug) return json(products.find(p => p.slug === slug) || { error: 'not found' });
-      return json(products);
-    } catch { return json([], 200); }
-  }
-
-  const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
-  const key = req.headers.get('x-admin-key');
-  if (!key || key !== ADMIN_KEY) return json({ error: 'Non autorisé' }, 401);
+  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   try {
+    if (req.method === 'GET') {
+      const products = readLocal();
+      if (req.query.slug) {
+        const p = products.find(p => p.slug === req.query.slug);
+        if (!p) { res.status(404).json({ error: 'not found' }); return; }
+        res.json(p); return;
+      }
+      res.json(products); return;
+    }
+
+    const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
+    if (!req.headers['x-admin-key'] || req.headers['x-admin-key'] !== ADMIN_KEY) {
+      res.status(401).json({ error: 'Non autorisé' }); return;
+    }
+
     let products = readLocal();
 
     if (req.method === 'POST') {
-      const body = await req.json();
-      body.id = Math.max(0, ...products.map(p => p.id)) + 1;
+      const body = typeof req.body === 'object' ? req.body : JSON.parse(req.body);
+      body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
       products.push(body);
       writeLocal(products);
       await writeGitHub(products);
-      return json(body, 201);
+      res.status(201).json(body); return;
     }
 
     if (req.method === 'PUT') {
-      const body = await req.json();
+      const body = typeof req.body === 'object' ? req.body : JSON.parse(req.body);
       const idx = products.findIndex(p => p.id === body.id);
-      if (idx < 0) return json({ error: 'Produit non trouvé' }, 404);
+      if (idx < 0) { res.status(404).json({ error: 'Produit non trouvé' }); return; }
       products[idx] = { ...products[idx], ...body };
       writeLocal(products);
       await writeGitHub(products);
-      return json(products[idx]);
+      res.json(products[idx]); return;
     }
 
     if (req.method === 'DELETE') {
-      const url = new URL(req.url);
-      const id = parseInt(url.searchParams.get('id'));
-      if (!id) return json({ error: 'id requis' }, 400);
-      products = products.filter(p => p.id !== id);
-      writeLocal(products);
-      await writeGitHub(products);
-      return json({ success: true });
+      const id = parseInt(req.query.id);
+      if (!id) { res.status(400).json({ error: 'id requis' }); return; }
+      const filtered = products.filter(p => p.id !== id);
+      if (filtered.length === products.length) { res.status(404).json({ error: 'Produit non trouvé' }); return; }
+      writeLocal(filtered);
+      await writeGitHub(filtered);
+      res.json({ success: true }); return;
     }
 
-    return json({ error: 'Méthode non supportée' }, 405);
+    res.status(405).json({ error: 'Méthode non supportée' });
   } catch (e) {
-    return json({ error: e.message }, 500);
+    res.status(500).json({ error: e.message });
   }
 };
