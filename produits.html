@@ -27,7 +27,7 @@
   <section class="section">
     <div class="container">
       <h2 class="section-title">Tous les produits</h2>
-      <p class="section-subtitle">Couteaux de cuisine artisanaux et cartes cadeau</p>
+      <p class="section-subtitle">Couteaux de cuisine artisanaux, cartes cadeau et bons d'achat</p>
       <div class="product-grid" id="all-products"></div>
     </div>
   </section>
@@ -54,7 +54,7 @@
     loadProducts().then(products => {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('categorie');
-      const filtered = cat ? products.filter(p => p.category.toLowerCase().replace(/\s+/g, '-') === cat) : products;
+      const filtered = cat ? products.filter(p => p.category.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-') === cat) : products;
       if (filtered.length === 0) {
         document.getElementById('all-products').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#888;">Aucun produit trouvé.</p>';
       } else {

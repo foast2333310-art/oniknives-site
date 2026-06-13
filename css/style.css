@@ -116,6 +116,13 @@ img { max-width: 100%; height: auto; display: block; }
 .modal-body h3 { color:#e5e5e5;font-size:0.9rem;font-weight:600;margin:18px 0 6px;letter-spacing:0.3px; }
 .modal-body p { color:#999;font-size:0.8rem;line-height:1.6;margin-bottom:4px; }
 
+/* Special cards (gift card, voucher) */
+.product-card-special { background: linear-gradient(135deg, #1a1a1a, #222); border: 1px solid #333; }
+.product-card-gift { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: #1a1a1a; }
+.product-card-amounts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.amount-tag { display: inline-block; padding: 2px 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 3px; font-size: 0.7rem; color: #d4a853; font-weight: 500; }
+.amount-tag-lg { padding: 6px 16px; font-size: 0.9rem; border-color: #d4a853; }
+
 /* Mobile */
 @media (max-width: 768px) {
   .nav { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: #0d0d0d; padding: 20px 24px; border-bottom: 1px solid #222; gap: 16px; }
