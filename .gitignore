@@ -1,13 +1,1 @@
-# Node
-node_modules/
-server.js
-server.log
-server.err
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temp
-*.ps1
-!serve.ps1
+node_modules

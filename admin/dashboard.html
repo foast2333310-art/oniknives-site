@@ -20,40 +20,19 @@
       justify-content: space-between;
       border-bottom: 1px solid #333;
     }
-    .header h1 {
-      color: #f0e6d0;
-      font-size: 20px;
-    }
+    .header h1 { color: #f0e6d0; font-size: 20px; }
     .header .links a {
-      color: #c8a87c;
-      text-decoration: none;
-      font-size: 14px;
-      margin-left: 20px;
+      color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px;
     }
     .header .links a:hover { color: #dbb98a; }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px;
-    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px; }
     .toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
     }
-    .toolbar h2 {
-      font-size: 22px;
-      color: #f0e6d0;
-    }
+    .toolbar h2 { font-size: 22px; color: #f0e6d0; }
     .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
+      padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
     }
     .btn:hover { opacity: 0.85; }
     .btn-primary { background: #c8a87c; color: #1a1a1a; }
@@ -61,143 +40,54 @@
     .btn-success { background: #27ae60; color: #fff; }
     .btn-secondary { background: #555; color: #fff; }
     .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
     }
     .product-card {
-      background: #2a2a2a;
-      border-radius: 10px;
-      padding: 16px;
-      border: 1px solid #333;
-      display: flex;
-      flex-direction: column;
+      background: #2a2a2a; border-radius: 10px; padding: 16px;
+      border: 1px solid #333; display: flex; flex-direction: column;
     }
     .product-card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 6px;
-      background: #333;
+      width: 100%; height: 160px; object-fit: cover;
+      border-radius: 6px; background: #333;
     }
-    .product-card .info {
-      flex: 1;
-      padding: 12px 0;
-    }
-    .product-card .info h3 {
-      font-size: 15px;
-      color: #f0e6d0;
-      margin-bottom: 4px;
-    }
-    .product-card .info .price {
-      color: #c8a87c;
-      font-weight: 600;
-      font-size: 16px;
-    }
-    .product-card .info .cat {
-      color: #888;
-      font-size: 12px;
-      margin-top: 2px;
-    }
-    .product-card .info .desc {
-      color: #aaa;
-      font-size: 12px;
-      margin-top: 6px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .product-card .actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .product-card .actions .btn {
-      flex: 1;
-      padding: 8px;
-      font-size: 12px;
-    }
+    .product-card .info { flex: 1; padding: 12px 0; }
+    .product-card .info h3 { font-size: 15px; color: #f0e6d0; margin-bottom: 4px; }
+    .product-card .info .price { color: #c8a87c; font-weight: 600; font-size: 16px; }
+    .product-card .info .cat { color: #888; font-size: 12px; margin-top: 2px; }
+    .product-card .info .desc { color: #aaa; font-size: 12px; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-card .actions { display: flex; gap: 8px; margin-top: 8px; }
+    .product-card .actions .btn { flex: 1; padding: 8px; font-size: 12px; }
     .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;
     }
     .modal-overlay.active { display: flex; }
     .modal {
-      background: #2a2a2a;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 32px;
+      background: #2a2a2a; border-radius: 12px; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto; padding: 32px;
     }
-    .modal h2 {
-      color: #f0e6d0;
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      color: #ccc;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
+    .modal h2 { color: #f0e6d0; font-size: 20px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; color: #ccc; font-size: 13px; margin-bottom: 4px; }
     .form-group input, .form-group textarea, .form-group select {
-      width: 100%;
-      padding: 10px 14px;
-      background: #1a1a1a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
+      width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #444;
+      border-radius: 6px; color: #fff; font-size: 14px; outline: none;
     }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-      border-color: #c8a87c;
-    }
-    .form-group textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #c8a87c; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
     .form-actions .btn { flex: 1; }
     .toast {
-      position: fixed;
-      bottom: 32px;
-      right: 32px;
-      background: #27ae60;
-      color: #fff;
-      padding: 14px 24px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 2000;
-      display: none;
+      position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
+      border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
       animation: slideIn 0.3s ease;
     }
-    .toast.error { background: #e74c3c; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #666;
-    }
+    .toast.success { background: #27ae60; color: #fff; }
+    .toast.error { background: #e74c3c; color: #fff; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
     .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+    .badge { display: inline-block; background: #444; color: #aaa; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
   </style>
 </head>
 <body>
@@ -212,38 +102,14 @@
 
   <div class="container">
     <div class="toolbar">
-      <h2>Gestion des produits</h2>
+      <h2 id="productCount">Gestion des produits <span class="badge" id="countBadge">0</span></h2>
       <div>
-        <button class="btn btn-secondary" onclick="downloadJSON()">Exporter JSON</button>
         <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un produit</button>
-        <button class="btn btn-success" onclick="publishToGitHub()">📤 Publier</button>
-        <button class="btn btn-secondary" onclick="openSettings()">⚙</button>
       </div>
     </div>
     <div id="productGrid" class="product-grid"></div>
   </div>
 
-  <!-- Modal Settings (GitHub Token) -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-      <h2>Configuration GitHub</h2>
-      <p style="color:#aaa;font-size:13px;margin-bottom:16px;">Entrez un <strong>Personal Access Token</strong> GitHub pour publier automatiquement les produits sur le site.</p>
-      <div class="form-group">
-        <label for="githubToken">GitHub Token</label>
-        <input type="password" id="githubToken" placeholder="ghp_...">
-      </div>
-      <p style="color:#888;font-size:12px;margin-bottom:16px;">
-        Créer un token : GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
-        (accès: "Contents" en lecture/écriture sur le repo foast2333310-art/oniknives-site)
-      </p>
-      <div class="form-actions">
-        <button class="btn btn-secondary" onclick="closeSettings()">Fermer</button>
-        <button class="btn btn-success" onclick="saveToken()">Enregistrer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Ajout/Modification -->
   <div class="modal-overlay" id="productModal">
     <div class="modal">
       <h2 id="modalTitle">Ajouter un produit</h2>
@@ -287,50 +153,49 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="../admin/js/admin-config.js"></script>
   <script>
-    // Vérifier connexion
     if (!sessionStorage.getItem('admin_logged_in')) {
       window.location.href = 'index.html';
     }
 
+    const API = '/api/products';
     let products = [];
 
-    function saveProducts() {
-      localStorage.setItem('oni_products', JSON.stringify(products));
+    function getAdminKey() {
+      return localStorage.getItem('admin_api_key') || 'default-key-change-me';
+    }
+
+    async function api(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json', ...options.headers };
+      if (options.method && options.method !== 'GET') {
+        headers['x-admin-key'] = getAdminKey();
+      }
+      const res = await fetch(path, { ...options, headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur API');
+      return data;
     }
 
     async function loadProducts() {
-      const stored = localStorage.getItem('oni_products');
-      if (stored) {
-        try {
-          products = JSON.parse(stored);
-          renderProducts();
-          return;
-        } catch(e) {}
-      }
       try {
-        const res = await fetch('../data/products.json?v=' + Date.now());
-        if (!res.ok) throw new Error('Erreur chargement');
-        const text = await res.text();
-        products = JSON.parse(text);
-        saveProducts();
+        products = await api(API);
         renderProducts();
       } catch (e) {
-        showToast('Erreur de chargement des produits', true);
-        products = [];
-        renderProducts();
+        showToast('Erreur chargement: ' + e.message, true);
       }
     }
 
     function renderProducts() {
       const grid = document.getElementById('productGrid');
+      document.getElementById('countBadge').textContent = products.length;
       if (products.length === 0) {
         grid.innerHTML = '<div class="empty-state"><h3>Aucun produit</h3><p>Cliquez sur "Ajouter un produit" pour commencer.</p></div>';
         return;
       }
       grid.innerHTML = products.map(p => `
         <div class="product-card">
-          <img src="../images/${p.image || 'placeholder.jpg'}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23333%22 width=%22200%22 height=%22200%22/><text fill=%22%23666%22 font-size=%2214%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>Image</text></svg>'">
+          <img src="../images/${p.image || 'placeholder.svg'}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23333%22 width=%22200%22 height=%22200%22/><text fill=%22%23666%22 font-size=%2214%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>Image</text></svg>'">
           <div class="info">
             <h3>${p.name}</h3>
             <div class="price">${p.price} €</div>
@@ -375,7 +240,7 @@
       document.getElementById('productModal').classList.remove('active');
     }
 
-    document.getElementById('productForm').addEventListener('submit', (e) => {
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
       const data = {
@@ -387,45 +252,37 @@
         description: document.getElementById('prodDesc').value.trim()
       };
 
-      if (editId) {
-        const idx = products.findIndex(x => x.id === parseInt(editId));
-        if (idx >= 0) {
-          products[idx] = { ...products[idx], ...data };
+      try {
+        if (editId) {
+          data.id = parseInt(editId);
+          await api(API, { method: 'PUT', body: JSON.stringify(data) });
+          showToast('Produit modifié ✓');
+        } else {
+          await api(API, { method: 'POST', body: JSON.stringify(data) });
+          showToast('Produit ajouté ✓');
         }
-      } else {
-        data.id = Math.max(0, ...products.map(p => p.id)) + 1;
-        products.push(data);
+        closeModal();
+        await loadProducts();
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
       }
-
-      saveProducts();
-      renderProducts();
-      closeModal();
-      showToast('Produit enregistré ! Pensez à exporter le JSON.');
     });
 
-    function deleteProduct(id) {
+    async function deleteProduct(id) {
       if (!confirm('Supprimer ce produit ?')) return;
-      products = products.filter(p => p.id !== id);
-      saveProducts();
-      renderProducts();
-      showToast('Produit supprimé');
-    }
-
-    function downloadJSON() {
-      const data = JSON.stringify(products, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'products.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-      showToast('Fichier products.json téléchargé !');
+      try {
+        await api(API + '?id=' + id, { method: 'DELETE' });
+        showToast('Produit supprimé');
+        await loadProducts();
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
+      }
     }
 
     function showToast(msg, isError = false) {
       const t = document.getElementById('toast');
       t.textContent = msg;
-      t.className = 'toast' + (isError ? ' error' : '');
+      t.className = 'toast ' + (isError ? 'error' : 'success');
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3000);
     }
@@ -435,89 +292,9 @@
       window.location.href = 'index.html';
     });
 
-    // Fermer modal en cliquant dehors
     document.getElementById('productModal').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) closeModal();
     });
-    document.getElementById('settingsModal').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeSettings();
-    });
-
-    // --- GitHub API ---
-    const GIT_OWNER = 'foast2333310-art';
-    const GIT_REPO = 'oniknives-site';
-    const GIT_PATH = 'data/products.json';
-    const GIT_BRANCH = 'master';
-
-    function getToken() { return localStorage.getItem('github_token'); }
-
-    function openSettings() {
-      document.getElementById('githubToken').value = getToken() || '';
-      document.getElementById('settingsModal').classList.add('active');
-    }
-
-    function closeSettings() {
-      document.getElementById('settingsModal').classList.remove('active');
-    }
-
-    function saveToken() {
-      const token = document.getElementById('githubToken').value.trim();
-      localStorage.setItem('github_token', token);
-      closeSettings();
-      showToast('Token GitHub enregistré');
-    }
-
-    async function publishToGitHub() {
-      const token = getToken();
-      if (!token) {
-        showToast('Configurez d\'abord un token GitHub (⚙)', true);
-        openSettings();
-        return;
-      }
-
-      const content = JSON.stringify(products, null, 2);
-
-      try {
-        // 1. Récupérer le fichier actuel (pour obtenir le SHA)
-        const getRes = await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/${GIT_PATH}?ref=${GIT_BRANCH}`, {
-          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-        });
-
-        let sha = null;
-        if (getRes.ok) {
-          const data = await getRes.json();
-          sha = data.sha;
-        } else if (getRes.status !== 404) {
-          const err = await getRes.json();
-          showToast(`Erreur GitHub: ${err.message}`, true);
-          return;
-        }
-
-        // 2. Encoder le contenu en base64
-        const encoded = btoa(unescape(encodeURIComponent(content)));
-
-        // 3. Pusher le nouveau fichier
-        const putRes = await fetch(`https://api.github.com/repos/${GIT_OWNER}/${GIT_REPO}/contents/${GIT_PATH}`, {
-          method: 'PUT',
-          headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-          body: JSON.stringify({
-            message: 'Mise à jour produits depuis admin',
-            content: encoded,
-            sha: sha,
-            branch: GIT_BRANCH
-          })
-        });
-
-        if (putRes.ok) {
-          showToast('✅ Publié ! Le site sera à jour dans 1-2 minutes.');
-        } else {
-          const err = await putRes.json();
-          showToast(`Erreur: ${err.message}`, true);
-        }
-      } catch (e) {
-        showToast(`Erreur réseau: ${e.message}`, true);
-      }
-    }
 
     loadProducts();
   </script>
