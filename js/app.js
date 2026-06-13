@@ -26,7 +26,7 @@ function renderProducts(products, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = products.map(p => {
-    const isSpecial = p.category === 'Carte cadeau' || p.category === 'Bons d\'achat';
+    const isSpecial = p.category === 'Carte cadeau';
     return `
     <a href="produit.html?slug=${p.slug}" class="product-card${isSpecial ? ' product-card-special' : ''}" style="position:relative">
       ${p.promo ? `<span class="badge badge-promo">-${p.promo}%</span>` : ''}
@@ -61,7 +61,7 @@ async function initProductPage() {
   const products = await loadProducts();
   const product = products.find(p => p.slug === slug);
   if (product) {
-    const isSpecial = product.category === 'Carte cadeau' || product.category === 'Bons d\'achat';
+    const isSpecial = product.category === 'Carte cadeau';
     document.title = `${product.name} — Oni Knives`;
     document.getElementById('product-image').src = isSpecial ? '' : imgSrc(product.image);
     document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };

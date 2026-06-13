@@ -137,7 +137,6 @@
           <select id="prodCategory">
             <option value="Couteaux de cuisine">Couteaux de cuisine</option>
             <option value="Carte cadeau">Carte cadeau</option>
-            <option value="Bons d'achat">Bons d'achat</option>
             <option value="Accessoires">Accessoires</option>
           </select>
         </div>
@@ -219,7 +218,7 @@
     });
 
     document.getElementById('prodCategory').addEventListener('change', function() {
-      const show = this.value === 'Carte cadeau' || this.value === "Bons d'achat";
+      const show = this.value === 'Carte cadeau';
       document.getElementById('amountsGroup').style.display = show ? 'block' : 'none';
     });
 
@@ -313,7 +312,7 @@
       document.getElementById('prodPromoVal').value = p.promo || '';
       document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
       const amounts = p.amounts || [];
-      document.getElementById('amountsGroup').style.display = amounts.length || p.category === 'Carte cadeau' || p.category === "Bons d'achat" ? 'block' : 'none';
+      document.getElementById('amountsGroup').style.display = amounts.length || p.category === 'Carte cadeau' ? 'block' : 'none';
       document.getElementById('prodAmounts').value = JSON.stringify(amounts);
       setCheckedAmounts(amounts);
       document.getElementById('productModal').classList.add('active');
