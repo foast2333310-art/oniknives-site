@@ -99,13 +99,14 @@ img { max-width: 100%; height: auto; display: block; }
   .categories { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 480px) {
+  .hero { padding: 50px 0; }
+  .hero h1 { font-size: 1.6rem; }
+}
+
 .badge {
   position: absolute; top: 8px; padding: 4px 10px; border-radius: 4px;
   font-size: 11px; font-weight: 700; z-index: 2; line-height: 1.4;
 }
 .badge-promo { background: #e74c3c; color: #fff; left: 8px; }
 .badge-epuise { background: #555; color: #ccc; right: 8px; }
-  .product-grid { grid-template-columns: 1fr; }
-  .hero { padding: 50px 0; }
-  .hero h1 { font-size: 1.6rem; }
-}
