@@ -5,7 +5,6 @@
     "slug": "couteau-de-cuisine-gyuto-26cm-acier-inox-14c28n",
     "price": "230.00",
     "description": "Couteau de cuisine Gyuto - Acier inox 14C28N, finition brossée, manche bois & résine rouge. Polyvalent, léger et tranchant.",
-    "image": "rn-image_picker_lib_temp_79e8153b-0f0d-444f-a7a2-9186cc64ac62.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -14,7 +13,6 @@
     "slug": "couteau-de-cuisine-gyuto-26-5cm-acier-vg10-suminagashi-67-couches",
     "price": "335.00",
     "description": "Couteau de cuisine Gyuto - Acier VG10 Suminagashi 67 couches, manche bois sombre & résine blanche. Lame damassée aux motifs ondulés.",
-    "image": "rn-image_picker_lib_temp_c7c3ccb4-c97d-4ccb-8bcb-4bc68ce49ed8.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -23,7 +21,6 @@
     "slug": "couteau-de-cuisine-gyuto-28cm-acier-carbone-xc75",
     "price": "230.00",
     "description": "Couteau de cuisine Gyuto - Acier XC75, trempe à l'argile, manche hêtre & ébène. Coupe vive et ressenti brut.",
-    "image": "rn-image_picker_lib_temp_141cffcd-a5ca-4e92-9e5a-7927ad3a0836.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -32,7 +29,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-25cm-14c28n-mancheboisetresine-bleu",
     "price": "280.00",
     "description": "Couteau Kiritsuke en acier 14C28N. Polyvalent, idéal pour les découpes fines et les préparations quotidiennes.",
-    "image": "rn-image_picker_lib_temp_e15d8359-b47c-4cb7-a33d-92b7cda98d04.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -41,7 +37,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-25cm-damas-mancheboisetresine-violet",
     "price": "390.00",
     "description": "Couteau Kiritsuke en acier Damas. Tranchant exceptionnel, équilibre parfait et design raffiné.",
-    "image": "rn-image_picker_lib_temp_b5c4d3b7-0611-42e5-9293-c1d073851b95.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -50,7 +45,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-25cm-vg10-mancheboisetresine-grisetrouge",
     "price": "312.00",
     "description": "Couteau Kiritsuke en acier VG10. Précision, équilibre et élégance pour les travaux de coupe délicats.",
-    "image": "rn-image_picker_lib_temp_dfcb8ae7-0027-4e76-80ef-20056c1aa81f.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -59,7 +53,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-26cm-acier-inox-14c28n-grave",
     "price": "375.00",
     "description": "Couteau Kiritsuke en acier inox 14C28N avec gravure demi-tête de dragon. Manche érable stabilisé bleu.",
-    "image": "rn-image_picker_lib_temp_0ddd4c0e-1846-4974-8dc2-c2c083613595.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -68,7 +61,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-28-cm-acier-carbone-xc75",
     "price": "230.00",
     "description": "Couteau Kiritsuke en acier XC75, trempe à l'argile, manche hêtre & ébène. Coupe précise et réactive.",
-    "image": "rn-image_picker_lib_temp_18e14652-77ed-44b8-b53f-945a9c227218.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -77,7 +69,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-28cm-xc75-stone-wash",
     "price": "180.00",
     "description": "Couteau Kiritsuke en acier XC75, finition Stone Wash, manche hêtre & ébène. Aspect texturé et haut de gamme.",
-    "image": "rn-image_picker_lib_temp_86a8ab02-1124-4211-a90c-eea2fac1108e.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -86,7 +77,6 @@
     "slug": "couteau-de-cuisine-kiritsuke-28cm-14c28n-gravee-hannya",
     "price": "235.00",
     "description": "Couteau Kiritsuke en acier inox 14C28N avec gravure demi-masque Hannya. Manche hêtre & ébène noir.",
-    "image": "rn-image_picker_lib_temp_ebfc761d-cc8f-49aa-ac15-572a5b06925b.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -95,7 +85,6 @@
     "slug": "couteau-de-cuisine-nakiri-28-5cm-acier-inox-14c28n",
     "price": "150.00",
     "description": "Couteau Nakiri en acier inox 14C28N. Spécialisé pour la découpe des légumes. Lame droite et large.",
-    "image": "rn-image_picker_lib_temp_4039380b-0621-4eca-b66f-acd913291401.png",
     "category": "Couteaux de cuisine"
   },
   {
@@ -104,16 +93,6 @@
     "slug": "couteau-de-cuisine-yanagiba-30-cm-acier-inox-14c28n",
     "price": "180.00",
     "description": "Couteau Yanagiba en acier inox 14C28N, finition Splatch Etching. Pour découpes longues et nettes de poisson.",
-    "image": "rn-image_picker_lib_temp_f891b723-9885-4bbe-9167-150817cfbcf2.png",
     "category": "Couteaux de cuisine"
-  },
-  {
-    "name": "efZFR",
-    "slug": "zef",
-    "price": "444.00",
-    "category": "Couteaux de cuisine",
-    "image": "esQDFDSf",
-    "description": "DSFsdfs",
-    "id": 15
   }
 ]

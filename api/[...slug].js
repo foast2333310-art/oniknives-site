@@ -1,15 +1,40 @@
 const fs = require('fs');
 const path = require('path');
+const urlMod = require('url');
 
-function load() {
-  const c = '/tmp/oni_products.json';
-  if (fs.existsSync(c)) return JSON.parse(fs.readFileSync(c, 'utf-8'));
-  const d = path.join(process.cwd(), 'data', 'products.json');
-  if (fs.existsSync(d)) return JSON.parse(fs.readFileSync(d, 'utf-8'));
+function qs(url) {
+  const q = urlMod.parse(url, true).query;
+  return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
+}
+
+function load(force) {
+  if (!force) {
+    try {
+      const c = '/tmp/oni_products.json';
+      if (fs.existsSync(c)) return JSON.parse(fs.readFileSync(c, 'utf-8'));
+    } catch {}
+  }
+  try {
+    const d = path.join(process.cwd(), 'data', 'products.json');
+    if (fs.existsSync(d)) return JSON.parse(fs.readFileSync(d, 'utf-8'));
+  } catch {}
   return [];
 }
 
-function save(data) { fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data)); }
+function save(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
+}
+
+function getBody(req) {
+  return new Promise((res, rej) => {
+    let raw = '';
+    req.on('data', c => raw += c);
+    req.on('end', () => { try { res(JSON.parse(raw)); } catch(e) { rej(new Error('Corps JSON invalide')); } });
+    req.on('error', rej);
+  });
+}
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
 
@@ -20,30 +45,30 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   const url = req.url.split('?')[0];
+  const query = qs(req.url);
   const key = process.env.ADMIN_API_KEY || 'admin123';
 
   try {
-    // === SERVE IMAGES ===
+    // Serve images
     if (url.startsWith('/api/images/')) {
       const name = path.basename(url.replace('/api/images/', ''));
-      for (const dir of ['/tmp/oni_images', path.join(process.cwd(), 'images')]) {
+      const dirs = ['/tmp/oni_images', path.join(process.cwd(), 'images')];
+      for (const dir of dirs) {
         const fp = path.join(dir, name);
         if (fs.existsSync(fp)) {
           const ext = path.extname(name).toLowerCase().replace('.', '');
           res.setHeader('Content-Type', CT[ext] || 'application/octet-stream');
           res.setHeader('Cache-Control', 'public, max-age=86400');
-          res.send(fs.readFileSync(fp)); return;
+          res.end(fs.readFileSync(fp)); return;
         }
       }
       res.status(404).end(); return;
     }
 
-    // === UPLOAD IMAGE ===
+    // Upload image
     if (url === '/api/upload' && req.method === 'POST') {
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
-      let raw = '';
-      await new Promise(r => { req.on('data', c => raw += c); req.on('end', r); });
-      const b = JSON.parse(raw);
+      const b = await getBody(req);
       const safe = path.basename(b.filename);
       const dir = '/tmp/oni_images';
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -51,12 +76,13 @@ module.exports = async (req, res) => {
       res.json({ filename: safe }); return;
     }
 
-    // === PRODUCTS CRUD ===
+    // Products CRUD
     if (url.startsWith('/api/products')) {
       if (req.method === 'GET') {
-        const products = load();
-        if (req.query.slug) {
-          const p = products.find(p => p.slug === req.query.slug);
+        const force = query.seed === 1;
+        const products = load(force);
+        if (query.slug) {
+          const p = products.find(p => p.slug === query.slug);
           if (!p) { res.status(404).json({ error: 'not found' }); return; }
           res.json(p); return;
         }
@@ -65,9 +91,7 @@ module.exports = async (req, res) => {
 
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
 
-      let raw = '';
-      await new Promise(r => { req.on('data', c => raw += c); req.on('end', r); });
-      const body = JSON.parse(raw);
+      const body = await getBody(req);
       let products = load();
 
       if (req.method === 'POST') {
@@ -86,9 +110,8 @@ module.exports = async (req, res) => {
       }
 
       if (req.method === 'DELETE') {
-        const id = parseInt(req.query.id);
-        if (!id) { res.status(400).json({ error: 'id requis' }); return; }
-        products = products.filter(p => p.id !== id);
+        if (!query.id) { res.status(400).json({ error: 'id requis' }); return; }
+        products = products.filter(p => p.id !== query.id);
         save(products);
         res.json({ success: true }); return;
       }
