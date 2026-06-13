@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const DATA_PATH = path.join(process.cwd(), 'data', 'products.json');
 const CACHE_PATH = '/tmp/oni_products.json';
+const IMG_DIR = '/tmp/oni_images';
+
+if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
 function readLocal() {
   if (fs.existsSync(CACHE_PATH)) return JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
@@ -10,8 +13,12 @@ function readLocal() {
 }
 
 function writeLocal(data) {
-  try { fs.writeFileSync(CACHE_PATH, JSON.stringify(data)); } catch {}
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(data));
 }
+
+function imgPath(name) { return path.join(IMG_DIR, name); }
+
+function isImage(name) { return /\.(png|jpg|jpeg|gif|webp)$/i.test(name); }
 
 async function writeGitHub(data) {
   const token = process.env.GITHUB_TOKEN;
@@ -28,6 +35,21 @@ async function writeGitHub(data) {
   });
 }
 
+async function uploadImageToGitHub(filename, buffer) {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return;
+  const content = buffer.toString('base64');
+  const url = `https://api.github.com/repos/foast2333310-art/oniknives-site/contents/images/${filename}`;
+  const opts = { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } };
+  const getRes = await fetch(url + '?ref=master', opts);
+  let sha = null;
+  if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
+  await fetch(url, {
+    method: 'PUT', headers: { ...opts.headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: `Ajout image ${filename}`, content, sha, branch: 'master' })
+  });
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -36,6 +58,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   try {
+    // GET /api/products
     if (req.method === 'GET') {
       const products = readLocal();
       if (req.query.slug) {
@@ -44,6 +67,42 @@ module.exports = async (req, res) => {
         res.json(p); return;
       }
       res.json(products); return;
+    }
+
+    // GET /api/images/filename -> sert l'image uploadée
+    if (req.method === 'GET' && req.url.startsWith('/api/images/')) {
+      const name = path.basename(req.url.replace('/api/images/', ''));
+      const filePath = imgPath(name);
+      if (fs.existsSync(filePath)) {
+        const ext = path.extname(name).toLowerCase();
+        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        res.send(fs.readFileSync(filePath)); return;
+      }
+      // Fallback: servir depuis le repo
+      const repoPath = path.join(process.cwd(), 'images', name);
+      if (fs.existsSync(repoPath)) {
+        const ext = path.extname(name).toLowerCase();
+        const ct = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+        res.setHeader('Content-Type', ct[ext] || 'application/octet-stream');
+        res.send(fs.readFileSync(repoPath)); return;
+      }
+      res.status(404).json({ error: 'not found' }); return;
+    }
+
+    // POST /api/upload (upload image)
+    if (req.method === 'POST' && req.url === '/api/upload') {
+      const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
+      if (!req.headers['x-admin-key'] || req.headers['x-admin-key'] !== ADMIN_KEY) {
+        res.status(401).json({ error: 'Non autorisé' }); return;
+      }
+      const { filename, data: b64data } = typeof req.body === 'object' ? req.body : JSON.parse(req.body);
+      if (!filename || !b64data) { res.status(400).json({ error: 'filename et data requis' }); return; }
+      const buffer = Buffer.from(b64data, 'base64');
+      fs.writeFileSync(imgPath(filename), buffer);
+      uploadImageToGitHub(filename, buffer); // async, ne bloque pas
+      res.json({ filename, url: '/api/images/' + filename }); return;
     }
 
     const ADMIN_KEY = process.env.ADMIN_API_KEY || 'admin123';
