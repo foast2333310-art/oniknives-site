@@ -11,7 +11,7 @@
   {
     "id": 2,
     "name": "Couteau Gyuto 26cm - Acier Inox 14C28N",
-    "slug": "coitea",
+    "slug": "couteau-de-cuisine-gyuto-26cm-acier-inox-14c28n",
     "price": "230.00",
     "description": "Couteau de cuisine Gyuto - Acier inox 14C28N, finition brossée, manche bois & résine rouge. Polyvalent, léger et tranchant.",
     "image": "rn-image_picker_lib_temp_79e8153b-0f0d-444f-a7a2-9186cc64ac62.png",
@@ -29,7 +29,7 @@
   {
     "id": 4,
     "name": "Couteau Gyuto 28cm - Acier Carbone XC75",
-    "slug": "couteau-de-cuisine-gyuto",
+    "slug": "couteau-de-cuisine-gyuto-28cm-acier-carbone-xc75",
     "price": "230.00",
     "description": "Couteau de cuisine Gyuto - Acier XC75, trempe à l'argile, manche hêtre & ébène. Coupe vive et ressenti brut.",
     "image": "rn-image_picker_lib_temp_141cffcd-a5ca-4e92-9e5a-7927ad3a0836.png",
@@ -83,7 +83,7 @@
   {
     "id": 10,
     "name": "Couteau Kiritsuke 28cm - XC75 Stone Wash",
-    "slug": "couteau-de-cuisine-kiritsuke-28cm-acier-carbone-xc75-1",
+    "slug": "couteau-de-cuisine-kiritsuke-28cm-xc75-stone-wash",
     "price": "180.00",
     "description": "Couteau Kiritsuke en acier XC75, finition Stone Wash, manche hêtre & ébène. Aspect texturé et haut de gamme.",
     "image": "rn-image_picker_lib_temp_86a8ab02-1124-4211-a90c-eea2fac1108e.png",
@@ -92,7 +92,7 @@
   {
     "id": 12,
     "name": "Couteau Kiritsuke 28cm - 14C28N Gravée Hannya",
-    "slug": "couteau-de-cuisine-kiritsuke",
+    "slug": "couteau-de-cuisine-kiritsuke-28cm-14c28n-gravee-hannya",
     "price": "235.00",
     "description": "Couteau Kiritsuke en acier inox 14C28N avec gravure demi-masque Hannya. Manche hêtre & ébène noir.",
     "image": "rn-image_picker_lib_temp_ebfc761d-cc8f-49aa-ac15-572a5b06925b.png",

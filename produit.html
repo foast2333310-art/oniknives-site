@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produit — Oni Knives</title>
+  <meta name="description" content="Couteau de cuisine artisanal Oni Knives.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗡️</text></svg>">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Oni <span>Knives</span></a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="product-detail" id="product-detail">
+      <img id="product-image" src="" alt="" class="product-detail-img">
+      <div class="product-detail-info">
+        <h1 id="product-name">Chargement...</h1>
+        <div class="product-detail-price" id="product-price"></div>
+        <p class="product-detail-desc" id="product-description"></p>
+        <a id="product-btn" class="btn btn-primary" href="#">Commander par email</a>
+        <p style="margin-top:12px;font-size:0.8rem;color:#666;">Cliquez pour envoyer une demande de devis</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p>&copy; 2026 Oni Knives — Couteaux de cuisine artisanaux</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>initProductPage();</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Oni Knives</title>
+  <meta name="description" content="Contactez Oni Knives pour toute question ou commande.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗡️</text></svg>">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Oni <span>Knives</span></a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Contactez-nous</h2>
+      <p class="section-subtitle">Une question ? Une commande spéciale ? Écrivez-nous.</p>
+      <form class="contact-form" action="mailto:contact@oniknives.com" method="post" enctype="text/plain">
+        <div class="form-group">
+          <label for="name">Nom</label>
+          <input type="text" id="name" name="nom" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Envoyer</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p>&copy; 2026 Oni Knives — Couteaux de cuisine artisanaux</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
