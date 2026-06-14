@@ -40,30 +40,30 @@ function save(data) {
 function syncToGitHub(data) {
   const token = process.env.GH_TOKEN;
   if (!token) return;
-  const opts = {
-    hostname: 'api.github.com',
-    path: '/repos/foast2333310-art/oniknives-site/contents/data/products.json',
-    method: 'PUT',
-    headers: {
-      'Authorization': 'token ' + token,
-      'Content-Type': 'application/json',
-      'User-Agent': 'oniknives-api'
-    }
-  };
-  const payload = {
-    message: 'sync depuis admin',
-    content: Buffer.from(JSON.stringify(data, null, 2)).toString('base64'),
-    sha: ghSha || undefined
-  };
-  const req = https.request(opts, res => {
+  const path = 'data/products.json';
+  const url = '/repos/foast2333310-art/oniknives-site/contents/' + path;
+  const json = JSON.stringify(data, null, 2);
+  const content = Buffer.from(json).toString('base64');
+  // D'abord récupérer le SHA actuel
+  const getReq = https.request({ hostname: 'api.github.com', path: url, headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api' } }, getRes => {
     let body = '';
-    res.on('data', c => body += c);
-    res.on('end', () => {
-      try { const r = JSON.parse(body); if (r.content) ghSha = r.content.sha; } catch {}
+    getRes.on('data', c => body += c);
+    getRes.on('end', () => {
+      try {
+        const info = JSON.parse(body);
+        const sha = info.sha || undefined;
+        // Ensuite mettre à jour avec le SHA
+        const putReq = https.request({ hostname: 'api.github.com', path: url, method: 'PUT', headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'oniknives-api' } }, putRes => {
+          let b = '';
+          putRes.on('data', c => b += c);
+          putRes.on('end', () => {});
+        });
+        putReq.write(JSON.stringify({ message: 'sync admin', content, sha }));
+        putReq.end();
+      } catch {}
     });
   });
-  req.write(JSON.stringify(payload));
-  req.end();
+  getReq.end();
 }
 
 function getBody(req) {
