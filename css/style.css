@@ -104,7 +104,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* Badges */
 .badge { position: absolute; top: 6px; padding: 3px 8px; border-radius: 2px; font-size: 0.6rem; font-weight: 600; z-index: 2; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.5px; }
 .badge-promo { background: #e74c3c; color: #fff; left: 6px; }
-.badge-epuise { background: #444; color: #aaa; right: 6px; }
+.badge-epuise { background: #e74c3c; color: #fff; right: 6px; }
 
 /* Modal */
 .modal-overlay { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;z-index:9999; }
