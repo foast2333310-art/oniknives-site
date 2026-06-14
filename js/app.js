@@ -73,25 +73,52 @@ async function initProductPage() {
     if (product.epuise) badges.push(`<span class="badge badge-epuise" style="position:static;display:inline-block;">ÉPUISÉ</span>`);
     document.getElementById('product-badges').innerHTML = badges.join('');
 
-    if (isSpecial && product.amounts && product.amounts.length) {
-      document.getElementById('product-price').innerHTML = `<span style="color:#888;font-size:14px;">Montants disponibles</span><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${product.amounts.map(a => `<span class="amount-tag amount-tag-lg">${a.toFixed(2).replace('.', ',')} €</span>`).join('')}</div>`;
-    } else {
-      document.getElementById('product-price').innerHTML = priceHtml(product.price, product.promo);
-    }
-    document.getElementById('product-description').textContent = product.description || '';
     const btn = document.getElementById('product-btn');
-    if (btn) {
-      const effectivePrice = product.promo ? (product.price * (100 - product.promo) / 100).toFixed(2) : product.price;
-      const amtStr = isSpecial && product.amounts && product.amounts.length ? ` (montants disponibles : ${product.amounts.join(', ')} €)` : '';
-      btn.href = `mailto:oni.knives33@gmail.com?subject=Commande : ${product.name}&body=Bonjour, je souhaite commander : ${encodeURIComponent(product.name)} ${encodeURIComponent(amtStr)}(à partir de ${effectivePrice} €)`;
+    if (isSpecial && product.amounts && product.amounts.length) {
+      const fmt = a => a.toFixed(2).replace('.', ',');
+      let selected = product.amounts[0];
+      const amtHtml = product.amounts.map(a => `<span class="amount-tag amount-tag-lg${a === selected ? ' amount-selected' : ''}" data-amount="${a}" onclick="selectAmount(this, ${a})">${fmt(a)} €</span>`).join('');
+      document.getElementById('product-price').innerHTML = `<span style="color:#888;font-size:14px;">Choisissez un montant</span><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${amtHtml}</div>`;
+      function updateBtn(amount) {
+        document.getElementById('selected-amount').textContent = fmt(amount) + ' €';
+        if (btn) {
+          btn.href = `mailto:oni.knives33@gmail.com?subject=Commande : ${product.name} (${fmt(amount)} €)&body=Bonjour, je souhaite commander une carte cadeau Oni Knives d'un montant de ${fmt(amount)} €.`;
+          if (!product.epuise) {
+            btn.textContent = `Commander pour ${fmt(amount)} €`;
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+          }
+        }
+      }
+      const selDiv = document.createElement('div');
+      selDiv.id = 'selected-amount';
+      selDiv.style.cssText = 'color:#d4a853;font-size:1.1rem;font-weight:500;margin-top:6px;';
+      document.getElementById('product-price').appendChild(selDiv);
+      updateBtn(selected);
+      window.selectAmount = function(el, amount) {
+        document.querySelectorAll('.amount-tag-lg').forEach(t => t.classList.remove('amount-selected'));
+        el.classList.add('amount-selected');
+        updateBtn(amount);
+      };
       if (product.epuise) {
         btn.textContent = 'Produit épuisé';
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.5';
-      } else {
-        btn.textContent = 'Commander par email';
-        btn.style.pointerEvents = '';
-        btn.style.opacity = '';
+      }
+    } else {
+      document.getElementById('product-price').innerHTML = priceHtml(product.price, product.promo);
+      if (btn) {
+        const effectivePrice = product.promo ? (product.price * (100 - product.promo) / 100).toFixed(2) : product.price;
+        btn.href = `mailto:oni.knives33@gmail.com?subject=Commande : ${product.name}&body=Bonjour, je souhaite commander : ${encodeURIComponent(product.name)} (${effectivePrice} €)`;
+        if (product.epuise) {
+          btn.textContent = 'Produit épuisé';
+          btn.style.pointerEvents = 'none';
+          btn.style.opacity = '0.5';
+        } else {
+          btn.textContent = 'Commander par email';
+          btn.style.pointerEvents = '';
+          btn.style.opacity = '';
+        }
       }
     }
   } else {
