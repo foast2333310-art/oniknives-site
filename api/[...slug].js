@@ -1,11 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
+const https = require('https');
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
   return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
 }
+
+let ghSha = null;
 
 function load(force) {
   if (!force) {
@@ -16,7 +19,13 @@ function load(force) {
   }
   try {
     const d = path.join(process.cwd(), 'data', 'products.json');
-    if (fs.existsSync(d)) return JSON.parse(fs.readFileSync(d, 'utf-8'));
+    if (fs.existsSync(d)) {
+      const data = JSON.parse(fs.readFileSync(d, 'utf-8'));
+      const dir = '/tmp';
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
+      return data;
+    }
   } catch {}
   return [];
 }
@@ -25,6 +34,36 @@ function save(data) {
   const dir = '/tmp';
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
+  syncToGitHub(data);
+}
+
+function syncToGitHub(data) {
+  const token = process.env.GH_TOKEN;
+  if (!token) return;
+  const opts = {
+    hostname: 'api.github.com',
+    path: '/repos/foast2333310-art/oniknives-site/contents/data/products.json',
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + token,
+      'Content-Type': 'application/json',
+      'User-Agent': 'oniknives-api'
+    }
+  };
+  const payload = {
+    message: 'sync depuis admin',
+    content: Buffer.from(JSON.stringify(data, null, 2)).toString('base64'),
+    sha: ghSha || undefined
+  };
+  const req = https.request(opts, res => {
+    let body = '';
+    res.on('data', c => body += c);
+    res.on('end', () => {
+      try { const r = JSON.parse(body); if (r.content) ghSha = r.content.sha; } catch {}
+    });
+  });
+  req.write(JSON.stringify(payload));
+  req.end();
 }
 
 function getBody(req) {
