@@ -8,8 +8,6 @@ function qs(url) {
   return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
 }
 
-let ghSha = null;
-
 function load(force) {
   if (!force) {
     try {
@@ -30,40 +28,52 @@ function load(force) {
   return [];
 }
 
-function save(data) {
+async function save(data) {
   const dir = '/tmp';
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
-  syncToGitHub(data);
+  await syncToGitHub(data);
 }
 
-function syncToGitHub(data) {
+function httpsGet(url, token) {
+  return new Promise((resolve, reject) => {
+    https.get({ hostname: 'api.github.com', path: url, headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api' } }, res => {
+      let body = '';
+      res.on('data', c => body += c);
+      res.on('end', () => { try { resolve(JSON.parse(body)); } catch {} });
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+function httpsPut(url, token, payload) {
+  return new Promise((resolve, reject) => {
+    const req = https.request({ hostname: 'api.github.com', path: url, method: 'PUT', headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'oniknives-api' } }, res => {
+      let body = '';
+      res.on('data', c => body += c);
+      res.on('end', () => { try { resolve(JSON.parse(body)); } catch {} });
+      res.on('error', reject);
+    });
+    req.on('error', reject);
+    req.write(JSON.stringify(payload));
+    req.end();
+  });
+}
+
+async function syncToGitHub(data) {
   const token = process.env.GH_TOKEN;
   if (!token) return;
-  const path = 'data/products.json';
-  const url = '/repos/foast2333310-art/oniknives-site/contents/' + path;
+  const ghPath = 'data/products.json';
+  const url = '/repos/foast2333310-art/oniknives-site/contents/' + ghPath;
   const json = JSON.stringify(data, null, 2);
   const content = Buffer.from(json).toString('base64');
-  // D'abord récupérer le SHA actuel
-  const getReq = https.request({ hostname: 'api.github.com', path: url, headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api' } }, getRes => {
-    let body = '';
-    getRes.on('data', c => body += c);
-    getRes.on('end', () => {
-      try {
-        const info = JSON.parse(body);
-        const sha = info.sha || undefined;
-        // Ensuite mettre à jour avec le SHA
-        const putReq = https.request({ hostname: 'api.github.com', path: url, method: 'PUT', headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'oniknives-api' } }, putRes => {
-          let b = '';
-          putRes.on('data', c => b += c);
-          putRes.on('end', () => {});
-        });
-        putReq.write(JSON.stringify({ message: 'sync admin', content, sha }));
-        putReq.end();
-      } catch {}
-    });
-  });
-  getReq.end();
+  try {
+    const info = await httpsGet(url, token);
+    const sha = info.sha || undefined;
+    await httpsPut(url, token, { message: 'sync admin', content, sha });
+  } catch (e) {
+    console.error('GitHub sync error:', e.message);
+  }
 }
 
 function getBody(req) {
@@ -136,7 +146,7 @@ module.exports = async (req, res) => {
       if (req.method === 'POST') {
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
-        save(products);
+        await save(products);
         res.status(201).json(body); return;
       }
 
@@ -144,14 +154,14 @@ module.exports = async (req, res) => {
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };
-        save(products);
+        await save(products);
         res.json(products[idx]); return;
       }
 
       if (req.method === 'DELETE') {
         if (!query.id) { res.status(400).json({ error: 'id requis' }); return; }
         products = products.filter(p => p.id !== query.id);
-        save(products);
+        await save(products);
         res.json({ success: true }); return;
       }
     }
