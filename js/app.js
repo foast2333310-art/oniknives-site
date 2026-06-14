@@ -31,10 +31,8 @@ function renderProducts(products, containerId) {
     <a href="produit.html?slug=${p.slug}" class="product-card${isSpecial ? ' product-card-special' : ''}" style="position:relative">
       ${p.promo ? `<span class="badge badge-promo">-${p.promo}%</span>` : ''}
       ${p.epuise ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''}
-      ${isSpecial
-        ? `<div class="product-card-gift">🎁</div>`
-        : `<img src="${imgSrc(p.image)}" alt="${p.name}" class="product-card-img" loading="lazy"
-             onerror="this.src='images/placeholder.svg'">`}
+      <img src="${imgSrc(p.image)}" alt="${p.name}" class="product-card-img" loading="lazy"
+           onerror="this.src='images/placeholder.svg'">
       <div class="product-card-body">
         <div class="product-card-title">${p.name}</div>
         ${isSpecial && p.amounts && p.amounts.length
@@ -63,9 +61,9 @@ async function initProductPage() {
   if (product) {
     const isSpecial = product.category === 'Carte cadeau';
     document.title = `${product.name} — Oni Knives`;
-    document.getElementById('product-image').src = isSpecial ? '' : imgSrc(product.image);
+    document.getElementById('product-image').src = imgSrc(product.image);
     document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };
-    document.getElementById('product-image').style.display = isSpecial ? 'none' : '';
+    document.getElementById('product-image').style.display = '';
     document.getElementById('product-name').textContent = product.name;
 
     const badges = [];
