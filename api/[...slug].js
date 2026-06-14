@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
-const https = require('https');
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
@@ -32,47 +31,25 @@ async function save(data) {
   const dir = '/tmp';
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
-  await syncToGitHub(data);
-}
-
-function httpsGet(url, token) {
-  return new Promise((resolve, reject) => {
-    https.get({ hostname: 'api.github.com', path: url, headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api' } }, res => {
-      let body = '';
-      res.on('data', c => body += c);
-      res.on('end', () => { try { resolve(JSON.parse(body)); } catch {} });
-      res.on('error', reject);
-    }).on('error', reject);
-  });
-}
-
-function httpsPut(url, token, payload) {
-  return new Promise((resolve, reject) => {
-    const req = https.request({ hostname: 'api.github.com', path: url, method: 'PUT', headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'oniknives-api' } }, res => {
-      let body = '';
-      res.on('data', c => body += c);
-      res.on('end', () => { try { resolve(JSON.parse(body)); } catch {} });
-      res.on('error', reject);
-    });
-    req.on('error', reject);
-    req.write(JSON.stringify(payload));
-    req.end();
-  });
-}
-
-async function syncToGitHub(data) {
   const token = process.env.GH_TOKEN;
-  if (!token) return;
-  const ghPath = 'data/products.json';
-  const url = '/repos/foast2333310-art/oniknives-site/contents/' + ghPath;
-  const json = JSON.stringify(data, null, 2);
-  const content = Buffer.from(json).toString('base64');
+  if (token) await syncToGitHub(data, token);
+}
+
+function ghApi(path, token, method, body) {
+  const opts = { headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api' } };
+  if (body) { opts.method = method || 'PUT'; opts.body = JSON.stringify(body); opts.headers['Content-Type'] = 'application/json'; }
+  return fetch('https://api.github.com' + path, opts).then(r => r.json());
+}
+
+async function syncToGitHub(data, token) {
   try {
-    const info = await httpsGet(url, token);
-    const sha = info.sha || undefined;
-    await httpsPut(url, token, { message: 'sync admin', content, sha });
+    const ghPath = '/repos/foast2333310-art/oniknives-site/contents/data/products.json';
+    const json = JSON.stringify(data, null, 2);
+    const content = Buffer.from(json).toString('base64');
+    const info = await ghApi(ghPath, token);
+    await ghApi(ghPath, token, 'PUT', { message: 'sync admin', content, sha: info.sha });
   } catch (e) {
-    console.error('GitHub sync error:', e.message);
+    console.error('GitHub sync failed:', e.message);
   }
 }
 
