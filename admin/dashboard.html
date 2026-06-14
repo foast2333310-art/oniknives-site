@@ -356,6 +356,7 @@
           return `
           <div class="order-card">
             <h3>Commande #${o.id} <span class="order-status ${o.status}">${o.status}</span>
+              ${o.status !== 'payé' ? `<button class="btn btn-primary" style="float:right;padding:4px 12px;font-size:11px;margin-left:6px;" onclick="payOrder(${o.id})">✓ Marquer payé</button>` : ''}
               <button class="btn btn-danger" style="float:right;padding:4px 12px;font-size:11px;" onclick="deleteOrder(${o.id})">Supprimer</button>
             </h3>
             <div class="order-meta">${date} — Total : ${total} €</div>
@@ -444,6 +445,15 @@
     document.getElementById('productModal').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) closeModal();
     });
+
+    async function payOrder(id) {
+      try {
+        const res = await fetch('/api/orders', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }, body: JSON.stringify({ id, status: 'payé' }) });
+        if (!res.ok) throw new Error();
+        loadOrders();
+        showToast('✓ Commande #' + id + ' marquée payée');
+      } catch { showToast('Erreur', true); }
+    }
 
     async function deleteOrder(id) {
       if (!confirm('Supprimer la commande #' + id + ' ?')) return;

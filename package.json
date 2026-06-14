@@ -1,5 +1,7 @@
 {
   "name": "oniknives-site",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "stripe": "^22.2.1"
+  }
 }
