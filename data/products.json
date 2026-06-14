@@ -4,8 +4,9 @@
     "name": "Couteau Gyuto 26cm - Acier Inox 14C28N",
     "slug": "couteau-de-cuisine-gyuto-26cm-acier-inox-14c28n",
     "price": "230.00",
-    "description": "Couteau de cuisine Gyuto - Acier inox 14C28N, finition brossée, manche bois & résine rouge. Polyvalent, léger et tranchant.",
-    "category": "Couteaux de cuisine"
+    "description": "Couteau de cuisine Gyuto - Acier inox 14C28N",
+    "category": "Couteaux de cuisine",
+    "image": "data:image/png;base64,test123"
   },
   {
     "id": 3,
