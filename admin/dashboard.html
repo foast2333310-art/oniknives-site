@@ -93,6 +93,14 @@
     }
     .badge-promo { background: #e74c3c; color: #fff; left: 8px; }
     .badge-epuise { background: #e74c3c; color: #fff; right: 8px; }
+    .order-card { background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .order-card h3 { font-size: 15px; color: #c8a87c; margin-bottom: 6px; }
+    .order-card .order-meta { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .order-card .order-items { font-size: 13px; color: #ccc; margin-bottom: 8px; }
+    .order-card .order-items li { margin-bottom: 4px; }
+    .order-card .order-customer { font-size: 13px; color: #aaa; line-height: 1.5; }
+    .order-status { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .order-status.pending { background: #f39c12; color: #fff; }
   </style>
 </head>
 <body>
@@ -113,6 +121,13 @@
       </div>
     </div>
     <div id="productGrid" class="product-grid"></div>
+  </div>
+
+  <div class="container" style="margin-top:24px;">
+    <div class="toolbar">
+      <h2>Commandes reçues</h2>
+    </div>
+    <div id="ordersGrid"></div>
   </div>
 
   <div class="modal-overlay" id="productModal">
@@ -324,6 +339,34 @@
 
     let products = [];
 
+    async function loadOrders() {
+      try {
+        const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) return;
+        const orders = await res.json();
+        const grid = document.getElementById('ordersGrid');
+        if (!orders || orders.length === 0) {
+          grid.innerHTML = '<div class="empty-state"><h3>Aucune commande</h3></div>';
+          return;
+        }
+        grid.innerHTML = orders.sort((a, b) => b.id - a.id).map(o => {
+          const items = o.items.map(i => `<li>${i.quantity}x ${i.name}${i.amount ? ' — ' + i.amount.toFixed(2).replace('.', ',') + ' €' : ''} — ${(i.price * i.quantity).toFixed(2).replace('.', ',')} €</li>`).join('');
+          const total = o.total.toFixed(2).replace('.', ',');
+          const date = new Date(o.createdAt).toLocaleString('fr-FR');
+          return `
+          <div class="order-card">
+            <h3>Commande #${o.id} <span class="order-status ${o.status}">${o.status}</span></h3>
+            <div class="order-meta">${date} — Total : ${total} €</div>
+            <div class="order-customer">
+              <strong>${o.customer.name}</strong> — ${o.customer.email}${o.customer.phone ? ' — ' + o.customer.phone : ''}<br>
+              ${o.customer.address}${o.customer.message ? '<br>Message : ' + o.customer.message : ''}
+            </div>
+            <ul class="order-items">${items}</ul>
+          </div>`;
+        }).join('');
+      } catch {}
+    }
+
     async function refreshProducts() {
       try {
         const res = await fetch(API);
@@ -401,6 +444,7 @@
     });
 
     refreshProducts();
+    loadOrders();
   </script>
 </body>
 </html>

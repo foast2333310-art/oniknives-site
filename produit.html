@@ -21,6 +21,7 @@
       </nav>
       <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       <a href="admin/" class="admin-icon" title="Administration" aria-label="Administration">⚙</a>
+      <a href="panier.html" class="cart-icon" title="Panier">🛒<span class="cart-count">0</span></a>
     </div>
   </header>
 
@@ -32,8 +33,9 @@
         <div id="product-badges" style="margin-bottom:8px;"></div>
         <div class="product-detail-price" id="product-price"></div>
         <p class="product-detail-desc" id="product-description"></p>
-        <a id="product-btn" class="btn btn-primary" href="#">Commander par email</a>
-        <p style="margin-top:12px;font-size:0.8rem;color:#666;">Cliquez pour envoyer une demande de devis</p>
+        <a id="product-btn" class="btn btn-primary" href="#" style="display:none">Commander par email</a>
+        <button id="product-cart-btn" class="cart-btn" style="font-size:1rem;padding:12px 24px;">Ajouter au panier</button>
+        <a id="product-cart-link" href="panier.html" style="display:none;margin-top:8px;font-size:0.85rem;color:#888;">Voir le panier →</a>
       </div>
     </div>
   </div>
@@ -55,6 +57,7 @@
     </div>
   </footer>
 
+  <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>initProductPage();</script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">

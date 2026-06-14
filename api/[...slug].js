@@ -7,6 +7,30 @@ function qs(url) {
   return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
 }
 
+function loadOrders() {
+  try {
+    const f = '/tmp/oni_orders.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  try {
+    const f = path.join(process.cwd(), 'data', 'orders.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_orders.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return [];
+}
+
+async function saveOrders(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_orders.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) await syncToGitHub(data, token, 'data/orders.json');
+}
+
 function load(force) {
   if (!force) {
     try {
@@ -41,13 +65,13 @@ function ghApi(path, token, method, body) {
   return fetch('https://api.github.com' + path, opts).then(r => r.json());
 }
 
-async function syncToGitHub(data, token) {
+async function syncToGitHub(data, token, filePath) {
   try {
-    const ghPath = '/repos/foast2333310-art/oniknives-site/contents/data/products.json';
+    const ghPath = '/repos/foast2333310-art/oniknives-site/contents/' + (filePath || 'data/products.json');
     const json = JSON.stringify(data, null, 2);
     const content = Buffer.from(json).toString('base64');
     const info = await ghApi(ghPath, token);
-    await ghApi(ghPath, token, 'PUT', { message: 'sync admin', content, sha: info.sha });
+    await ghApi(ghPath, token, 'PUT', { message: 'sync ' + (filePath || 'products'), content, sha: info.sha });
   } catch (e) {
     console.error('GitHub sync failed:', e.message);
   }
@@ -140,6 +164,24 @@ module.exports = async (req, res) => {
         products = products.filter(p => p.id !== query.id);
         await save(products);
         res.json({ success: true }); return;
+      }
+    }
+
+    // Orders
+    if (url === '/api/orders') {
+      if (req.method === 'POST') {
+        const body = await getBody(req);
+        let orders = loadOrders();
+        body.id = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+        body.status = 'pending';
+        body.createdAt = new Date().toISOString();
+        orders.push(body);
+        await saveOrders(orders);
+        res.status(201).json({ success: true, id: body.id }); return;
+      }
+      if (req.method === 'GET') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        res.json(loadOrders()); return;
       }
     }
 

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panier — Oni Knives</title>
+  <meta name="description" content="Votre panier Oni Knives.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗡️</text></svg>">
+  <style>
+    .cart-page { padding: 40px 0; min-height: 60vh; }
+    .cart-empty { text-align: center; padding: 60px 0; color: #888; }
+    .cart-empty h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #e5e5e5; margin-bottom: 8px; }
+    .cart-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .cart-item { display: flex; gap: 16px; background: #1a1a1a; border-radius: 6px; padding: 16px; align-items: center; }
+    .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; background: #222; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 500; font-size: 0.9rem; }
+    .cart-item-price { color: #c8a87c; font-size: 0.9rem; margin-top: 2px; }
+    .cart-item-actions { display: flex; align-items: center; gap: 8px; }
+    .cart-item-actions input { width: 50px; padding: 4px 8px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #fff; text-align: center; font-size: 0.85rem; }
+    .cart-item-remove { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem; padding: 4px 8px; }
+    .cart-item-remove:hover { text-decoration: underline; }
+    .cart-total { text-align: right; font-size: 1.2rem; padding: 16px 0; border-top: 1px solid #222; }
+    .cart-total strong { color: #c8a87c; }
+    .checkout-form { max-width: 500px; margin-top: 32px; }
+    .checkout-form h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 16px; }
+    .checkout-form .form-group { margin-bottom: 12px; }
+    .checkout-form label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 4px; }
+    .checkout-form input, .checkout-form textarea { width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 0.9rem; outline: none; }
+    .checkout-form input:focus, .checkout-form textarea:focus { border-color: #c8a87c; }
+    .checkout-form textarea { min-height: 80px; resize: vertical; }
+    .checkout-submit { margin-top: 16px; }
+    #order-confirmation { display: none; text-align: center; padding: 40px; background: #1a1a1a; border-radius: 8px; margin-top: 24px; }
+    #order-confirmation h3 { color: #27ae60; font-size: 1.2rem; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="top-banner">Livraison gratuite en France 🇫🇷</div>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><img src="images/logo.png" alt="Oni Knives"></a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <a href="admin/" class="admin-icon" title="Administration" aria-label="Administration">⚙</a>
+      <a href="panier.html" class="cart-icon" title="Panier">🛒<span class="cart-count">0</span></a>
+    </div>
+  </header>
+
+  <section class="section cart-page">
+    <div class="container">
+      <h2 class="section-title">Votre panier</h2>
+
+      <div id="cart-empty" class="cart-empty" style="display:none;">
+        <h2>Votre panier est vide</h2>
+        <p>Découvrez nos couteaux de cuisine artisanaux.</p>
+        <a href="produits.html" class="hero-cta" style="margin-top:20px;">Voir les produits</a>
+      </div>
+
+      <div id="cart-content" style="display:none;">
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-total">Total : <strong id="cart-total">0,00 €</strong></div>
+
+        <div class="checkout-form" id="checkout-form">
+          <h3>Informations de livraison</h3>
+          <div class="form-group">
+            <label for="order-name">Nom complet</label>
+            <input type="text" id="order-name" placeholder="Votre nom" required>
+          </div>
+          <div class="form-group">
+            <label for="order-email">Email</label>
+            <input type="email" id="order-email" placeholder="votre@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="order-phone">Téléphone</label>
+            <input type="tel" id="order-phone" placeholder="06 12 34 56 78">
+          </div>
+          <div class="form-group">
+            <label for="order-address">Adresse de livraison</label>
+            <textarea id="order-address" placeholder="Rue, code postal, ville..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="order-message">Message (optionnel)</label>
+            <textarea id="order-message" placeholder="Instructions particulières..."></textarea>
+          </div>
+          <p style="font-size:0.8rem;color:#666;margin-top:4px;">Aucun paiement en ligne — nous vous contacterons pour finaliser la commande.</p>
+          <button class="cart-btn checkout-submit" onclick="submitOrder()" style="font-size:0.9rem;padding:12px 36px;">Commander</button>
+        </div>
+
+        <div id="order-confirmation">
+          <h3>✓ Commande envoyée !</h3>
+          <p style="color:#888;">Nous vous contacterons rapidement par email pour finaliser.</p>
+          <a href="produits.html" class="hero-cta" style="margin-top:20px;">Continuer mes achats</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-social">
+        <a href="https://www.tiktok.com/@oni_knives" target="_blank" rel="noopener" title="TikTok">♪</a>
+        <a href="mailto:oni.knives33@gmail.com" title="Email">✉</a>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+        <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">Mentions légales</a>
+      </div>
+      <p>&copy; 2026 Oni Knives — Lorenzo Lo Cunsolo — SIREN 944 111 657</p>
+    </div>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const empty = document.getElementById('cart-empty');
+      const content = document.getElementById('cart-content');
+      const items = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+
+      if (cart.length === 0) {
+        empty.style.display = '';
+        content.style.display = 'none';
+        return;
+      }
+      empty.style.display = 'none';
+      content.style.display = '';
+      document.getElementById('checkout-form').style.display = '';
+      document.getElementById('order-confirmation').style.display = 'none';
+
+      items.innerHTML = cart.map(item => {
+        const img = item.image && item.image.startsWith('data:') ? item.image : '/api/images/' + (item.image || '');
+        return `
+        <div class="cart-item">
+          <img src="${img}" alt="${item.name}" onerror="this.src='images/placeholder.svg'">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}${item.amount ? ' — ' + item.amount.toFixed(2).replace('.', ',') + ' €' : ''}</div>
+            <div class="cart-item-price">${item.price.toFixed(2).replace('.', ',')} €</div>
+          </div>
+          <div class="cart-item-actions">
+            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity('${item.key}', this.value); renderCart();" style="width:50px;">
+            <button class="cart-item-remove" onclick="removeFromCart('${item.key}'); renderCart();">Supprimer</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      const total = getCartTotal();
+      totalEl.textContent = total.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    async function submitOrder() {
+      const cart = getCart();
+      if (cart.length === 0) return;
+
+      const name = document.getElementById('order-name').value.trim();
+      const email = document.getElementById('order-email').value.trim();
+      const phone = document.getElementById('order-phone').value.trim();
+      const address = document.getElementById('order-address').value.trim();
+
+      if (!name || !email || !address) {
+        showToast('Veuillez remplir les champs obligatoires');
+        return;
+      }
+
+      const btn = document.querySelector('.checkout-submit');
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours...';
+
+      try {
+        const data = {
+          items: cart,
+          customer: { name, email, phone, address, message: document.getElementById('order-message').value.trim() },
+          total: getCartTotal()
+        };
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error();
+        localStorage.removeItem('oni_cart');
+        updateCartCount();
+        document.getElementById('checkout-form').style.display = 'none';
+        document.getElementById('order-confirmation').style.display = '';
+        renderCart();
+      } catch {
+        showToast('Erreur lors de l\'envoi de la commande');
+        btn.disabled = false;
+        btn.textContent = 'Commander';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+<div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
+    <h2>Informations légales</h2>
+    <div class="modal-body">
+
+      <h3>⚖️ Mentions légales</h3>
+      <p><strong>Oni Knives</strong> – Lorenzo Lo Cunsolo<br>
+      Entrepreneur individuel – SIREN 944 111 657<br>
+      60 Rue François 1er – 75008 Paris (France)<br>
+      Email : oni.knives33@gmail.com<br>
+      TVA non applicable – art. 293 B du CGI</p>
+
+      <h3>🧾 Conditions Générales de Vente</h3>
+      <p><strong>Produits :</strong> Couteaux artisanaux fabriqués à la main en France. Chaque pièce étant unique, de légères variations peuvent exister.</p>
+      <p><strong>Prix :</strong> En euros TTC (TVA non applicable – art. 293 B du CGI). Les tarifs en vigueur au jour de la commande font foi.</p>
+      <p><strong>Commandes :</strong> Fermes et définitives après validation. Règlement sur stand (espèces/carte/virement) ou en ligne.</p>
+      <p><strong>Délais :</strong> Chaque couteau étant fabriqué à la main, un délai de fabrication s'applique (précisé lors de la commande).</p>
+      <p><strong>Droit de rétractation :</strong> 14 jours (art. L221-18 du Code de la consommation). Ne s'applique pas aux produits personnalisés (art. L221-28).</p>
+      <p><strong>Garantie :</strong> Garantie légale de conformité (art. L217-4 et suivants) et garantie contre les vices cachés. Toute utilisation inappropriée annule la garantie.</p>
+      <p><strong>Médiation :</strong> CM2C – 49 rue de Ponthieu, 75008 Paris – cm2c.net – litiges@cm2c.net</p>
+
+      <h3>🔒 Politique de confidentialité</h3>
+      <p><strong>Responsable du traitement :</strong> Oni Knives – Lorenzo Lo Cunsolo – SIREN 944 111 657 – oni.knives33@gmail.com</p>
+      <p><strong>Données collectées :</strong> Nom, prénom, adresse, email, téléphone, informations de livraison/facturation, historique commandes. Aucune donnée sans consentement explicite.</p>
+      <p><strong>Finalités :</strong> Traitement et expédition des commandes, gestion des paiements, communication client, obligations légales et comptables.</p>
+      <p><strong>Destinataires :</strong> Exclusivement Oni Knives. Jamais vendues ni transmises à des tiers (hors prestataires techniques nécessaires).</p>
+      <p><strong>Durée de conservation :</strong> 5 ans pour les commandes/factures, 12 mois pour les messages de contact.</p>
+      <p><strong>Vos droits :</strong> Accès, rectification, effacement, limitation, opposition, portabilité. Exercice par email à oni.knives33@gmail.com. Réponse sous 30 jours.</p>
+
+      <h3>🔁 Politique de retour et remboursement</h3>
+      <p><strong>Droit de rétractation :</strong> 14 jours à compter de la réception (art. L221-18). Le client doit informer Oni Knives par email avant tout renvoi.</p>
+      <p><strong>Exceptions :</strong> Les produits fabriqués sur mesure ou personnalisés ne peuvent être retournés ni remboursés.</p>
+      <p><strong>Conditions :</strong> Produits neufs, non utilisés, dans leur emballage d'origine. Frais de retour à la charge du client.</p>
+      <p><strong>Remboursement :</strong> Sous 14 jours après réception et inspection, via le même moyen de paiement.</p>
+      <p><strong>Produits défectueux :</strong> Informer Oni Knives dans les 48h avec photos. Échange, réparation ou remboursement selon le cas.</p>
+
+      <h3>📦 Politique d'expédition</h3>
+      <p><strong>Préparation :</strong> Produits en stock : 3-5 jours ouvrés. Couteaux sur mesure : 2 à 6 semaines.</p>
+      <p><strong>Transporteurs :</strong> La Poste / Colissimo (suivi avec signature) ou Mondial Relay.</p>
+      <p><strong>Zone :</strong> France métropolitaine uniquement.</p>
+      <p><strong>Réception :</strong> Vérifier l'état du colis, signaler toute anomalie au transporteur et à Oni Knives dans les 48h.</p>
+      <p><strong>Retours :</strong> Contacter oni.knives33@gmail.com avant tout retour. L'adresse de retour est communiquée par email après accord.</p>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -25,6 +25,11 @@ img { max-width: 100%; height: auto; display: block; }
 
 .admin-icon { font-size: 1rem; text-decoration: none; opacity: 0.25; transition: opacity 0.2s; line-height: 1; padding: 4px; }
 .admin-icon:hover { opacity: 0.7; }
+.cart-icon { font-size: 1.1rem; text-decoration: none; position: relative; padding: 4px; line-height: 1; }
+.cart-count { position: absolute; top: -2px; right: -6px; background: #e74c3c; color: #fff; font-size: 0.6rem; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; padding: 0 4px; }
+.cart-btn { display: inline-block; padding: 8px 18px; background: #c8a87c; color: #0d0d0d; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; }
+.cart-btn:hover { background: #dbb98a; color: #0d0d0d; }
+.cart-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Hero */
 .hero { padding: 80px 0; text-align: center; position: relative; overflow: hidden; }
