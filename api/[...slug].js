@@ -183,6 +183,13 @@ module.exports = async (req, res) => {
         if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
         res.json(loadOrders()); return;
       }
+      if (req.method === 'DELETE') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        if (!query.id) { res.status(400).json({ error: 'id requis' }); return; }
+        let orders = loadOrders().filter(o => o.id !== query.id);
+        await saveOrders(orders);
+        res.json({ success: true }); return;
+      }
     }
 
     res.status(404).json({ error: 'Not found' });

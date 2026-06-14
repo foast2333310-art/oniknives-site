@@ -355,7 +355,9 @@
           const date = new Date(o.createdAt).toLocaleString('fr-FR');
           return `
           <div class="order-card">
-            <h3>Commande #${o.id} <span class="order-status ${o.status}">${o.status}</span></h3>
+            <h3>Commande #${o.id} <span class="order-status ${o.status}">${o.status}</span>
+              <button class="btn btn-danger" style="float:right;padding:4px 12px;font-size:11px;" onclick="deleteOrder(${o.id})">Supprimer</button>
+            </h3>
             <div class="order-meta">${date} — Total : ${total} €</div>
             <div class="order-customer">
               <strong>${o.customer.name}</strong> — ${o.customer.email}${o.customer.phone ? ' — ' + o.customer.phone : ''}<br>
@@ -442,6 +444,16 @@
     document.getElementById('productModal').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) closeModal();
     });
+
+    async function deleteOrder(id) {
+      if (!confirm('Supprimer la commande #' + id + ' ?')) return;
+      try {
+        const res = await fetch('/api/orders?id=' + id, { method: 'DELETE', headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        loadOrders();
+        showToast('Commande #' + id + ' supprimée');
+      } catch { showToast('Erreur suppression', true); }
+    }
 
     refreshProducts();
     loadOrders();
