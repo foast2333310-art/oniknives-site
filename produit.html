@@ -32,10 +32,29 @@
         <h1 id="product-name">Chargement...</h1>
         <div id="product-badges" style="margin-bottom:8px;"></div>
         <div class="product-detail-price" id="product-price"></div>
-        <p class="product-detail-desc" id="product-description"></p>
         <a id="product-btn" class="btn btn-primary" href="#" style="display:none">Commander par email</a>
         <button id="product-cart-btn" class="cart-btn" style="font-size:1rem;padding:12px 24px;">Ajouter au panier</button>
         <a id="product-cart-link" href="panier.html" style="display:none;margin-top:8px;font-size:0.85rem;color:#888;">Voir le panier →</a>
+        <div class="product-tabs">
+          <div class="product-tabs-nav">
+            <button class="active" onclick="switchTab(this,'desc')">Description</button>
+            <button onclick="switchTab(this,'details')">Détails</button>
+            <button onclick="switchTab(this,'livraison')">Livraison</button>
+          </div>
+          <div class="product-tab-content active" id="tab-desc"><span id="product-description"></span></div>
+          <div class="product-tab-content" id="tab-details">
+            <ul>
+              <li>Fait main en France</li>
+              <li>Acier inoxydable haut de gamme</li>
+              <li>Trempe et affûtage artisanaux</li>
+              <li>Manche en bois et résine époxy</li>
+              <li>Livré avec étui de protection</li>
+            </ul>
+          </div>
+          <div class="product-tab-content" id="tab-livraison">
+            <p>Livraison gratuite en France métropolitaine. Délai de préparation : 3-5 jours ouvrés pour les articles en stock, 2 à 6 semaines pour les créations sur mesure. Colissimo suivi avec signature.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -59,7 +78,15 @@
 
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
-  <script>initProductPage();</script>
+  <script>
+    function switchTab(btn, id) {
+      btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.product-tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+    }
+    initProductPage();
+  </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
