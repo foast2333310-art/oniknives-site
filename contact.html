@@ -30,11 +30,10 @@
       <h2 class="section-title">Contactez-nous</h2>
       <p class="section-subtitle">Une question ? Un projet ? Parlons-en.</p>
       <div class="contact-info">
-        <p>📧 <strong>Email :</strong> oni.knives33@gmail.com</p>
-        <p>✉️ <strong>Email :</strong> oni.knives33@gmail.com</p>
+        <p>📧 <strong>Email :</strong> lacorposite@gmail.com</p>
         <p>💳 <strong>Paiement :</strong> PayPal · RIB</p>
       </div>
-      <form class="contact-form" action="mailto:oni.knives33@gmail.com" method="post" enctype="text/plain">
+      <form class="contact-form" id="contactForm">
         <div class="form-group">
           <label for="name">Pseudo / Nom</label>
           <input type="text" id="name" name="nom" required>
@@ -48,6 +47,7 @@
           <textarea id="message" name="message" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;">Envoyer</button>
+        <div id="contactSuccess" style="display:none;text-align:center;padding:20px;color:#27ae60;">✓ Message envoyé !</div>
       </form>
     </div>
   </section>
@@ -56,7 +56,7 @@
     <div class="container">
       <div class="footer-social">
         <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" title="Discord">💬</a>
-        <a href="mailto:oni.knives33@gmail.com" title="Email">✉</a>
+        <a href="mailto:lacorposite@gmail.com" title="Email">✉</a>
       </div>
       <div class="footer-links">
         <a href="index.html">Accueil</a>
@@ -71,6 +71,26 @@
 
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message })
+        });
+        if (res.ok) {
+          document.getElementById('contactSuccess').style.display = 'block';
+          this.querySelector('button[type=submit]').style.display = 'none';
+          this.querySelectorAll('input, textarea').forEach(el => el.disabled = true);
+        }
+      } catch {}
+    });
+  </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>

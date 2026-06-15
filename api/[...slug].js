@@ -414,6 +414,33 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Contact
+    if (url === '/api/contact' && req.method === 'POST') {
+      const body = await getBody(req);
+      const webhook = process.env.DISCORD_WEBHOOK_URL;
+      if (webhook) {
+        fetch(webhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: '',
+            embeds: [{
+              title: '📬 Nouveau message de contact',
+              color: 0xc8a87c,
+              fields: [
+                { name: 'Nom', value: body.name || '—', inline: true },
+                { name: 'Email', value: body.email || '—', inline: true },
+                { name: 'Message', value: body.message || '—' }
+              ],
+              timestamp: new Date().toISOString()
+            }]
+          })
+        }).catch(() => {});
+      }
+      res.status(200).json({ success: true });
+      return;
+    }
+
     res.status(404).json({ error: 'Not found' });
   } catch (e) {
     res.status(500).json({ error: e.message });
