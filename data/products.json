@@ -60,15 +60,15 @@
     "badge": "🚗"
   },
   {
-    "name": "sqfhqsg",
-    "slug": "qsgfdghqfdg",
-    "price": "44.00",
-    "category": "fdgqgqfdgqdf",
+    "name": "TEST",
+    "slug": "TEST",
+    "price": "0.00",
+    "category": "Bots Discord",
     "image": "",
     "epuise": false,
     "promo": 0,
-    "badge": "qfdg",
-    "description": "qdfg",
+    "badge": "TEST",
+    "description": "TEST",
     "id": 5
   }
 ]
