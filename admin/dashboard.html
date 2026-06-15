@@ -59,6 +59,17 @@
     .dash-card .icon { font-size: 32px; margin-bottom: 12px; }
     .dash-card h3 { font-size: 18px; color: #f0e6d0; margin-bottom: 6px; }
     .dash-card p { color: #888; font-size: 13px; line-height: 1.5; }
+
+    .reviews-section { margin-top: 48px; text-align: left; }
+    .reviews-section h3 { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .review-row { background: #2a2a2a; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #333; }
+    .review-row .info { flex: 1; }
+    .review-row .name { color: #c8a87c; font-weight: 600; font-size: 13px; }
+    .review-row .stars { color: #d4a853; font-size: 14px; }
+    .review-row .comment { color: #aaa; font-size: 12px; margin-top: 2px; }
+    .review-row .date { color: #555; font-size: 11px; }
+    .btn-del { background: none; border: 1px solid #c0392b; color: #c0392b; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-del:hover { background: #c0392b; color: #fff; }
   </style>
 </head>
 <body>
@@ -96,6 +107,11 @@
         <h3>Commandes</h3>
         <p>Consulter les commandes reçues<br>Marquer comme payées ou les supprimer</p>
       </a>
+    </div>
+
+    <div class="reviews-section">
+      <h3>⭐ Avis clients</h3>
+      <div id="reviewsList"></div>
     </div>
   </div>
 
@@ -162,6 +178,46 @@
     });
 
     loadStats();
+    loadReviews();
+
+    async function loadReviews() {
+      try {
+        const res = await fetch('/api/reviews?all=1');
+        const reviews = await res.json();
+        const el = document.getElementById('reviewsList');
+        if (!reviews || reviews.length === 0) {
+          el.innerHTML = '<div style="color:#666;font-size:13px;">Aucun avis pour le moment.</div>';
+          return;
+        }
+        el.innerHTML = reviews.map(r => {
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const date = new Date(r.createdAt).toLocaleDateString('fr-FR');
+          return `<div class="review-row">
+            <div class="info">
+              <div><span class="name">${r.name}</span> <span class="stars">${stars}</span></div>
+              <div class="comment">${r.comment}</div>
+              <div class="date">${date}</div>
+            </div>
+            <button class="btn-del" onclick="deleteReview(${r.id})">Supprimer</button>
+          </div>`;
+        }).join('');
+      } catch {}
+    }
+
+    async function deleteReview(id) {
+      if (!confirm('Supprimer cet avis ?')) return;
+      try {
+        const res = await fetch('/api/reviews', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify({ id })
+        });
+        if (!res.ok) throw new Error();
+        loadReviews();
+      } catch {
+        alert('Erreur lors de la suppression');
+      }
+    }
   </script>
 </body>
 </html>

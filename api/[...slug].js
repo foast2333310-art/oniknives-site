@@ -15,11 +15,24 @@ function qs(url) {
   return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
 }
 
-function loadOrders() {
+async function loadOrders() {
   try {
     const f = '/tmp/oni_orders.json';
     if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
   } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/orders.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fs.writeFileSync('/tmp/oni_orders.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
   try {
     const f = path.join(process.cwd(), 'data', 'orders.json');
     if (fs.existsSync(f)) {
@@ -117,11 +130,24 @@ function getRawBody(req) {
   });
 }
 
-function loadReviews() {
+async function loadReviews() {
   try {
     const f = '/tmp/oni_reviews.json';
     if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
   } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/reviews.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fs.writeFileSync('/tmp/oni_reviews.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
   try {
     const f = path.join(process.cwd(), 'data', 'reviews.json');
     if (fs.existsSync(f)) {
@@ -255,7 +281,7 @@ module.exports = async (req, res) => {
       if (!getStripe()) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
       const body = await getBody(req);
 
-      let orders = loadOrders();
+      let orders = await loadOrders();
       const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
       const order = {
         id: orderId,
@@ -305,7 +331,7 @@ module.exports = async (req, res) => {
         }
 
         const orderId = parseInt(session.metadata.orderId);
-        let orders = loadOrders();
+        let orders = await loadOrders();
         const idx = orders.findIndex(o => o.id === orderId);
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
@@ -338,7 +364,7 @@ module.exports = async (req, res) => {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         const orderId = parseInt(session.metadata.orderId);
-        let orders = loadOrders();
+        let orders = await loadOrders();
         const idx = orders.findIndex(o => o.id === orderId);
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
@@ -354,10 +380,10 @@ module.exports = async (req, res) => {
 
     // Public stats
     if (url === '/api/stats' && req.method === 'GET') {
-      const orders = loadOrders();
+      const orders = await loadOrders();
       const paid = orders.filter(o => o.status === 'payé');
       const totalVentes = paid.length;
-      const reviews = loadReviews();
+      const reviews = await loadReviews();
       const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : 0;
       res.json({ totalVentes, avgRating: Math.round(avgRating * 10) / 10, reviewCount: reviews.length });
       return;
@@ -365,7 +391,7 @@ module.exports = async (req, res) => {
 
     // Reviews
     if (url === '/api/reviews' && req.method === 'GET') {
-      const reviews = loadReviews();
+      const reviews = await loadReviews();
       const all = query.all === '1';
       res.json(all ? reviews : reviews.slice(-10).reverse());
       return;
@@ -376,7 +402,7 @@ module.exports = async (req, res) => {
         res.status(400).json({ error: 'name, rating et comment requis' });
         return;
       }
-      let reviews = loadReviews();
+      let reviews = await loadReviews();
       const review = {
         id: reviews.length > 0 ? Math.max(...reviews.map(r => r.id)) + 1 : 1,
         name: body.name,
@@ -390,12 +416,20 @@ module.exports = async (req, res) => {
       res.status(201).json(review);
       return;
     }
+    if (url === '/api/reviews' && req.method === 'DELETE') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const body = await getBody(req);
+      let reviews = (await loadReviews()).filter(r => r.id !== body.id);
+      await saveReviews(reviews);
+      res.json({ success: true });
+      return;
+    }
 
     // Orders
     if (url === '/api/orders') {
       if (req.method === 'POST') {
         const body = await getBody(req);
-        let orders = loadOrders();
+        let orders = await loadOrders();
         body.id = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
         body.status = 'pending';
         body.createdAt = new Date().toISOString();
@@ -405,12 +439,13 @@ module.exports = async (req, res) => {
       }
       if (req.method === 'GET') {
         if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
-        res.json(loadOrders()); return;
+        const orders = await loadOrders();
+        res.json(orders); return;
       }
       if (req.method === 'PUT') {
         if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
         const body = await getBody(req);
-        let orders = loadOrders();
+        let orders = await loadOrders();
         const idx = orders.findIndex(o => o.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         const wasPaid = orders[idx].status === 'payé';
@@ -424,7 +459,7 @@ module.exports = async (req, res) => {
       if (req.method === 'DELETE') {
         if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
         if (!query.id) { res.status(400).json({ error: 'id requis' }); return; }
-        let orders = loadOrders().filter(o => o.id !== query.id);
+        let orders = (await loadOrders()).filter(o => o.id !== query.id);
         await saveOrders(orders);
         res.json({ success: true }); return;
       }
