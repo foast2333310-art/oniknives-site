@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produits - LaCorpo Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    .header {
+      background: #2a2a2a;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 { color: #f0e6d0; font-size: 20px; }
+    .header .links a {
+      color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px;
+    }
+    .header .links a:hover { color: #dbb98a; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px; }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    }
+    .toolbar h2 { font-size: 22px; color: #f0e6d0; }
+    .btn {
+      padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #c8a87c; color: #1a1a1a; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .btn-secondary { background: #555; color: #fff; }
+    .product-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+    }
+    .product-card {
+      background: #2a2a2a; border-radius: 10px; padding: 16px;
+      border: 1px solid #333; display: flex; flex-direction: column;
+    }
+    .product-card img {
+      width: 100%; height: 160px; object-fit: cover;
+      border-radius: 6px; background: #333;
+    }
+    .product-card .info { flex: 1; padding: 12px 0; }
+    .product-card .info h3 { font-size: 15px; color: #f0e6d0; margin-bottom: 4px; }
+    .product-card .info .price { color: #c8a87c; font-weight: 600; font-size: 16px; }
+    .product-card .info .cat { color: #888; font-size: 12px; margin-top: 2px; }
+    .product-card .info .desc { color: #aaa; font-size: 12px; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-card .actions { display: flex; gap: 8px; margin-top: 8px; }
+    .product-card .actions .btn { flex: 1; padding: 8px; font-size: 12px; }
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #2a2a2a; border-radius: 12px; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto; padding: 32px;
+    }
+    .modal h2 { color: #f0e6d0; font-size: 20px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; color: #ccc; font-size: 13px; margin-bottom: 4px; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #444;
+      border-radius: 6px; color: #fff; font-size: 14px; outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: #c8a87c; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .form-actions .btn { flex: 1; }
+    .badge {
+      position: absolute; top: 8px; padding: 4px 10px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; z-index: 2;
+    }
+    .badge-promo { background: #e74c3c; color: #fff; left: 8px; }
+    .badge-epuise { background: #e74c3c; color: #fff; right: 8px; }
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
+      border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background: #27ae60; color: #fff; }
+    .toast.error { background: #e74c3c; color: #fff; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LaCorpo - Produits</h1>
+    <div class="links">
+      <a href="commandes.html">Commandes</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="/data/products.json" target="_blank">Voir products.json</a>
+      <a href="/">Voir le site</a>
+      <a href="#" id="logoutBtn">Déconnexion</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <h2>Gestion des produits</h2>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un produit</button>
+    </div>
+    <div id="productGrid" class="product-grid"></div>
+  </div>
+
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <h2 id="modalTitle">Ajouter un produit</h2>
+      <form id="productForm">
+        <input type="hidden" id="editId" value="">
+        <div class="form-group">
+          <label for="prodName">Nom du produit</label>
+          <input type="text" id="prodName" required>
+        </div>
+        <div class="form-group">
+          <label for="prodSlug">Slug (URL: produit.html?slug=...)</label>
+          <input type="text" id="prodSlug" required>
+        </div>
+        <div class="form-group">
+          <label for="prodPrice">Prix (€)</label>
+          <input type="number" id="prodPrice" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="prodCategory">Catégorie</label>
+          <input type="text" id="prodCategory" placeholder="ex: Bots Discord, Comptes Forza, Services..." required>
+        </div>
+        <div class="form-group" id="badgeGroup">
+          <label for="prodBadge">Badge (optionnel, ex: 🔥 Nouveau)</label>
+          <input type="text" id="prodBadge" placeholder="⭐ Populaire">
+        </div>
+        <div class="form-group">
+          <label for="prodImage">Image du produit</label>
+          <input type="file" id="prodImage" accept="image/png,image/jpeg,image/gif,image/webp">
+          <div id="uploadProgress" style="color:#888;font-size:13px;margin-top:4px;display:none;">Chargement...</div>
+          <div id="imagePreview" style="margin-top:8px;display:none;"><img id="previewImg" style="max-height:100px;border-radius:4px;"></div>
+          <input type="hidden" id="prodImageData" value="">
+        </div>
+        <div class="form-group">
+          <label for="prodDesc">Description</label>
+          <textarea id="prodDesc"></textarea>
+        </div>
+        <div class="form-group" style="display:flex;gap:24px;">
+          <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="prodEpuise" style="width:auto;"> Épuisé
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="prodPromoCheck" style="width:auto;"> Promo
+          </label>
+          <div id="promoInput" style="display:none;">
+            <label style="color:#ccc;font-size:13px;">-<input type="number" id="prodPromoVal" min="1" max="99" style="width:60px;padding:6px 8px;background:#1a1a1a;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;"> %</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-success">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    if (!sessionStorage.getItem('admin_logged_in')) {
+      window.location.href = 'index.html';
+    }
+
+    const API = '/api/products';
+
+    function getAdminKey() {
+      return localStorage.getItem('admin_api_key');
+    }
+
+    document.getElementById('prodImage').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const p = document.getElementById('uploadProgress');
+      p.style.display = 'block'; p.textContent = 'Compression...';
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('previewImg').src = ev.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('prodImageData').value = ev.target.result;
+        p.textContent = '✓ Image prête';
+        p.style.color = '#27ae60';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('prodPromoCheck').addEventListener('change', function() {
+      document.getElementById('promoInput').style.display = this.checked ? 'inline-block' : 'none';
+    });
+
+    function promoBadge(v) { return v ? `<span class="badge badge-promo">-${v}%</span>` : ''; }
+    function epuiseBadge(v) { return v ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''; }
+
+    function priceHtml(p, promo) {
+      if (promo) {
+        const reduced = (p * (100 - promo) / 100).toFixed(2);
+        return `<span style="text-decoration:line-through;color:#888;font-size:13px;">${p} €</span> <span style="color:#e74c3c;font-size:18px;">${reduced.replace('.', ',')} €</span>`;
+      }
+      return `<span>${p} €</span>`;
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById('productGrid');
+      if (!products || products.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><h3>Aucun produit</h3><p>Cliquez sur "Ajouter un produit" pour commencer.</p></div>';
+        return;
+      }
+      grid.innerHTML = products.map(p => {
+        const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
+        return `
+        <div class="product-card" style="position:relative">
+          ${promoBadge(p.promo)}
+          ${epuiseBadge(p.epuise)}
+          <img src="${img}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22/%3E%3C/svg%3E'">
+          <div class="info">
+            <h3>${p.name}</h3>
+            <div class="price">${priceHtml(p.price, p.promo)}</div>
+            <div class="cat">${p.category}</div>
+            ${p.badge ? `<div style="color:#c8a87c;font-size:12px;margin-top:4px;">Badge : ${p.badge}</div>` : ''}
+            <div class="desc">${p.description || ''}</div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="editProduct(${p.id})">Modifier</button>
+            <button class="btn btn-danger" onclick="deleteProduct(${p.id})">Supprimer</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Ajouter un produit';
+      document.getElementById('editId').value = '';
+      document.getElementById('prodName').value = '';
+      document.getElementById('prodSlug').value = '';
+      document.getElementById('prodPrice').value = '';
+      document.getElementById('prodCategory').value = '';
+      document.getElementById('prodImage').value = '';
+      document.getElementById('prodImageData').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadProgress').style.display = 'none';
+      document.getElementById('prodDesc').value = '';
+      document.getElementById('prodEpuise').checked = false;
+      document.getElementById('prodPromoCheck').checked = false;
+      document.getElementById('prodPromoVal').value = '';
+      document.getElementById('promoInput').style.display = 'none';
+      document.getElementById('prodBadge').value = '';
+      document.getElementById('productModal').classList.add('active');
+    }
+
+    function editProduct(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('modalTitle').textContent = 'Modifier le produit';
+      document.getElementById('editId').value = id;
+      document.getElementById('prodName').value = p.name;
+      document.getElementById('prodSlug').value = p.slug;
+      document.getElementById('prodPrice').value = p.price;
+      document.getElementById('prodCategory').value = p.category;
+      document.getElementById('prodImage').value = '';
+      document.getElementById('prodImageData').value = p.image || '';
+      document.getElementById('uploadProgress').style.display = 'none';
+      const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
+      document.getElementById('imagePreview').style.display = p.image ? 'block' : 'none';
+      document.getElementById('previewImg').src = img;
+      document.getElementById('prodDesc').value = p.description;
+      document.getElementById('prodEpuise').checked = !!p.epuise;
+      document.getElementById('prodPromoCheck').checked = !!p.promo;
+      document.getElementById('prodPromoVal').value = p.promo || '';
+      document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
+      document.getElementById('prodBadge').value = p.badge || '';
+      document.getElementById('productModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('productModal').classList.remove('active');
+    }
+
+    let products = [];
+
+    async function refreshProducts() {
+      try {
+        const res = await fetch(API);
+        products = await res.json();
+        renderProducts(products);
+      } catch { showToast('Erreur chargement', true); }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const editId = document.getElementById('editId').value;
+      const imgData = document.getElementById('prodImageData').value;
+      const promoVal = parseInt(document.getElementById('prodPromoVal').value);
+      const badge = document.getElementById('prodBadge').value.trim();
+      const data = {
+        name: document.getElementById('prodName').value.trim(),
+        slug: document.getElementById('prodSlug').value.trim(),
+        price: parseFloat(document.getElementById('prodPrice').value).toFixed(2),
+        category: document.getElementById('prodCategory').value,
+        image: imgData,
+        epuise: document.getElementById('prodEpuise').checked,
+        promo: document.getElementById('prodPromoCheck').checked && promoVal > 0 ? promoVal : 0,
+        badge: badge || undefined,
+        description: document.getElementById('prodDesc').value.trim()
+      };
+      if (editId) data.id = parseInt(editId);
+
+      try {
+        const res = await fetch(API, {
+          method: editId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        closeModal();
+        await refreshProducts();
+        showToast('✓ ' + (editId ? 'Modifié' : 'Ajouté'));
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
+      }
+    });
+
+    async function deleteProduct(id) {
+      if (!confirm('Supprimer ce produit ?')) return;
+      try {
+        const res = await fetch(API + '?id=' + id, {
+          method: 'DELETE',
+          headers: { 'x-admin-key': getAdminKey() }
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+        await refreshProducts();
+        showToast('Supprimé');
+      } catch (e) {
+        showToast('Erreur: ' + e.message, true);
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + (isError ? 'error' : 'success');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('admin_api_key');
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('productModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    refreshProducts();
+  </script>
+</body>
+</html>

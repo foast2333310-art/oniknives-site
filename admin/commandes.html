@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commandes - LaCorpo Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    .header {
+      background: #2a2a2a;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 { color: #f0e6d0; font-size: 20px; }
+    .header .links a {
+      color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px;
+    }
+    .header .links a:hover { color: #dbb98a; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px; }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    }
+    .toolbar h2 { font-size: 22px; color: #f0e6d0; }
+    .btn {
+      padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #c8a87c; color: #1a1a1a; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .btn-secondary { background: #555; color: #fff; }
+    .order-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .order-stat-card { background: #2a2a2a; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #333; }
+    .order-stat-card .stat-num { font-size: 1.6rem; font-weight: 700; }
+    .order-stat-card .stat-label { font-size: 0.75rem; color: #888; margin-top: 2px; }
+    .order-stat-card.total .stat-num { color: #c8a87c; }
+    .order-stat-card.pending .stat-num { color: #f39c12; }
+    .order-stat-card.paid .stat-num { color: #27ae60; }
+    .order-table { width: 100%; border-collapse: collapse; }
+    .order-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; padding: 8px 12px; border-bottom: 1px solid #333; font-weight: 600; }
+    .order-table td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.85rem; vertical-align: top; }
+    .order-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .order-details { display: none; padding: 12px; background: #1a1a1a; border-radius: 6px; margin-top: 8px; }
+    .order-details.open { display: block; }
+    .order-details h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 6px; }
+    .order-details .detail-row { display: flex; gap: 8px; font-size: 0.82rem; color: #ccc; padding: 3px 0; }
+    .order-details .detail-row strong { color: #aaa; min-width: 80px; }
+    .order-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
+    .order-status.pending { background: rgba(243,156,18,0.15); color: #f39c12; }
+    .order-status.paid { background: rgba(39,174,96,0.15); color: #27ae60; }
+    .order-actions { display: flex; gap: 4px; }
+    .order-actions .btn { padding: 4px 10px; font-size: 0.7rem; border-radius: 4px; }
+    .order-id { font-weight: 600; color: #e5e5e5; font-size: 0.85rem; }
+    .order-customer-name { color: #c8a87c; font-weight: 500; }
+    .order-items-list { font-size: 0.78rem; color: #999; line-height: 1.5; }
+    .order-date { font-size: 0.78rem; color: #666; }
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
+      border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background: #27ae60; color: #fff; }
+    .toast.error { background: #e74c3c; color: #fff; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LaCorpo - Commandes</h1>
+    <div class="links">
+      <a href="produits.html">Produits</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="/">Voir le site</a>
+      <a href="#" id="logoutBtn">Déconnexion</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <h2>Commandes reçues</h2>
+      <button class="btn btn-secondary" onclick="loadOrders()">⟳ Rafraîchir</button>
+    </div>
+    <div id="ordersGrid"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    if (!sessionStorage.getItem('admin_logged_in')) {
+      window.location.href = 'index.html';
+    }
+
+    function getAdminKey() {
+      return localStorage.getItem('admin_api_key');
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) return;
+        const orders = await res.json();
+        const grid = document.getElementById('ordersGrid');
+        if (!orders || orders.length === 0) {
+          grid.innerHTML = '<div class="empty-state"><h3>Aucune commande</h3></div>';
+          return;
+        }
+        const sorted = orders.sort((a, b) => b.id - a.id);
+        const totalCount = sorted.length;
+        const pendingCount = sorted.filter(o => o.status !== 'payé').length;
+        const paidCount = sorted.filter(o => o.status === 'payé').length;
+        grid.innerHTML = `
+          <div class="order-stats">
+            <div class="order-stat-card total"><div class="stat-num">${totalCount}</div><div class="stat-label">Total commandes</div></div>
+            <div class="order-stat-card pending"><div class="stat-num">${pendingCount}</div><div class="stat-label">En attente</div></div>
+            <div class="order-stat-card paid"><div class="stat-num">${paidCount}</div><div class="stat-label">Payées</div></div>
+          </div>
+          <table class="order-table">
+            <thead><tr>
+              <th>#</th><th>Client</th><th>Articles</th><th>Total</th><th>Date</th><th>Statut</th><th></th>
+            </tr></thead>
+            <tbody>${sorted.map(o => {
+          const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
+          const date = new Date(o.createdAt).toLocaleString('fr-FR');
+          const shortDate = new Date(o.createdAt).toLocaleDateString('fr-FR');
+          const itemsShort = o.items.map(i => i.name).slice(0, 2).join(', ') + (o.items.length > 2 ? ` +${o.items.length - 2}` : '');
+          const itemsFull = o.items.map(i =>
+            `<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${i.quantity}x ${i.name}${i.amount ? ' — ' + parseFloat(i.amount).toFixed(2).replace('.', ',') + ' €' : ''}</span><span style="color:#c8a87c;">${(i.price * i.quantity).toFixed(2).replace('.', ',')} €</span></div>`
+          ).join('');
+          const customerName = o.customer.discord || o.customer.name || '—';
+          const email = o.customer.email || '—';
+          const desc = o.customer.description || '';
+          const addr = o.customer.address || '';
+          const msg = o.customer.message || '';
+          return `<tr>
+            <td><span class="order-id">#${o.id}</span></td>
+            <td>
+              <div class="order-customer-name">${escHtml(customerName)}</div>
+              <div style="font-size:0.75rem;color:#666;">${escHtml(email)}</div>
+            </td>
+            <td><div class="order-items-list">${escHtml(itemsShort)}</div></td>
+            <td style="color:#c8a87c;font-weight:600;">${total} €</td>
+            <td><span class="order-date" title="${escHtml(date)}">${shortDate}</span></td>
+            <td><span class="order-status ${o.status === 'payé' ? 'paid' : 'pending'}">${o.status === 'payé' ? '✓' : '⏳'} ${o.status}</span></td>
+            <td>
+              <div class="order-actions">
+                <button class="btn btn-secondary" onclick="toggleOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">Détails</button>
+                ${o.status !== 'payé' ? `<button class="btn btn-success" onclick="payOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">✓</button>` : ''}
+                <button class="btn btn-danger" onclick="deleteOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">✕</button>
+              </div>
+            </td>
+          </tr>
+          <tr id="order-detail-${o.id}" style="display:none;">
+            <td colspan="7" style="padding:0 12px 12px;">
+              <div class="order-details open">
+                <h4>Articles</h4>
+                ${itemsFull}
+                ${desc ? `<div class="detail-row" style="margin-top:8px;"><strong>Projet :</strong><span>${escHtml(desc)}</span></div>` : ''}
+                ${addr ? `<div class="detail-row"><strong>Adresse :</strong><span>${escHtml(addr)}</span></div>` : ''}
+                ${msg ? `<div class="detail-row"><strong>Message :</strong><span>${escHtml(msg)}</span></div>` : ''}
+                <div class="detail-row" style="margin-top:4px;color:#666;font-size:0.75rem;">Commande passée le ${escHtml(date)}</div>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+          </table>`;
+      } catch {}
+    }
+
+    function escHtml(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function toggleOrder(id) { const el = document.getElementById('order-detail-' + id); if (el) el.style.display = el.style.display === 'none' ? '' : 'none'; }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + (isError ? 'error' : 'success');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    async function payOrder(id) {
+      try {
+        const res = await fetch('/api/orders', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }, body: JSON.stringify({ id, status: 'payé' }) });
+        if (!res.ok) throw new Error();
+        loadOrders();
+        showToast('✓ Commande #' + id + ' marquée payée');
+      } catch { showToast('Erreur', true); }
+    }
+
+    async function deleteOrder(id) {
+      if (!confirm('Supprimer la commande #' + id + ' ?')) return;
+      try {
+        const res = await fetch('/api/orders?id=' + id, { method: 'DELETE', headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        loadOrders();
+        showToast('Commande #' + id + ' supprimée');
+      } catch { showToast('Erreur suppression', true); }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('admin_api_key');
+      window.location.href = 'index.html';
+    });
+
+    loadOrders();
+  </script>
+</body>
+</html>
