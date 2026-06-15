@@ -30,7 +30,7 @@ async function saveOrders(data) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_orders.json', JSON.stringify(data, null, 2));
   const token = process.env.GH_TOKEN;
-  if (token) await syncToGitHub(data, token, 'data/orders.json');
+  if (token) syncToGitHub(data, token, 'data/orders.json').catch(() => {});
 }
 
 function load(force) {
@@ -58,7 +58,7 @@ async function save(data) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
   const token = process.env.GH_TOKEN;
-  if (token) await syncToGitHub(data, token);
+  if (token) syncToGitHub(data, token).catch(() => {});
 }
 
 function ghApi(path, token, method, body) {
