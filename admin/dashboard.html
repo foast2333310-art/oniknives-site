@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Oni Knives Admin</title>
+  <title>Dashboard - LaCorpo Dev Admin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -105,7 +105,7 @@
 </head>
 <body>
   <div class="header">
-    <h1>Oni Knives - Administration</h1>
+    <h1>LaCorpo Dev - Administration</h1>
     <div class="links">
       <a href="/data/products.json" target="_blank">Voir products.json</a>
       <a href="/">Voir le site</a>
@@ -150,24 +150,13 @@
         <div class="form-group">
           <label for="prodCategory">Catégorie</label>
           <select id="prodCategory">
-            <option value="Couteaux de cuisine">Couteaux de cuisine</option>
-            <option value="Carte cadeau">Carte cadeau</option>
-            <option value="Accessoires">Accessoires</option>
+            <option value="Bots Discord">Bots Discord</option>
+            <option value="Comptes Forza">Comptes Forza</option>
           </select>
         </div>
-        <div class="form-group" id="amountsGroup" style="display:none;">
-          <label>Montants disponibles (€)</label>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="50" style="width:auto;"> 50</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="100" style="width:auto;"> 100</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="150" style="width:auto;"> 150</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="200" style="width:auto;"> 200</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="250" style="width:auto;"> 250</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="300" style="width:auto;"> 300</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="350" style="width:auto;"> 350</label>
-            <label style="display:flex;align-items:center;gap:4px;color:#ccc;font-size:14px;cursor:pointer;"><input type="checkbox" class="amount-chk" value="400" style="width:auto;"> 400</label>
-          </div>
-          <input type="hidden" id="prodAmounts" value="">
+        <div class="form-group" id="badgeGroup">
+          <label for="prodBadge">Badge (optionnel, ex: 🔥 Nouveau)</label>
+          <input type="text" id="prodBadge" placeholder="⭐ Populaire">
         </div>
         <div class="form-group">
           <label for="prodImage">Image du produit</label>
@@ -232,19 +221,6 @@
       document.getElementById('promoInput').style.display = this.checked ? 'inline-block' : 'none';
     });
 
-    document.getElementById('prodCategory').addEventListener('change', function() {
-      const show = this.value === 'Carte cadeau';
-      document.getElementById('amountsGroup').style.display = show ? 'block' : 'none';
-    });
-
-    function getCheckedAmounts() {
-      return Array.from(document.querySelectorAll('.amount-chk:checked')).map(c => parseFloat(c.value));
-    }
-
-    function setCheckedAmounts(amounts) {
-      document.querySelectorAll('.amount-chk').forEach(c => c.checked = amounts.includes(parseFloat(c.value)));
-    }
-
     function promoBadge(v) { return v ? `<span class="badge badge-promo">-${v}%</span>` : ''; }
     function epuiseBadge(v) { return v ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''; }
 
@@ -273,7 +249,7 @@
             <h3>${p.name}</h3>
             <div class="price">${priceHtml(p.price, p.promo)}</div>
             <div class="cat">${p.category}</div>
-            ${p.amounts && p.amounts.length ? `<div style="color:#c8a87c;font-size:12px;margin-top:4px;">Montants : ${p.amounts.map(a => a.toFixed(2).replace('.', ',') + ' €').join(' · ')}</div>` : ''}
+            ${p.badge ? `<div style="color:#c8a87c;font-size:12px;margin-top:4px;">Badge : ${p.badge}</div>` : ''}
             <div class="desc">${p.description || ''}</div>
           </div>
           <div class="actions">
@@ -290,7 +266,7 @@
       document.getElementById('prodName').value = '';
       document.getElementById('prodSlug').value = '';
       document.getElementById('prodPrice').value = '';
-      document.getElementById('prodCategory').value = 'Couteaux de cuisine';
+      document.getElementById('prodCategory').value = 'Bots Discord';
       document.getElementById('prodImage').value = '';
       document.getElementById('prodImageData').value = '';
       document.getElementById('imagePreview').style.display = 'none';
@@ -300,9 +276,7 @@
       document.getElementById('prodPromoCheck').checked = false;
       document.getElementById('prodPromoVal').value = '';
       document.getElementById('promoInput').style.display = 'none';
-      document.getElementById('amountsGroup').style.display = 'none';
-      document.getElementById('prodAmounts').value = '';
-      setCheckedAmounts([]);
+      document.getElementById('prodBadge').value = '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -326,10 +300,7 @@
       document.getElementById('prodPromoCheck').checked = !!p.promo;
       document.getElementById('prodPromoVal').value = p.promo || '';
       document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
-      const amounts = p.amounts || [];
-      document.getElementById('amountsGroup').style.display = amounts.length || p.category === 'Carte cadeau' ? 'block' : 'none';
-      document.getElementById('prodAmounts').value = JSON.stringify(amounts);
-      setCheckedAmounts(amounts);
+      document.getElementById('prodBadge').value = p.badge || '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -361,8 +332,10 @@
             </h3>
             <div class="order-meta">${date} — Total : ${total} €</div>
             <div class="order-customer">
-              <strong>${o.customer.name}</strong> — ${o.customer.email}${o.customer.phone ? ' — ' + o.customer.phone : ''}<br>
-              ${o.customer.address}${o.customer.message ? '<br>Message : ' + o.customer.message : ''}
+              <strong>${o.customer.discord || o.customer.name}</strong> — ${o.customer.email}<br>
+              ${o.customer.description ? 'Projet : ' + o.customer.description + '<br>' : ''}
+              ${o.customer.address ? 'Adresse : ' + o.customer.address + '<br>' : ''}
+              ${o.customer.message ? 'Message : ' + o.customer.message : ''}
             </div>
             <ul class="order-items">${items}</ul>
           </div>`;
@@ -383,6 +356,7 @@
       const editId = document.getElementById('editId').value;
       const imgData = document.getElementById('prodImageData').value;
       const promoVal = parseInt(document.getElementById('prodPromoVal').value);
+      const badge = document.getElementById('prodBadge').value.trim();
       const data = {
         name: document.getElementById('prodName').value.trim(),
         slug: document.getElementById('prodSlug').value.trim(),
@@ -391,7 +365,7 @@
         image: imgData,
         epuise: document.getElementById('prodEpuise').checked,
         promo: document.getElementById('prodPromoCheck').checked && promoVal > 0 ? promoVal : 0,
-        amounts: getCheckedAmounts(),
+        badge: badge || undefined,
         description: document.getElementById('prodDesc').value.trim()
       };
       if (editId) data.id = parseInt(editId);

@@ -1,102 +1,42 @@
 [
   {
+    "id": 1,
+    "name": "🤖 Bot Discord - Offre Basic",
+    "slug": "bot-discord-basic",
+    "price": "10.00",
+    "description": "Commandes simples, réponse automatique, configuration de base. Idéal pour débuter !",
+    "category": "Bots Discord",
+    "features": ["Commandes simples", "Réponse automatique", "Configuration de base", "Support inclus"],
+    "badge": "🔥 Nouveau"
+  },
+  {
     "id": 2,
-    "name": "Couteau Gyuto 26cm - Acier Inox 14C28N",
-    "slug": "couteau-de-cuisine-gyuto-26cm-acier-inox-14c28n",
-    "price": "230.00",
-    "description": "Couteau de cuisine Gyuto - Acier inox 14C28N, finition brossée, manche bois & résine rouge. Polyvalent, léger et tranchant.",
-    "category": "Couteaux de cuisine",
-    "image": "",
-    "amounts": [],
-    "promo": 0,
-    "epuise": false
+    "name": "🤖 Bot Discord - Offre Standard",
+    "slug": "bot-discord-standard",
+    "price": "15.00",
+    "description": "Commandes avancées, système de modération, logs & embeds. Le meilleur rapport qualité/prix !",
+    "category": "Bots Discord",
+    "features": ["Commandes avancées", "Système de modération", "Logs & embeds", "Support prioritaire"],
+    "badge": "⭐ Populaire"
   },
   {
     "id": 3,
-    "name": "Couteau Gyuto 26,5cm - VG10 Suminagashi 67 couches",
-    "slug": "couteau-de-cuisine-gyuto-26-5cm-acier-vg10-suminagashi-67-couches",
-    "price": "335.00",
-    "description": "Couteau de cuisine Gyuto - Acier VG10 Suminagashi 67 couches, manche bois sombre & résine blanche. Lame damassée aux motifs ondulés.",
-    "category": "Couteaux de cuisine"
+    "name": "🤖 Bot Discord - Offre Premium",
+    "slug": "bot-discord-premium",
+    "price": "25.00",
+    "description": "Fonctionnalités sur-mesure, API & base de données, dashboard web (option). Le bot ultime !",
+    "category": "Bots Discord",
+    "features": ["Fonctionnalités sur-mesure", "API & base de données", "Dashboard web (option)", "Support VIP"],
+    "badge": "👑"
   },
   {
     "id": 4,
-    "name": "Couteau Gyuto 28cm - Acier Carbone XC75",
-    "slug": "couteau-de-cuisine-gyuto-28cm-acier-carbone-xc75",
-    "price": "230.00",
-    "description": "Couteau de cuisine Gyuto - Acier XC75, trempe à l'argile, manche hêtre & ébène. Coupe vive et ressenti brut.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 5,
-    "name": "Couteau Kiritsuke 25cm - Acier 14C28N, manche bois & résine bleu",
-    "slug": "couteau-de-cuisine-kiritsuke-25cm-14c28n-mancheboisetresine-bleu",
-    "price": "280.00",
-    "description": "Couteau Kiritsuke en acier 14C28N. Polyvalent, idéal pour les découpes fines et les préparations quotidiennes.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 6,
-    "name": "Couteau Kiritsuke 25cm - Damas, manche bois & résine violet",
-    "slug": "couteau-de-cuisine-kiritsuke-25cm-damas-mancheboisetresine-violet",
-    "price": "390.00",
-    "description": "Couteau Kiritsuke en acier Damas. Tranchant exceptionnel, équilibre parfait et design raffiné.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 7,
-    "name": "Couteau Kiritsuke 25cm - VG10, manche bois & résine rouge",
-    "slug": "couteau-de-cuisine-kiritsuke-25cm-vg10-mancheboisetresine-grisetrouge",
-    "price": "312.00",
-    "description": "Couteau Kiritsuke en acier VG10. Précision, équilibre et élégance pour les travaux de coupe délicats.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 8,
-    "name": "Couteau Kiritsuke 26cm - 14C28N Gravée Dragon",
-    "slug": "couteau-de-cuisine-kiritsuke-26cm-acier-inox-14c28n-grave",
-    "price": "375.00",
-    "description": "Couteau Kiritsuke en acier inox 14C28N avec gravure demi-tête de dragon. Manche érable stabilisé bleu.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 9,
-    "name": "Couteau Kiritsuke 28cm - Acier Carbone XC75 (Trempe argile)",
-    "slug": "couteau-de-cuisine-kiritsuke-28-cm-acier-carbone-xc75",
-    "price": "230.00",
-    "description": "Couteau Kiritsuke en acier XC75, trempe à l'argile, manche hêtre & ébène. Coupe précise et réactive.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 10,
-    "name": "Couteau Kiritsuke 28cm - XC75 Stone Wash",
-    "slug": "couteau-de-cuisine-kiritsuke-28cm-xc75-stone-wash",
-    "price": "180.00",
-    "description": "Couteau Kiritsuke en acier XC75, finition Stone Wash, manche hêtre & ébène. Aspect texturé et haut de gamme.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 12,
-    "name": "Couteau Kiritsuke 28cm - 14C28N Gravée Hannya",
-    "slug": "couteau-de-cuisine-kiritsuke-28cm-14c28n-gravee-hannya",
-    "price": "235.00",
-    "description": "Couteau Kiritsuke en acier inox 14C28N avec gravure demi-masque Hannya. Manche hêtre & ébène noir.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 13,
-    "name": "Couteau Nakiri 28,5cm - Acier Inox 14C28N",
-    "slug": "couteau-de-cuisine-nakiri-28-5cm-acier-inox-14c28n",
-    "price": "150.00",
-    "description": "Couteau Nakiri en acier inox 14C28N. Spécialisé pour la découpe des légumes. Lame droite et large.",
-    "category": "Couteaux de cuisine"
-  },
-  {
-    "id": 14,
-    "name": "Couteau Yanagiba 30cm - Acier Inox 14C28N",
-    "slug": "couteau-de-cuisine-yanagiba-30-cm-acier-inox-14c28n",
-    "price": "180.00",
-    "description": "Couteau Yanagiba en acier inox 14C28N, finition Splatch Etching. Pour découpes longues et nettes de poisson.",
-    "category": "Couteaux de cuisine"
+    "name": "🔥 Compte Mod Forza 6",
+    "slug": "compte-mod-forza-6",
+    "price": "10.00",
+    "description": "Toutes les voitures débloquées, crédits max, niveau max. Compte prêt à jouer immédiatement !",
+    "category": "Comptes Forza",
+    "features": ["Toutes les voitures débloquées", "Crédits max", "Niveau maximum", "Livraison rapide"],
+    "badge": "🚗"
   }
 ]

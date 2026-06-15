@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panier — Oni Knives</title>
-  <meta name="description" content="Votre panier Oni Knives.">
+  <title>Panier — LaCorpo Dev</title>
+  <meta name="description" content="Votre panier LaCorpo Dev.">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗡️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
   <style>
     .cart-page { padding: 40px 0; min-height: 60vh; }
     .cart-empty { text-align: center; padding: 60px 0; color: #888; }
@@ -16,30 +16,34 @@
     .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; background: #222; }
     .cart-item-info { flex: 1; }
     .cart-item-name { font-weight: 500; font-size: 0.9rem; }
-    .cart-item-price { color: #c8a87c; font-size: 0.9rem; margin-top: 2px; }
+    .cart-item-price { color: #d4a853; font-size: 0.9rem; margin-top: 2px; }
     .cart-item-actions { display: flex; align-items: center; gap: 8px; }
     .cart-item-actions input { width: 50px; padding: 4px 8px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #fff; text-align: center; font-size: 0.85rem; }
     .cart-item-remove { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem; padding: 4px 8px; }
     .cart-item-remove:hover { text-decoration: underline; }
     .cart-total { text-align: right; font-size: 1.2rem; padding: 16px 0; border-top: 1px solid #222; }
-    .cart-total strong { color: #c8a87c; }
+    .cart-total strong { color: #d4a853; }
     .checkout-form { max-width: 500px; margin-top: 32px; }
     .checkout-form h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 16px; }
     .checkout-form .form-group { margin-bottom: 12px; }
     .checkout-form label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 4px; }
-    .checkout-form input, .checkout-form textarea { width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 0.9rem; outline: none; }
-    .checkout-form input:focus, .checkout-form textarea:focus { border-color: #c8a87c; }
+    .checkout-form input, .checkout-form textarea, .checkout-form select { width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 0.9rem; outline: none; font-family: Inter, sans-serif; }
+    .checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #d4a853; }
     .checkout-form textarea { min-height: 80px; resize: vertical; }
     .checkout-submit { margin-top: 16px; }
     #order-confirmation { display: none; text-align: center; padding: 40px; background: #1a1a1a; border-radius: 8px; margin-top: 24px; }
     #order-confirmation h3 { color: #27ae60; font-size: 1.2rem; margin-bottom: 8px; }
+    .payment-steps { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+    .payment-steps h4 { color: #d4a853; margin-bottom: 12px; font-size: 0.9rem; }
+    .payment-steps ol { padding-left: 20px; color: #999; font-size: 0.85rem; line-height: 1.8; }
+    .payment-steps ol li strong { color: #e5e5e5; }
   </style>
 </head>
 <body>
-  <div class="top-banner">Livraison gratuite en France 🇫🇷</div>
+  <div class="top-banner">🔒 Paiement sécurisé Stripe · Support Discord 24/7</div>
   <header class="header">
     <div class="container header-inner">
-      <a href="index.html" class="logo"><img src="images/logo.png" alt="Oni Knives"></a>
+      <a href="index.html" class="logo">LaCorpo Dev</a>
       <nav class="nav">
         <a href="index.html">Accueil</a>
         <a href="produits.html">Produits</a>
@@ -58,7 +62,7 @@
 
       <div id="cart-empty" class="cart-empty" style="display:none;">
         <h2>Votre panier est vide</h2>
-        <p>Découvrez nos couteaux de cuisine artisanaux.</p>
+        <p>Découvrez nos offres de bots Discord et comptes gaming.</p>
         <a href="produits.html" class="hero-cta" style="margin-top:20px;">Voir les produits</a>
       </div>
 
@@ -67,36 +71,44 @@
         <div class="cart-total">Total : <strong id="cart-total">0,00 €</strong></div>
         <div id="cart-suggestions" class="cart-suggestions" style="display:none;"><h3>Vous aimerez aussi</h3><div class="product-grid" id="suggestions-grid"></div></div>
 
+        <div class="payment-steps">
+          <h4>💳 Après ton paiement Stripe</h4>
+          <ol>
+            <li><strong>Paye avec Stripe</strong> (carte bancaire)</li>
+            <li><strong>Prends un screen</strong> de la confirmation de paiement</li>
+            <li><strong>Remplis le formulaire</strong> ci-dessous</li>
+            <li><strong>Crée un ticket</strong> sur le serveur Discord</li>
+            <li><strong>Envoie ton screen</strong> dans le ticket comme preuve</li>
+          </ol>
+          <p style="color:#888;font-size:0.8rem;margin-top:8px;">⏳ Le staff traite ta commande sous 24h après réception du paiement.</p>
+        </div>
+
         <div class="checkout-form" id="checkout-form">
-          <h3>Informations de livraison</h3>
+          <h3>📝 Commander</h3>
           <div class="form-group">
-            <label for="order-name">Nom complet</label>
-            <input type="text" id="order-name" placeholder="Votre nom" required>
+            <label for="order-discord">Ton pseudo Discord *</label>
+            <input type="text" id="order-discord" placeholder="ex: Luffy#1234" required>
           </div>
           <div class="form-group">
-            <label for="order-email">Email</label>
-            <input type="email" id="order-email" placeholder="votre@email.com" required>
+            <label for="order-email">Ton email *</label>
+            <input type="email" id="order-email" placeholder="exemple@email.com" required>
           </div>
           <div class="form-group">
-            <label for="order-phone">Téléphone</label>
-            <input type="tel" id="order-phone" placeholder="06 12 34 56 78">
+            <label for="order-desc">Description de ton projet *</label>
+            <textarea id="order-desc" placeholder="Explique ce que tu veux exactement..." required></textarea>
           </div>
           <div class="form-group">
-            <label for="order-address">Adresse de livraison</label>
-            <textarea id="order-address" placeholder="Rue, code postal, ville..." required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="order-message">Message (optionnel)</label>
+            <label for="order-message">Message complémentaire (optionnel)</label>
             <textarea id="order-message" placeholder="Instructions particulières..."></textarea>
           </div>
-          <p style="font-size:0.8rem;color:#666;margin-top:4px;">Aucun paiement en ligne — nous vous contacterons pour finaliser la commande.</p>
-          <button class="cart-btn checkout-submit" onclick="submitOrder()" style="font-size:0.9rem;padding:12px 36px;">Commander</button>
+          <p style="font-size:0.75rem;color:#666;margin-top:4px;">⚠️ Après ta commande, crée un ticket sur le serveur Discord avec ton pseudo et ton email pour confirmer.</p>
+          <button class="cart-btn checkout-submit" onclick="submitOrder()" style="font-size:0.9rem;padding:12px 36px;">🚀 Envoyer ma demande</button>
         </div>
 
         <div id="order-confirmation">
           <h3>✓ Commande envoyée !</h3>
-          <p style="color:#888;">Nous vous contacterons rapidement par email pour finaliser.</p>
-          <a href="produits.html" class="hero-cta" style="margin-top:20px;">Continuer mes achats</a>
+          <p style="color:#888;">Rends-toi sur le serveur Discord et crée un ticket avec ton pseudo et ton email pour confirmer.</p>
+          <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" class="hero-cta" style="margin-top:20px;">→ Aller sur le serveur Discord ←</a>
         </div>
       </div>
     </div>
@@ -105,7 +117,7 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-social">
-        <a href="https://www.tiktok.com/@oni_knives" target="_blank" rel="noopener" title="TikTok">♪</a>
+        <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" title="Discord">💬</a>
         <a href="mailto:oni.knives33@gmail.com" title="Email">✉</a>
       </div>
       <div class="footer-links">
@@ -113,9 +125,9 @@
         <a href="produits.html">Produits</a>
         <a href="a-propos.html">À propos</a>
         <a href="contact.html">Contact</a>
-        <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">Mentions légales</a>
+        <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">Conditions générales</a>
       </div>
-      <p>&copy; 2026 Oni Knives — Lorenzo Lo Cunsolo — SIREN 944 111 657</p>
+      <p>&copy; 2026 LaCorpo Dev — Lorenzo Lo Cunsolo — SIREN 944 111 657</p>
     </div>
   </footer>
 
@@ -164,7 +176,7 @@
       try {
         const all = await loadProducts();
         const ids = cart.map(i => i.productId);
-        const sugg = all.filter(p => p.category !== 'Carte cadeau' && !ids.includes(p.id)).slice(0, 3);
+        const sugg = all.filter(p => !ids.includes(p.id)).slice(0, 3);
         const el = document.getElementById('cart-suggestions');
         const grid = document.getElementById('suggestions-grid');
         if (sugg.length && grid) {
@@ -178,12 +190,11 @@
       const cart = getCart();
       if (cart.length === 0) return;
 
-      const name = document.getElementById('order-name').value.trim();
+      const discord = document.getElementById('order-discord').value.trim();
       const email = document.getElementById('order-email').value.trim();
-      const phone = document.getElementById('order-phone').value.trim();
-      const address = document.getElementById('order-address').value.trim();
+      const desc = document.getElementById('order-desc').value.trim();
 
-      if (!name || !email || !address) {
+      if (!discord || !email || !desc) {
         showToast('Veuillez remplir les champs obligatoires');
         return;
       }
@@ -195,7 +206,12 @@
       try {
         const data = {
           items: cart,
-          customer: { name, email, phone, address, message: document.getElementById('order-message').value.trim() },
+          customer: {
+            discord,
+            email,
+            description: desc,
+            message: document.getElementById('order-message').value.trim()
+          },
           total: getCartTotal()
         };
         const res = await fetch('/api/orders', {
@@ -212,7 +228,7 @@
       } catch {
         showToast('Erreur lors de l\'envoi de la commande');
         btn.disabled = false;
-        btn.textContent = 'Commander';
+        btn.textContent = '🚀 Envoyer ma demande';
       }
     }
 
@@ -221,46 +237,38 @@
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
-    <h2>Informations légales</h2>
+    <h2>Conditions Générales de Vente</h2>
     <div class="modal-body">
 
       <h3>⚖️ Mentions légales</h3>
-      <p><strong>Oni Knives</strong> – Lorenzo Lo Cunsolo<br>
+      <p><strong>LaCorpo Dev</strong> – Lorenzo Lo Cunsolo<br>
       Entrepreneur individuel – SIREN 944 111 657<br>
       60 Rue François 1er – 75008 Paris (France)<br>
       Email : oni.knives33@gmail.com<br>
       TVA non applicable – art. 293 B du CGI</p>
 
       <h3>🧾 Conditions Générales de Vente</h3>
-      <p><strong>Produits :</strong> Couteaux artisanaux fabriqués à la main en France. Chaque pièce étant unique, de légères variations peuvent exister.</p>
+      <p><strong>Produits :</strong> Bots Discord sur mesure et comptes de jeux modifiés. Chaque bot est développé selon les spécifications convenues avec le client.</p>
       <p><strong>Prix :</strong> En euros TTC (TVA non applicable – art. 293 B du CGI). Les tarifs en vigueur au jour de la commande font foi.</p>
-      <p><strong>Commandes :</strong> Fermes et définitives après validation. Règlement sur stand (espèces/carte/virement) ou en ligne.</p>
-      <p><strong>Délais :</strong> Chaque couteau étant fabriqué à la main, un délai de fabrication s'applique (précisé lors de la commande).</p>
-      <p><strong>Droit de rétractation :</strong> 14 jours (art. L221-18 du Code de la consommation). Ne s'applique pas aux produits personnalisés (art. L221-28).</p>
-      <p><strong>Garantie :</strong> Garantie légale de conformité (art. L217-4 et suivants) et garantie contre les vices cachés. Toute utilisation inappropriée annule la garantie.</p>
-      <p><strong>Médiation :</strong> CM2C – 49 rue de Ponthieu, 75008 Paris – cm2c.net – litiges@cm2c.net</p>
+      <p><strong>Commandes :</strong> Fermes et définitives après validation du paiement.</p>
+      <p><strong>Aucun remboursement</strong> ne pourra être effectué après utilisation du bot, du service ou de la commande. Toute commande validée est considérée comme définitive.</p>
+      <p>À partir du moment où vous modifiez, touchez ou accédez au code, nous ne sommes plus responsables des éventuels problèmes, dysfonctionnements ou conséquences pouvant survenir par la suite.</p>
+      <p>Le client est responsable de l'utilisation faite des produits et services fournis. Nous nous réservons le droit de refuser ou d'annuler une commande en cas d'abus ou de non-respect des règles.</p>
+      <p><strong>Délais :</strong> Bots livrés sous 24-72h selon la complexité. Comptes Forza livrés sous 24h après confirmation du paiement.</p>
+      <p><strong>Garantie :</strong> Garantie de bon fonctionnement au moment de la livraison. Toute modification ultérieure par le client annule la garantie.</p>
 
       <h3>🔒 Politique de confidentialité</h3>
-      <p><strong>Responsable du traitement :</strong> Oni Knives – Lorenzo Lo Cunsolo – SIREN 944 111 657 – oni.knives33@gmail.com</p>
-      <p><strong>Données collectées :</strong> Nom, prénom, adresse, email, téléphone, informations de livraison/facturation, historique commandes. Aucune donnée sans consentement explicite.</p>
-      <p><strong>Finalités :</strong> Traitement et expédition des commandes, gestion des paiements, communication client, obligations légales et comptables.</p>
-      <p><strong>Destinataires :</strong> Exclusivement Oni Knives. Jamais vendues ni transmises à des tiers (hors prestataires techniques nécessaires).</p>
-      <p><strong>Durée de conservation :</strong> 5 ans pour les commandes/factures, 12 mois pour les messages de contact.</p>
-      <p><strong>Vos droits :</strong> Accès, rectification, effacement, limitation, opposition, portabilité. Exercice par email à oni.knives33@gmail.com. Réponse sous 30 jours.</p>
+      <p><strong>Responsable du traitement :</strong> LaCorpo Dev – Lorenzo Lo Cunsolo – SIREN 944 111 657 – oni.knives33@gmail.com</p>
+      <p><strong>Données collectées :</strong> Pseudo Discord, email, informations de commande. Aucune donnée sans consentement explicite.</p>
+      <p><strong>Finalités :</strong> Traitement des commandes, communication client.</p>
+      <p><strong>Destinataires :</strong> Exclusivement LaCorpo Dev. Jamais vendues ni transmises à des tiers.</p>
+      <p><strong>Durée de conservation :</strong> 3 ans pour les commandes, 12 mois pour les messages de contact.</p>
+      <p><strong>Vos droits :</strong> Accès, rectification, effacement, limitation, opposition. Exercice par email à oni.knives33@gmail.com.</p>
 
-      <h3>🔁 Politique de retour et remboursement</h3>
-      <p><strong>Droit de rétractation :</strong> 14 jours à compter de la réception (art. L221-18). Le client doit informer Oni Knives par email avant tout renvoi.</p>
-      <p><strong>Exceptions :</strong> Les produits fabriqués sur mesure ou personnalisés ne peuvent être retournés ni remboursés.</p>
-      <p><strong>Conditions :</strong> Produits neufs, non utilisés, dans leur emballage d'origine. Frais de retour à la charge du client.</p>
-      <p><strong>Remboursement :</strong> Sous 14 jours après réception et inspection, via le même moyen de paiement.</p>
-      <p><strong>Produits défectueux :</strong> Informer Oni Knives dans les 48h avec photos. Échange, réparation ou remboursement selon le cas.</p>
-
-      <h3>📦 Politique d'expédition</h3>
-      <p><strong>Préparation :</strong> Produits en stock : 3-5 jours ouvrés. Couteaux sur mesure : 2 à 6 semaines.</p>
-      <p><strong>Transporteurs :</strong> La Poste / Colissimo (suivi avec signature) ou Mondial Relay.</p>
-      <p><strong>Zone :</strong> France métropolitaine uniquement.</p>
-      <p><strong>Réception :</strong> Vérifier l'état du colis, signaler toute anomalie au transporteur et à Oni Knives dans les 48h.</p>
-      <p><strong>Retours :</strong> Contacter oni.knives33@gmail.com avant tout retour. L'adresse de retour est communiquée par email après accord.</p>
+      <h3>🔁 Politique de remboursement</h3>
+      <p><strong>Aucun remboursement</strong> après validation de la commande et livraison du produit ou service.</p>
+      <p>Avant livraison, un remboursement intégral est possible si le client annule sa commande.</p>
+      <p>Les produits dématérialisés (bots, comptes) ne sont pas échangeables ni remboursables une fois livrés.</p>
 
     </div>
   </div>
