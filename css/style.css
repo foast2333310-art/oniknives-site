@@ -192,34 +192,7 @@ img { max-width: 100%; height: auto; display: block; }
 .cart-suggestions { margin-top: 40px; }
 .cart-suggestions h3 { font-family: 'Playfair Display', serif; text-align: center; font-size: 1.1rem; font-weight: 400; margin-bottom: 20px; color: #e5e5e5; }
 
-/* ===== PRICING CARDS ===== */
-.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
-.pricing-card { background: #1a1a1a; border-radius: 8px; padding: 28px 20px; text-align: center; border: 1px solid #222; position: relative; transition: all 0.3s; display: flex; flex-direction: column; }
-.pricing-card:hover { transform: translateY(-4px); border-color: #333; }
-.pricing-card.popular { border-color: #d4a853; }
-.pricing-card .popular-tag { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: #d4a853; color: #0d0d0d; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 16px; border-radius: 0 0 4px 4px; }
-.pricing-card .pricing-icon { font-size: 2rem; margin-bottom: 10px; }
-.pricing-card h3 { font-size: 1rem; font-weight: 600; color: #e5e5e5; margin-bottom: 4px; }
-.pricing-card .pricing-sub { font-size: 0.75rem; color: #666; margin-bottom: 14px; }
-.pricing-card .pricing-amount { font-size: 2rem; font-weight: 700; color: #d4a853; margin-bottom: 14px; }
-.pricing-card .pricing-amount small { font-size: 0.9rem; font-weight: 400; color: #888; }
-.pricing-card .pricing-features { list-style: none; text-align: left; margin-bottom: 20px; flex: 1; }
-.pricing-card .pricing-features li { padding: 5px 0; font-size: 0.8rem; color: #999; border-bottom: 1px solid #1a1a1a; }
-.pricing-card .pricing-features li::before { content: '✓ '; color: #27ae60; }
-.pricing-card .pricing-btn { display: block; padding: 10px; background: #d4a853; color: #0d0d0d; font-weight: 600; font-size: 0.85rem; border-radius: 4px; transition: background 0.2s; text-decoration: none; }
-.pricing-card .pricing-btn:hover { background: #e8c06a; color: #0d0d0d; }
 
-/* ===== FORZA SECTION ===== */
-.forza-card { max-width: 500px; margin: 0 auto; background: linear-gradient(135deg, #1a1a1a, #221111); border-radius: 10px; padding: 32px; text-align: center; border: 1px solid #333; }
-.forza-card .forza-icon { font-size: 3rem; margin-bottom: 8px; }
-.forza-card h3 { font-size: 1.3rem; font-weight: 600; color: #e5e5e5; margin-bottom: 4px; }
-.forza-card .forza-sub { font-size: 0.8rem; color: #d4a853; margin-bottom: 14px; }
-.forza-card .forza-price { font-size: 2.2rem; font-weight: 700; color: #d4a853; margin-bottom: 16px; }
-.forza-card .forza-features { list-style: none; text-align: left; max-width: 280px; margin: 0 auto 20px; }
-.forza-card .forza-features li { padding: 4px 0; font-size: 0.85rem; color: #999; }
-.forza-card .forza-features li::before { content: '✓ '; color: #27ae60; }
-.forza-card .forza-btn { display: inline-block; padding: 12px 36px; background: #d4a853; color: #0d0d0d; font-weight: 600; font-size: 0.9rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; }
-.forza-card .forza-btn:hover { background: #e8c06a; color: #0d0d0d; }
 
 /* ===== DISCORD CTA ===== */
 .discord-cta { text-align: center; padding: 24px; }
@@ -239,7 +212,6 @@ img { max-width: 100%; height: auto; display: block; }
   .stat-number { font-size: 1.6rem; }
   .testimonial-card { flex: 0 0 260px; }
   .product-tabs-nav button { padding: 8px 12px; font-size: 0.75rem; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
 }
 
 @media (max-width: 480px) {
