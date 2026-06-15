@@ -39,11 +39,26 @@ async function saveOrders(data) {
   if (token) syncToGitHub(data, token, 'data/orders.json').catch(() => {});
 }
 
-function load(force) {
+async function load(force) {
   if (!force) {
     try {
       const c = '/tmp/oni_products.json';
       if (fs.existsSync(c)) return JSON.parse(fs.readFileSync(c, 'utf-8'));
+    } catch {}
+  }
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/products.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const dir = '/tmp';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync('/tmp/oni_products.json', JSON.stringify(data, null, 2));
+        return data;
+      }
     } catch {}
   }
   try {
@@ -197,7 +212,7 @@ module.exports = async (req, res) => {
     if (url.startsWith('/api/products')) {
       if (req.method === 'GET') {
         const force = query.seed === 1;
-        const products = load(force);
+        const products = await load(force);
         if (query.slug) {
           const p = products.find(p => p.slug === query.slug);
           if (!p) { res.status(404).json({ error: 'not found' }); return; }
@@ -208,7 +223,7 @@ module.exports = async (req, res) => {
 
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
 
-      let products = load();
+      let products = await load();
 
       if (req.method === 'POST') {
         const body = await getBody(req);
