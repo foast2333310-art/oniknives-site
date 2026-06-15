@@ -208,10 +208,10 @@ module.exports = async (req, res) => {
 
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
 
-      const body = await getBody(req);
       let products = load();
 
       if (req.method === 'POST') {
+        const body = await getBody(req);
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
         await save(products);
@@ -219,6 +219,7 @@ module.exports = async (req, res) => {
       }
 
       if (req.method === 'PUT') {
+        const body = await getBody(req);
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };
