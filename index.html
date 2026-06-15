@@ -37,8 +37,8 @@
     <div class="container">
       <h2 class="section-title">LaCorpo en chiffres</h2>
       <p class="section-subtitle">Une communauté qui grandit chaque jour</p>
-      <div class="stats">
-        <div><div class="stat-number">+50</div><div class="stat-label">Produits vendus</div></div>
+      <div class="stats" id="statsContainer">
+        <div><div class="stat-number">...</div><div class="stat-label">Produits vendus</div></div>
         <div><div class="stat-number">4.9/5</div><div class="stat-label">Avis clients</div></div>
         <div><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
       </div>
@@ -64,27 +64,6 @@
         <div class="why-card"><span class="icon">🛒</span><h3>Produits variés</h3><p>Une sélection de produits et services digitaux dans une seule boutique.</p></div>
         <div class="why-card"><span class="icon">⚡</span><h3>Livraison rapide</h3><p>Produits livrés sous 24h après confirmation du paiement. Support réactif 7j/7.</p></div>
         <div class="why-card"><span class="icon">🔒</span><h3>Paiement sécurisé</h3><p>Transactions sécurisées via Stripe. Données protégées et confidentialité garantie.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <div class="container">
-      <h2 class="section-title">Ce qu'ils en disent</h2>
-      <p class="section-subtitle">Des clients satisfaits</p>
-      <div class="testimonials">
-        <div class="testimonial-card">
-          <p>"Produit reçu rapidement et conforme à la description. Service client réactif, je recommande !"</p>
-          <div class="testimonial-author"><strong>Kevin M.</strong><span>Client</span></div>
-        </div>
-        <div class="testimonial-card">
-          <p>"Commande reçue en moins d'une heure après le paiement. Super service !"</p>
-          <div class="testimonial-author"><strong>Alexandre D.</strong><span>Client</span></div>
-        </div>
-        <div class="testimonial-card">
-          <p>"Livré en 48h, fonctionne parfaitement. Je recommande !"</p>
-          <div class="testimonial-author"><strong>Lucas B.</strong><span>Client</span></div>
-        </div>
       </div>
     </div>
   </section>
@@ -144,7 +123,22 @@
         }).join('');
       } catch {}
     }
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        const el = document.getElementById('statsContainer');
+        if (el && data.totalVentes !== undefined) {
+          el.innerHTML = `
+            <div><div class="stat-number">+${data.totalVentes}</div><div class="stat-label">Produits vendus</div></div>
+            <div><div class="stat-number">4.9/5</div><div class="stat-label">Avis clients</div></div>
+            <div><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
+          `;
+        }
+      } catch {}
+    }
     loadHomeProducts();
+    loadStats();
   </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">

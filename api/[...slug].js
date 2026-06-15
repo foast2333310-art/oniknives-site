@@ -313,6 +313,15 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Public stats
+    if (url === '/api/stats' && req.method === 'GET') {
+      const orders = loadOrders();
+      const paid = orders.filter(o => o.status === 'payé');
+      const totalVentes = paid.length;
+      res.json({ totalVentes });
+      return;
+    }
+
     // Orders
     if (url === '/api/orders') {
       if (req.method === 'POST') {
