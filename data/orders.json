@@ -20,32 +20,5 @@
     "id": 1,
     "status": "pending",
     "createdAt": "2026-06-14T20:42:24.205Z"
-  },
-  {
-    "id": 2,
-    "items": [
-      {
-        "key": "5",
-        "productId": 5,
-        "name": "dfgq<",
-        "price": 444,
-        "originalPrice": 444,
-        "promo": 0,
-        "image": "",
-        "slug": "fqdg",
-        "amount": null,
-        "quantity": 1
-      }
-    ],
-    "customer": {
-      "discord": "sdf",
-      "email": "sdfcvsd",
-      "description": "sdFwdX",
-      "message": "wxcwx"
-    },
-    "total": 444,
-    "status": "pending_payment",
-    "createdAt": "2026-06-15T18:14:00.441Z",
-    "stripeSessionId": "cs_live_a1NPdrSH6x2TZJEKETFEkjUgqOf79ogNz8MZYPh9oU0YXgBGhm1ytzFana"
   }
 ]
