@@ -102,7 +102,28 @@ function getRawBody(req) {
   });
 }
 
-const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
+function loadReviews() {
+  try {
+    const f = '/tmp/oni_reviews.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  try {
+    const f = path.join(process.cwd(), 'data', 'reviews.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_reviews.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return [];
+}
+async function saveReviews(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_reviews.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) syncToGitHub(data, token, 'data/reviews.json').catch(() => {});
+}
 
 async function sendDiscordNotification(o) {
   const url = process.env.DISCORD_WEBHOOK_URL;
@@ -131,6 +152,8 @@ async function sendDiscordNotification(o) {
     });
   } catch {}
 }
+
+const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -318,7 +341,37 @@ module.exports = async (req, res) => {
       const orders = loadOrders();
       const paid = orders.filter(o => o.status === 'payé');
       const totalVentes = paid.length;
-      res.json({ totalVentes });
+      const reviews = loadReviews();
+      const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : 0;
+      res.json({ totalVentes, avgRating: Math.round(avgRating * 10) / 10, reviewCount: reviews.length });
+      return;
+    }
+
+    // Reviews
+    if (url === '/api/reviews' && req.method === 'GET') {
+      const reviews = loadReviews();
+      const all = query.all === '1';
+      res.json(all ? reviews : reviews.slice(-10).reverse());
+      return;
+    }
+    if (url === '/api/reviews' && req.method === 'POST') {
+      const body = await getBody(req);
+      if (!body.name || !body.rating || !body.comment) {
+        res.status(400).json({ error: 'name, rating et comment requis' });
+        return;
+      }
+      let reviews = loadReviews();
+      const review = {
+        id: reviews.length > 0 ? Math.max(...reviews.map(r => r.id)) + 1 : 1,
+        name: body.name,
+        rating: Math.min(5, Math.max(1, parseInt(body.rating))),
+        comment: body.comment,
+        product: body.product || null,
+        createdAt: new Date().toISOString(),
+      };
+      reviews.push(review);
+      await saveReviews(reviews);
+      res.status(201).json(review);
       return;
     }
 

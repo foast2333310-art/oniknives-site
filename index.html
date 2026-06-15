@@ -69,10 +69,35 @@
   </section>
 
   <section class="section reveal" style="background:#111;">
-    <div class="container discord-cta">
-      <h2 class="section-title">💬 Besoin d'aide ?</h2>
-      <p>Rejoins le serveur Discord pour un suivi personnalisé après ta commande.</p>
-      <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" class="hero-cta">Rejoindre le serveur Discord</a>
+    <div class="container">
+      <h2 class="section-title">💬 Avis clients</h2>
+      <p class="section-subtitle">Ils ont déjà commandé</p>
+      <div id="reviewsContainer" style="max-width:600px;margin:0 auto;">
+        <div style="text-align:center;color:#666;">Chargement...</div>
+      </div>
+      <div style="max-width:500px;margin:32px auto 0;background:#1a1a1a;border-radius:8px;padding:24px;border:1px solid #333;">
+        <h3 style="font-size:15px;color:#f0e6d0;margin-bottom:12px;">Laisser un avis</h3>
+        <div class="form-group">
+          <label style="color:#888;font-size:13px;">Ton nom</label>
+          <input type="text" id="reviewName" style="width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;">
+        </div>
+        <div class="form-group">
+          <label style="color:#888;font-size:13px;">Note</label>
+          <div id="starRating" style="display:flex;gap:6px;font-size:28px;cursor:pointer;">
+            <span data-star="1" style="color:#555;">★</span>
+            <span data-star="2" style="color:#555;">★</span>
+            <span data-star="3" style="color:#555;">★</span>
+            <span data-star="4" style="color:#555;">★</span>
+            <span data-star="5" style="color:#555;">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" value="0">
+        </div>
+        <div class="form-group">
+          <label style="color:#888;font-size:13px;">Ton avis</label>
+          <textarea id="reviewComment" style="width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;min-height:60px;"></textarea>
+        </div>
+        <button onclick="submitReview()" style="padding:10px 24px;background:#c8a87c;color:#1a1a1a;border:none;border-radius:4px;font-weight:600;cursor:pointer;">Envoyer</button>
+      </div>
     </div>
   </section>
 
@@ -128,10 +153,11 @@
         const res = await fetch('/api/stats');
         const data = await res.json();
         const el = document.getElementById('statsContainer');
-        if (el && data.totalVentes !== undefined) {
+        if (el) {
+          const rating = data.avgRating ? data.avgRating.toFixed(1).replace('.', ',') : '0.0';
           el.innerHTML = `
-            <div><div class="stat-number">+${data.totalVentes}</div><div class="stat-label">Produits vendus</div></div>
-            <div><div class="stat-number">4.9/5</div><div class="stat-label">Avis clients</div></div>
+            <div><div class="stat-number">+${data.totalVentes || 0}</div><div class="stat-label">Produits vendus</div></div>
+            <div><div class="stat-number">${rating}/5</div><div class="stat-label">Avis clients (${data.reviewCount || 0})</div></div>
             <div><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
           `;
         }
@@ -139,6 +165,67 @@
     }
     loadHomeProducts();
     loadStats();
+    loadReviews();
+
+    document.getElementById('starRating').addEventListener('click', function(e) {
+      const star = e.target.dataset.star;
+      if (!star) return;
+      document.getElementById('reviewRating').value = star;
+      this.querySelectorAll('span').forEach((s, i) => {
+        s.style.color = i < parseInt(star) ? '#d4a853' : '#555';
+      });
+    });
+
+    async function loadReviews() {
+      try {
+        const res = await fetch('/api/reviews');
+        const reviews = await res.json();
+        const el = document.getElementById('reviewsContainer');
+        if (!reviews || reviews.length === 0) {
+          el.innerHTML = '<div style="text-align:center;color:#666;">Aucun avis pour le moment<br><span style="font-size:13px;">Sois le premier à donner ton avis !</span></div>';
+          return;
+        }
+        el.innerHTML = reviews.map(r => {
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const date = new Date(r.createdAt).toLocaleDateString('fr-FR');
+          return `
+          <div style="background:#1a1a1a;border-radius:6px;padding:14px 16px;margin-bottom:10px;border:1px solid #2a2a2a;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <strong style="color:#c8a87c;font-size:14px;">${r.name}</strong>
+              <span style="color:#d4a853;font-size:16px;">${stars}</span>
+            </div>
+            <p style="color:#aaa;font-size:13px;line-height:1.5;">${r.comment}</p>
+            <div style="color:#666;font-size:11px;margin-top:4px;">${date}</div>
+          </div>`;
+        }).join('');
+      } catch {}
+    }
+
+    async function submitReview() {
+      const name = document.getElementById('reviewName').value.trim();
+      const rating = parseInt(document.getElementById('reviewRating').value);
+      const comment = document.getElementById('reviewComment').value.trim();
+      if (!name || !rating || !comment) {
+        alert('Veuillez remplir tous les champs');
+        return;
+      }
+      try {
+        const res = await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, rating, comment })
+        });
+        if (!res.ok) throw new Error();
+        document.getElementById('reviewName').value = '';
+        document.getElementById('reviewRating').value = '0';
+        document.getElementById('reviewComment').value = '';
+        document.getElementById('starRating').querySelectorAll('span').forEach(s => s.style.color = '#555');
+        loadReviews();
+        loadStats();
+      } catch {
+        alert('Erreur lors de l\'envoi');
+      }
+    }
   </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
