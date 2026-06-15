@@ -98,6 +98,34 @@ function getRawBody(req) {
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
 
+async function sendDiscordNotification(o) {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) return;
+  const items = o.items.map(i => `${i.quantity}x ${i.name}${i.amount ? ' — ' + parseFloat(i.amount).toFixed(2).replace('.', ',') + '€' : ''} — ${(i.price * i.quantity).toFixed(2).replace('.', ',')}€`).join('\n');
+  const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
+  const customer = o.customer || {};
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '🛒 Commande #' + o.id + ' — Payée !',
+          color: 0x27ae60,
+          fields: [
+            { name: '📦 Articles', value: items || '—', inline: false },
+            { name: '💰 Total', value: total + ' €', inline: true },
+            { name: '👤 Client', value: customer.discord || customer.name || '—', inline: true },
+            { name: '📧 Email', value: customer.email || '—', inline: true },
+            { name: '📝 Projet', value: customer.description || '—', inline: false },
+          ],
+          timestamp: new Date().toISOString(),
+        }]
+      }),
+    });
+  } catch {}
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -238,12 +266,44 @@ module.exports = async (req, res) => {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
+          await sendDiscordNotification(orders[idx]);
         }
 
         res.json({ status: 'paid', orderId });
       } catch (e) {
         res.status(500).json({ error: e.message });
       }
+      return;
+    }
+
+    // Stripe Webhook
+    if (url === '/api/webhook' && req.method === 'POST') {
+      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      const raw = await getRawBody(req);
+      const sig = req.headers['stripe-signature'];
+
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      } catch (err) {
+        res.status(400).send('Webhook Error: ' + err.message);
+        return;
+      }
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const orderId = parseInt(session.metadata.orderId);
+        let orders = loadOrders();
+        const idx = orders.findIndex(o => o.id === orderId);
+        if (idx >= 0 && orders[idx].status !== 'payé') {
+          orders[idx].status = 'payé';
+          orders[idx].paidAt = new Date().toISOString();
+          await saveOrders(orders);
+          await sendDiscordNotification(orders[idx]);
+        }
+      }
+
+      res.json({ received: true });
       return;
     }
 
@@ -269,8 +329,12 @@ module.exports = async (req, res) => {
         let orders = loadOrders();
         const idx = orders.findIndex(o => o.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
+        const wasPaid = orders[idx].status === 'payé';
         orders[idx] = { ...orders[idx], ...body };
         await saveOrders(orders);
+        if (!wasPaid && orders[idx].status === 'payé') {
+          sendDiscordNotification(orders[idx]);
+        }
         res.json(orders[idx]); return;
       }
       if (req.method === 'DELETE') {
