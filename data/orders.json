@@ -45,6 +45,7 @@
     },
     "total": 10,
     "status": "pending_payment",
-    "createdAt": "2026-06-15T18:06:12.533Z"
+    "createdAt": "2026-06-15T18:06:12.533Z",
+    "stripeSessionId": "cs_live_a14ZelBWqmLP7vCc2mz5zgu3iUJgYUmtS5oZ882LYRVSWvVsiiffCenFAu"
   }
 ]
