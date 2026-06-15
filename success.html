@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement réussi — LaCorpo</title>
+  <meta name="description" content="Votre commande a été confirmée.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
+  <style>
+    .success-page { text-align: center; padding: 80px 0; min-height: 60vh; }
+    .success-page .check { font-size: 64px; margin-bottom: 16px; }
+    .success-page h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #27ae60; margin-bottom: 12px; }
+    .success-page p { color: #888; font-size: 1rem; line-height: 1.6; max-width: 480px; margin: 0 auto 24px; }
+    .success-page .discord-btn { display: inline-block; background: #5865f2; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
+    .success-page .discord-btn:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="top-banner">🔒 Paiement sécurisé Stripe · Support 24/7</div>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">LaCorpo</a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <a href="panier.html" class="cart-icon" title="Panier">🛒<span class="cart-count">0</span></a>
+    </div>
+  </header>
+
+  <section class="section success-page">
+    <div class="container">
+      <div class="check">✅</div>
+      <h1>Paiement réussi !</h1>
+      <p>Merci pour ta commande. Nos équipes vont la traiter sous 24h.<br>Rejoins le serveur Discord pour suivre l'avancement et créer un ticket si besoin.</p>
+      <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" class="discord-btn">💬 Rejoindre le serveur Discord</a>
+      <p style="margin-top:32px;"><a href="produits.html" style="color:#c8a87c;">← Retour aux produits</a></p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-social">
+        <a href="https://discord.gg/lacorpodev" target="_blank" rel="noopener" title="Discord">💬</a>
+        <a href="mailto:oni.knives33@gmail.com" title="Email">✉</a>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p>&copy; 2026 LaCorpo</p>
+    </div>
+  </footer>
+
+  <script>
+    if (localStorage.getItem('oni_cart')) {
+      localStorage.removeItem('oni_cart');
+    }
+  </script>
+</body>
+</html>

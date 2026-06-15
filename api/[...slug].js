@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
+const SITE_URL = 'https://oniknives-site.vercel.app';
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
@@ -85,6 +87,14 @@ function getBody(req) {
     req.on('error', rej);
   });
 }
+function getRawBody(req) {
+  return new Promise((res, rej) => {
+    let raw = '';
+    req.on('data', c => raw += c);
+    req.on('end', () => res(raw));
+    req.on('error', rej);
+  });
+}
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
 
@@ -165,6 +175,77 @@ module.exports = async (req, res) => {
         await save(products);
         res.json({ success: true }); return;
       }
+    }
+
+    // Stripe Checkout
+    if (url === '/api/create-checkout-session' && req.method === 'POST') {
+      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      const body = await getBody(req);
+
+      let orders = loadOrders();
+      const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+      const order = {
+        id: orderId,
+        items: body.items,
+        customer: body.customer,
+        total: body.total,
+        status: 'pending_payment',
+        createdAt: new Date().toISOString(),
+      };
+      orders.push(order);
+      await saveOrders(orders);
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: body.items.map(item => ({
+          price_data: {
+            currency: 'eur',
+            product_data: { name: item.name },
+            unit_amount: Math.round(parseFloat(item.price || item.amount) * 100),
+          },
+          quantity: item.quantity,
+        })),
+        mode: 'payment',
+        success_url: SITE_URL + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url: SITE_URL + '/panier.html',
+        metadata: { orderId: String(orderId) },
+      });
+
+      orders[orders.length - 1].stripeSessionId = session.id;
+      await saveOrders(orders);
+
+      res.json({ url: session.url });
+      return;
+    }
+
+    // Stripe Webhook
+    if (url === '/api/webhook' && req.method === 'POST') {
+      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      const raw = await getRawBody(req);
+      const sig = req.headers['stripe-signature'];
+
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      } catch (err) {
+        res.status(400).send('Webhook Error: ' + err.message);
+        return;
+      }
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const orderId = parseInt(session.metadata.orderId);
+        let orders = loadOrders();
+        const idx = orders.findIndex(o => o.id === orderId);
+        if (idx >= 0) {
+          orders[idx].status = 'payé';
+          orders[idx].paidAt = new Date().toISOString();
+          await saveOrders(orders);
+        }
+      }
+
+      res.json({ received: true });
+      return;
     }
 
     // Orders

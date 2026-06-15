@@ -72,15 +72,11 @@
         <div id="cart-suggestions" class="cart-suggestions" style="display:none;"><h3>Vous aimerez aussi</h3><div class="product-grid" id="suggestions-grid"></div></div>
 
         <div class="payment-steps">
-          <h4>💳 Après ton paiement Stripe</h4>
-          <ol>
-            <li><strong>Paye avec Stripe</strong> (carte bancaire)</li>
-            <li><strong>Prends un screen</strong> de la confirmation de paiement</li>
-            <li><strong>Remplis le formulaire</strong> ci-dessous</li>
-            <li><strong>Crée un ticket</strong> sur le serveur Discord</li>
-            <li><strong>Envoie ton screen</strong> dans le ticket comme preuve</li>
-          </ol>
-          <p style="color:#888;font-size:0.8rem;margin-top:8px;">⏳ Le staff traite ta commande sous 24h après réception du paiement.</p>
+          <h4>💳 Paiement sécurisé Stripe</h4>
+          <p style="color:#999;font-size:0.85rem;line-height:1.6;">
+            Après avoir cliqué sur "Payer", tu seras redirigé·e vers Stripe pour payer par carte bancaire.<br>
+            Une fois le paiement confirmé, ta commande sera traitée sous 24h.
+          </p>
         </div>
 
         <div class="checkout-form" id="checkout-form">
@@ -101,8 +97,8 @@
             <label for="order-message">Message complémentaire (optionnel)</label>
             <textarea id="order-message" placeholder="Instructions particulières..."></textarea>
           </div>
-          <p style="font-size:0.75rem;color:#666;margin-top:4px;">⚠️ Après ta commande, crée un ticket sur le serveur Discord avec ton pseudo et ton email pour confirmer.</p>
-          <button class="cart-btn checkout-submit" onclick="submitOrder()" style="font-size:0.9rem;padding:12px 36px;">🚀 Envoyer ma demande</button>
+          <p style="font-size:0.75rem;color:#666;margin-top:4px;">🔒 Paiement 100% sécurisé par Stripe. Aucune donnée bancaire stockée.</p>
+          <button class="cart-btn checkout-submit" onclick="payWithStripe()" style="font-size:0.9rem;padding:12px 36px;">💳 Payer par carte</button>
         </div>
 
         <div id="order-confirmation">
@@ -186,7 +182,7 @@
       } catch {}
     }
 
-    async function submitOrder() {
+    async function payWithStripe() {
       const cart = getCart();
       if (cart.length === 0) return;
 
@@ -201,7 +197,7 @@
 
       const btn = document.querySelector('.checkout-submit');
       btn.disabled = true;
-      btn.textContent = 'Envoi en cours...';
+      btn.textContent = 'Redirection vers Stripe...';
 
       try {
         const data = {
@@ -214,21 +210,20 @@
           },
           total: getCartTotal()
         };
-        const res = await fetch('/api/orders', {
+        const res = await fetch('/api/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-        if (!res.ok) throw new Error();
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Erreur Stripe');
         localStorage.removeItem('oni_cart');
         updateCartCount();
-        document.getElementById('checkout-form').style.display = 'none';
-        document.getElementById('order-confirmation').style.display = '';
-        renderCart();
-      } catch {
-        showToast('Erreur lors de l\'envoi de la commande');
+        window.location.href = result.url;
+      } catch (e) {
+        showToast('Erreur : ' + (e.message || 'impossible de contacter Stripe'));
         btn.disabled = false;
-        btn.textContent = '🚀 Envoyer ma demande';
+        btn.textContent = '💳 Payer par carte';
       }
     }
 
