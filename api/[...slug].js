@@ -1,8 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
-const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const SITE_URL = 'https://lacorpo.vercel.app';
+let _stripe = null;
+function getStripe() {
+  if (!_stripe && process.env.STRIPE_SECRET_KEY) {
+    try { _stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); } catch {}
+  }
+  return _stripe;
+}
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
@@ -207,7 +213,7 @@ module.exports = async (req, res) => {
 
     // Stripe Checkout
     if (url === '/api/create-checkout-session' && req.method === 'POST') {
-      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      if (!getStripe()) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
       const body = await getBody(req);
 
       let orders = loadOrders();
@@ -223,7 +229,7 @@ module.exports = async (req, res) => {
       orders.push(order);
       await saveOrders(orders);
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: body.items.map(item => ({
           price_data: {
@@ -248,13 +254,13 @@ module.exports = async (req, res) => {
 
     // Confirm payment after redirect
     if (url === '/api/confirm-payment' && req.method === 'GET') {
-      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      if (!getStripe()) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
       const parsedUrl = urlMod.parse(req.url, true);
       const sid = parsedUrl.query.session_id;
       if (!sid) { res.status(400).json({ error: 'session_id requis' }); return; }
 
       try {
-        const session = await stripe.checkout.sessions.retrieve(sid);
+        const session = await getStripe().checkout.sessions.retrieve(sid);
         if (session.payment_status !== 'paid') {
           res.json({ status: 'not_paid' }); return;
         }
@@ -278,13 +284,13 @@ module.exports = async (req, res) => {
 
     // Stripe Webhook
     if (url === '/api/webhook' && req.method === 'POST') {
-      if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
+      if (!getStripe()) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
       const raw = await getRawBody(req);
       const sig = req.headers['stripe-signature'];
 
       let event;
       try {
-        event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        event = getStripe().webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
       } catch (err) {
         res.status(400).send('Webhook Error: ' + err.message);
         return;
