@@ -111,12 +111,8 @@
         const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
         if (!res.ok) return;
         const orders = await res.json();
-        if (!orders || orders.length === 0) {
-          document.getElementById('statsGrid').innerHTML = '<div style="grid-column:1/-1;color:#666;padding:40px;">Aucune commande pour le moment</div>';
-          return;
-        }
-
-        const paid = orders.filter(o => o.status === 'payé');
+        const list = orders || [];
+        const paid = list.filter(o => o.status === 'payé');
         const totalVentes = paid.length;
         const totalRevenu = paid.reduce((s, o) => s + parseFloat(o.total || 0), 0);
 
@@ -144,6 +140,11 @@
           months[key].count++;
           months[key].total += parseFloat(o.total || 0);
         });
+
+        if (Object.keys(months).length === 0) {
+          const key = thisYear + '-' + String(thisMonth + 1).padStart(2, '0');
+          months[key] = { count: 0, total: 0, key };
+        }
 
         const sortedMonths = Object.values(months).sort((a, b) => b.key.localeCompare(a.key));
         document.getElementById('monthlyBody').innerHTML = sortedMonths.map(m => {
