@@ -6,7 +6,12 @@
     "price": "10.00",
     "description": "Commandes simples, réponse automatique, configuration de base. Idéal pour débuter !",
     "category": "Bots Discord",
-    "features": ["Commandes simples", "Réponse automatique", "Configuration de base", "Support inclus"],
+    "features": [
+      "Commandes simples",
+      "Réponse automatique",
+      "Configuration de base",
+      "Support inclus"
+    ],
     "badge": "🔥 Nouveau"
   },
   {
@@ -16,7 +21,12 @@
     "price": "15.00",
     "description": "Commandes avancées, système de modération, logs & embeds. Le meilleur rapport qualité/prix !",
     "category": "Bots Discord",
-    "features": ["Commandes avancées", "Système de modération", "Logs & embeds", "Support prioritaire"],
+    "features": [
+      "Commandes avancées",
+      "Système de modération",
+      "Logs & embeds",
+      "Support prioritaire"
+    ],
     "badge": "⭐ Populaire"
   },
   {
@@ -26,7 +36,12 @@
     "price": "25.00",
     "description": "Fonctionnalités sur-mesure, API & base de données, dashboard web (option). Le bot ultime !",
     "category": "Bots Discord",
-    "features": ["Fonctionnalités sur-mesure", "API & base de données", "Dashboard web (option)", "Support VIP"],
+    "features": [
+      "Fonctionnalités sur-mesure",
+      "API & base de données",
+      "Dashboard web (option)",
+      "Support VIP"
+    ],
     "badge": "👑"
   },
   {
@@ -36,7 +51,24 @@
     "price": "10.00",
     "description": "Toutes les voitures débloquées, crédits max, niveau max. Compte prêt à jouer immédiatement !",
     "category": "Comptes Forza",
-    "features": ["Toutes les voitures débloquées", "Crédits max", "Niveau maximum", "Livraison rapide"],
+    "features": [
+      "Toutes les voitures débloquées",
+      "Crédits max",
+      "Niveau maximum",
+      "Livraison rapide"
+    ],
     "badge": "🚗"
+  },
+  {
+    "name": "dfgq<",
+    "slug": "fqdg",
+    "price": "444.00",
+    "category": "D<fS",
+    "image": "",
+    "epuise": false,
+    "promo": 0,
+    "badge": "esdffDFSd",
+    "description": "SDFSdfS",
+    "id": 5
   }
 ]
