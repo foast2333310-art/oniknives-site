@@ -62,6 +62,20 @@
     if (localStorage.getItem('oni_cart')) {
       localStorage.removeItem('oni_cart');
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (sessionId) {
+      fetch('/api/confirm-payment?session_id=' + encodeURIComponent(sessionId))
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === 'paid') {
+            document.querySelector('.check').textContent = '✅';
+            document.querySelector('h1').textContent = 'Paiement réussi !';
+          }
+        })
+        .catch(() => {});
+    }
   </script>
 </body>
 </html>

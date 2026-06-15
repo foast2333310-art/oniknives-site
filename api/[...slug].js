@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
-const SITE_URL = 'https://oniknives-site.vercel.app';
+const SITE_URL = 'https://lacorpo.vercel.app';
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
@@ -218,33 +218,32 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Stripe Webhook
-    if (url === '/api/webhook' && req.method === 'POST') {
+    // Confirm payment after redirect
+    if (url === '/api/confirm-payment' && req.method === 'GET') {
       if (!stripe) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
-      const raw = await getRawBody(req);
-      const sig = req.headers['stripe-signature'];
+      const parsedUrl = urlMod.parse(req.url, true);
+      const sid = parsedUrl.query.session_id;
+      if (!sid) { res.status(400).json({ error: 'session_id requis' }); return; }
 
-      let event;
       try {
-        event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
-      } catch (err) {
-        res.status(400).send('Webhook Error: ' + err.message);
-        return;
-      }
+        const session = await stripe.checkout.sessions.retrieve(sid);
+        if (session.payment_status !== 'paid') {
+          res.json({ status: 'not_paid' }); return;
+        }
 
-      if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
         const orderId = parseInt(session.metadata.orderId);
         let orders = loadOrders();
         const idx = orders.findIndex(o => o.id === orderId);
-        if (idx >= 0) {
+        if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
         }
-      }
 
-      res.json({ received: true });
+        res.json({ status: 'paid', orderId });
+      } catch (e) {
+        res.status(500).json({ error: e.message });
+      }
       return;
     }
 
