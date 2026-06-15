@@ -76,7 +76,7 @@ async function initProductPage() {
   const products = await loadProducts();
   const product = products.find(p => p.slug === slug);
   if (product) {
-    document.title = `${product.name} — LaCorpo Dev`;
+    document.title = `${product.name} — LaCorpo`;
     document.getElementById('product-image').src = imgSrc(product.image);
     document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };
     document.getElementById('product-image').style.display = '';
