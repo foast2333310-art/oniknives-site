@@ -429,7 +429,7 @@ module.exports = async (req, res) => {
               color: 0xc8a87c,
               fields: [
                 { name: 'Nom', value: body.name || '—', inline: true },
-                { name: 'Email', value: body.email || '—', inline: true },
+                { name: 'Email', value: body.email ? `[${body.email}](mailto:${body.email})` : '—', inline: true },
                 { name: 'Message', value: body.message || '—' }
               ],
               timestamp: new Date().toISOString()
