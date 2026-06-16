@@ -265,6 +265,7 @@
             <div class="price">${priceHtml(p.price, p.promo)}</div>
             <div class="cat">${p.category}</div>
             ${p.badge ? `<div style="color:#c8a87c;font-size:12px;margin-top:4px;">Badge : ${p.badge}</div>` : ''}
+            ${p.file ? `<div style="color:#27ae60;font-size:12px;margin-top:2px;">📎 Fichier</div>` : ''}
             <div class="desc">${p.description || ''}</div>
           </div>
           <div class="actions">
@@ -292,6 +293,12 @@
       document.getElementById('prodPromoVal').value = '';
       document.getElementById('promoInput').style.display = 'none';
       document.getElementById('prodBadge').value = '';
+      document.getElementById('prodFileData').value = '';
+      document.getElementById('prodFileName').value = '';
+      document.getElementById('prodRemoveFile').value = '';
+      document.getElementById('prodFile').value = '';
+      document.getElementById('fileInfo').textContent = '';
+      document.getElementById('currentFileInfo').style.display = 'none';
       document.getElementById('productModal').classList.add('active');
     }
 
