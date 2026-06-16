@@ -263,6 +263,11 @@ module.exports = async (req, res) => {
 
       if (req.method === 'PUT') {
         const body = await getBody(req);
+        if (body.removeFile === '1') {
+          body.file = null;
+          body.fileName = null;
+        }
+        delete body.removeFile;
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };

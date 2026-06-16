@@ -152,8 +152,13 @@
           <label for="prodFile">Fichier à télécharger (PDF, zip…) — optionnel</label>
           <input type="file" id="prodFile">
           <div id="fileInfo" style="color:#888;font-size:13px;margin-top:4px;"></div>
+          <div id="currentFileInfo" style="display:none;margin-top:4px;font-size:13px;color:#27ae60;">
+            <span id="currentFileName"></span>
+            <button type="button" onclick="removeFile()" style="background:none;border:1px solid #c0392b;color:#c0392b;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;margin-left:8px;">Supprimer</button>
+          </div>
           <input type="hidden" id="prodFileData" value="">
           <input type="hidden" id="prodFileName" value="">
+          <input type="hidden" id="prodRemoveFile" value="">
         </div>
         <div class="form-group">
           <label for="prodDesc">Description</label>
@@ -226,6 +231,13 @@
 
     function promoBadge(v) { return v ? `<span class="badge badge-promo">-${v}%</span>` : ''; }
     function epuiseBadge(v) { return v ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''; }
+
+    function removeFile() {
+      document.getElementById('prodRemoveFile').value = '1';
+      document.getElementById('currentFileInfo').style.display = 'none';
+      document.getElementById('fileInfo').textContent = '✓ Fichier supprimé';
+      document.getElementById('fileInfo').style.color = '#c0392b';
+    }
 
     function priceHtml(p, promo) {
       if (promo) {
@@ -304,6 +316,20 @@
       document.getElementById('prodPromoVal').value = p.promo || '';
       document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
       document.getElementById('prodBadge').value = p.badge || '';
+      document.getElementById('prodFileData').value = '';
+      document.getElementById('prodFileName').value = '';
+      document.getElementById('prodRemoveFile').value = '';
+      document.getElementById('prodFile').value = '';
+      const fileInfo = document.getElementById('fileInfo');
+      const currentFileInfo = document.getElementById('currentFileInfo');
+      if (p.file) {
+        fileInfo.textContent = '';
+        document.getElementById('currentFileName').textContent = '📎 ' + (p.fileName || p.file);
+        currentFileInfo.style.display = 'block';
+      } else {
+        currentFileInfo.style.display = 'none';
+        fileInfo.textContent = '';
+      }
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -338,7 +364,8 @@
         badge: badge || undefined,
         description: document.getElementById('prodDesc').value.trim(),
         fileData: document.getElementById('prodFileData').value || undefined,
-        fileName: document.getElementById('prodFileName').value || undefined
+        fileName: document.getElementById('prodFileName').value || undefined,
+        removeFile: document.getElementById('prodRemoveFile').value || undefined
       };
       if (editId) data.id = parseInt(editId);
 
