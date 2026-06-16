@@ -223,12 +223,14 @@ module.exports = async (req, res) => {
       res.status(404).end(); return;
     }
 
-    // Upload image
+    // Upload
     if (url === '/api/upload' && req.method === 'POST') {
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
       const b = await getBody(req);
-      const safe = path.basename(b.filename);
-      const dir = '/tmp/oni_images';
+      const ext = path.extname(b.filename).toLowerCase();
+      const safe = Date.now() + '_' + path.basename(b.filename).replace(/[^a-zA-Z0-9._-]/g, '_');
+      const isImage = ['.png','.jpg','.jpeg','.gif','.webp'].includes(ext);
+      const dir = isImage ? '/tmp/oni_images' : '/tmp/oni_files';
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(path.join(dir, safe), Buffer.from(b.data, 'base64'));
       res.json({ filename: safe }); return;
@@ -253,15 +255,6 @@ module.exports = async (req, res) => {
 
       if (req.method === 'POST') {
         const body = await getBody(req);
-        if (body.fileData && body.fileName) {
-          const dir = '/tmp/oni_files';
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-          const safeName = Date.now() + '_' + body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-          fs.writeFileSync(path.join(dir, safeName), Buffer.from(body.fileData, 'base64'));
-          body.file = safeName;
-          delete body.fileData;
-          delete body.fileName;
-        }
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
         await save(products);
@@ -270,15 +263,6 @@ module.exports = async (req, res) => {
 
       if (req.method === 'PUT') {
         const body = await getBody(req);
-        if (body.fileData && body.fileName) {
-          const dir = '/tmp/oni_files';
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-          const safeName = Date.now() + '_' + body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-          fs.writeFileSync(path.join(dir, safeName), Buffer.from(body.fileData, 'base64'));
-          body.file = safeName;
-          delete body.fileData;
-          delete body.fileName;
-        }
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };

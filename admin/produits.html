@@ -343,6 +343,21 @@
       if (editId) data.id = parseInt(editId);
 
       try {
+        if (document.getElementById('prodFileData').value) {
+          const fileRes = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+            body: JSON.stringify({
+              filename: document.getElementById('prodFileName').value,
+              data: document.getElementById('prodFileData').value
+            })
+          });
+          const fileResult = await fileRes.json();
+          if (!fileRes.ok) throw new Error(fileResult.error);
+          data.file = fileResult.filename;
+          data.fileName = document.getElementById('prodFileName').value;
+        }
+        delete data.fileData;
         const res = await fetch(API, {
           method: editId ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
