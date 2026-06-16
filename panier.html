@@ -221,7 +221,8 @@
         updateCartCount();
         window.location.href = result.url;
       } catch (e) {
-        showToast('Erreur : ' + (e.message || 'impossible de contacter Stripe'));
+        const msg = e.message || '';
+        showToast(msg.includes('épuisé') ? '❌ ' + msg : 'Erreur : ' + msg);
         btn.disabled = false;
         btn.textContent = '💳 Payer par carte';
       }

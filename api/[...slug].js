@@ -281,6 +281,15 @@ module.exports = async (req, res) => {
       if (!getStripe()) { res.status(500).json({ error: 'Stripe non configuré' }); return; }
       const body = await getBody(req);
 
+      const products = await load();
+      for (const item of (body.items || [])) {
+        const prod = products.find(p => p.slug === item.slug || p.name === item.name);
+        if (prod && prod.epuise) {
+          res.status(400).json({ error: `"${prod.name}" est épuisé et ne peut pas être acheté.` });
+          return;
+        }
+      }
+
       let orders = await loadOrders();
       const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
       const order = {
