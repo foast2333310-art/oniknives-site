@@ -14,6 +14,10 @@
     .success-page p { color: #888; font-size: 1rem; line-height: 1.6; max-width: 480px; margin: 0 auto 24px; }
     .success-page .discord-btn { display: inline-block; background: #5865f2; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
     .success-page .discord-btn:hover { opacity: 0.85; }
+    .download-section { margin: 24px auto; max-width: 400px; background: #1a1a1a; border-radius: 8px; padding: 20px; border: 1px solid #333; display: none; }
+    .download-section h3 { color: #f0e6d0; font-size: 14px; margin-bottom: 12px; }
+    .download-link { display: block; background: #2a2a2a; padding: 12px 16px; border-radius: 6px; color: #c8a87c; text-decoration: none; margin-bottom: 8px; border: 1px solid #333; font-size: 14px; }
+    .download-link:hover { border-color: #c8a87c; }
   </style>
 </head>
 <body>
@@ -37,6 +41,10 @@
       <div class="check">✅</div>
       <h1>Paiement réussi !</h1>
       <p>Merci pour ta commande. Nos équipes vont la traiter sous 24h.<br>Rejoins le serveur Discord pour suivre l'avancement et créer un ticket si besoin.</p>
+      <div class="download-section" id="downloadSection">
+        <h3>📥 Tes téléchargements</h3>
+        <div id="downloadLinks"></div>
+      </div>
       <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" class="discord-btn">💬 Rejoindre le serveur Discord</a>
       <p style="margin-top:32px;"><a href="produits.html" style="color:#c8a87c;">← Retour aux produits</a></p>
     </div>
@@ -72,6 +80,19 @@
           if (data.status === 'paid') {
             document.querySelector('.check').textContent = '✅';
             document.querySelector('h1').textContent = 'Paiement réussi !';
+            if (data.downloadToken) {
+              fetch('/api/download?token=' + data.downloadToken)
+                .then(r => r.json())
+                .then(dl => {
+                  if (dl.files && dl.files.length > 0) {
+                    const el = document.getElementById('downloadLinks');
+                    el.innerHTML = dl.files.map(f =>
+                      `<a class="download-link" href="/api/download-file?token=${data.downloadToken}&file=${f.name}" download>📥 ${f.originalName}</a>`
+                    ).join('');
+                    document.getElementById('downloadSection').style.display = 'block';
+                  }
+                }).catch(() => {});
+            }
           }
         })
         .catch(() => {});

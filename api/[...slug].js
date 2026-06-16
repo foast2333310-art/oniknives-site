@@ -253,6 +253,15 @@ module.exports = async (req, res) => {
 
       if (req.method === 'POST') {
         const body = await getBody(req);
+        if (body.fileData && body.fileName) {
+          const dir = '/tmp/oni_files';
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          const safeName = Date.now() + '_' + body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+          fs.writeFileSync(path.join(dir, safeName), Buffer.from(body.fileData, 'base64'));
+          body.file = safeName;
+          delete body.fileData;
+          delete body.fileName;
+        }
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
         await save(products);
@@ -261,6 +270,15 @@ module.exports = async (req, res) => {
 
       if (req.method === 'PUT') {
         const body = await getBody(req);
+        if (body.fileData && body.fileName) {
+          const dir = '/tmp/oni_files';
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          const safeName = Date.now() + '_' + body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+          fs.writeFileSync(path.join(dir, safeName), Buffer.from(body.fileData, 'base64'));
+          body.file = safeName;
+          delete body.fileData;
+          delete body.fileName;
+        }
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };
@@ -298,6 +316,7 @@ module.exports = async (req, res) => {
         customer: body.customer,
         total: body.total,
         status: 'pending_payment',
+        downloadToken: Math.random().toString(36).slice(2) + Date.now().toString(36),
         createdAt: new Date().toISOString(),
       };
       orders.push(order);
@@ -345,11 +364,12 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
+          if (!orders[idx].downloadToken) orders[idx].downloadToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
 
-        res.json({ status: 'paid', orderId });
+        res.json({ status: 'paid', orderId, downloadToken: orders[idx].downloadToken || null });
       } catch (e) {
         res.status(500).json({ error: e.message });
       }
@@ -378,6 +398,7 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
+          if (!orders[idx].downloadToken) orders[idx].downloadToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
@@ -472,6 +493,38 @@ module.exports = async (req, res) => {
         await saveOrders(orders);
         res.json({ success: true }); return;
       }
+    }
+
+    // Download
+    if (url === '/api/download' && req.method === 'GET') {
+      if (!query.token) { res.status(400).json({ error: 'token requis' }); return; }
+      const orders = await loadOrders();
+      const order = orders.find(o => o.downloadToken === query.token);
+      if (!order || order.status !== 'payé') { res.status(403).json({ error: 'Accès refusé' }); return; }
+      const products = await load();
+      const items = order.items || [];
+      const files = items.map(item => {
+        const prod = products.find(p => p.slug === item.slug || p.name === item.name);
+        return prod && prod.file ? { name: prod.file, originalName: prod.fileName || prod.file } : null;
+      }).filter(Boolean);
+      res.json({ files });
+      return;
+    }
+
+    // Download file
+    if (url === '/api/download-file' && req.method === 'GET') {
+      if (!query.token || !query.file) { res.status(400).json({ error: 'paramètres requis' }); return; }
+      const orders = await loadOrders();
+      const order = orders.find(o => o.downloadToken === query.token);
+      if (!order || order.status !== 'payé') { res.status(403).json({ error: 'Accès refusé' }); return; }
+      const filePath = path.join('/tmp/oni_files', query.file);
+      if (!fs.existsSync(filePath)) { res.status(404).json({ error: 'Fichier introuvable' }); return; }
+      const ext = path.extname(query.file).toLowerCase();
+      const mimeTypes = { '.pdf': 'application/pdf', '.zip': 'application/zip', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.txt': 'text/plain' };
+      res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+      res.setHeader('Content-Disposition', 'attachment');
+      res.end(fs.readFileSync(filePath));
+      return;
     }
 
     // Contact
