@@ -279,13 +279,30 @@ module.exports = async (req, res) => {
         }
       }
 
+      const lineItems = [];
+      for (const item of (body.items || [])) {
+        const unit = parseFloat(item.price || item.amount);
+        if (isNaN(unit) || unit <= 0) {
+          res.status(400).json({ error: `Prix invalide pour "${item.name}". Vide ton panier et réessaie.` });
+          return;
+        }
+        lineItems.push({
+          price_data: {
+            currency: 'eur',
+            product_data: { name: item.name },
+            unit_amount: Math.round(unit * 100),
+          },
+          quantity: item.quantity,
+        });
+      }
+
       let orders = await loadOrders();
       const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
       const order = {
         id: orderId,
         items: body.items,
         customer: body.customer,
-        total: body.total,
+        total: parseFloat(body.total) || 0,
         status: 'pending_payment',
         createdAt: new Date().toISOString(),
       };
@@ -294,14 +311,7 @@ module.exports = async (req, res) => {
 
       const session = await getStripe().checkout.sessions.create({
         payment_method_types: ['card'],
-        line_items: body.items.map(item => ({
-          price_data: {
-            currency: 'eur',
-            product_data: { name: item.name },
-            unit_amount: Math.round(parseFloat(item.price || item.amount) * 100),
-          },
-          quantity: item.quantity,
-        })),
+        line_items: lineItems,
         mode: 'payment',
         success_url: SITE_URL + '/success.html?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: SITE_URL + '/panier.html',
