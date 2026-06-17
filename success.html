@@ -45,6 +45,11 @@
         <h3>📥 Voici ton lien de téléchargement</h3>
         <div id="downloadLinks"></div>
       </div>
+      <div class="download-section" id="parrainSection" style="display:none;">
+        <h3>🎟 Parraine un ami et gagne -5€</h3>
+        <p style="color:#888;font-size:14px;margin:8px 0;">Partage ce code, ton ami économise 5€ et toi aussi sur ta prochaine commande :</p>
+        <div id="parrainCode" style="background:#2a2a2a;padding:12px 16px;border-radius:6px;border:1px solid #c8a87c;font-size:18px;font-weight:700;color:#c8a87c;letter-spacing:2px;text-align:center;font-family:monospace;"></div>
+      </div>
       <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" class="discord-btn">💬 Rejoindre le serveur Discord</a>
       <p style="margin-top:32px;"><a href="produits.html" style="color:#c8a87c;">← Retour aux produits</a></p>
     </div>
@@ -87,6 +92,10 @@
               ).join('');
               document.getElementById('downloadSection').style.display = 'block';
             }
+            if (data.parrainCode) {
+              document.getElementById('parrainCode').textContent = data.parrainCode;
+              document.getElementById('parrainSection').style.display = 'block';
+            }
           }
         })
         .catch(() => {});
@@ -105,6 +114,10 @@
                 `<a class="download-link" href="${d.url}" target="_blank" rel="noopener">📥 ${d.name}</a>`
               ).join('');
               document.getElementById('downloadSection').style.display = 'block';
+            }
+            if (data.parrainCode) {
+              document.getElementById('parrainCode').textContent = data.parrainCode;
+              document.getElementById('parrainSection').style.display = 'block';
             }
           }).catch(() => {});
       }
