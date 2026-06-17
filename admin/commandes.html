@@ -82,6 +82,7 @@
     <h1>LaCorpo - Commandes</h1>
     <div class="links">
       <a href="produits.html">Produits</a>
+      <a href="codes.html">Codes promo</a>
       <a href="dashboard.html">Dashboard</a>
       <a href="/">Voir le site</a>
       <a href="#" id="logoutBtn">Déconnexion</a>
@@ -170,6 +171,7 @@
                 ${desc ? `<div class="detail-row" style="margin-top:8px;"><strong>Projet :</strong><span>${escHtml(desc)}</span></div>` : ''}
                 ${addr ? `<div class="detail-row"><strong>Adresse :</strong><span>${escHtml(addr)}</span></div>` : ''}
                 ${msg ? `<div class="detail-row"><strong>Message :</strong><span>${escHtml(msg)}</span></div>` : ''}
+                ${o.promoCode ? `<div class="detail-row"><strong>🎟 Code promo :</strong><span style="color:#c8a87c;">${escHtml(o.promoCode)} ${o.promoDiscount ? '(-' + o.promoDiscount + ' €)' : ''}</span></div>` : ''}
                 <div class="detail-row" style="margin-top:4px;color:#666;font-size:0.75rem;">Commande passée le ${escHtml(date)}</div>
               </div>
             </td>

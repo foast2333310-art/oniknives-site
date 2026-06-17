@@ -207,6 +207,42 @@ function genParrainCode() {
   return code;
 }
 
+async function loadCodes() {
+  try {
+    const f = '/tmp/oni_codes.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/codes.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fs.writeFileSync('/tmp/oni_codes.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
+  try {
+    const f = path.join(process.cwd(), 'data', 'codes.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_codes.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return [];
+}
+async function saveCodes(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_codes.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) syncToGitHub(data, token, 'data/codes.json').catch(() => {});
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -311,11 +347,25 @@ module.exports = async (req, res) => {
 
       let orders = await loadOrders();
       const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+
+      let promoDiscount = 0;
+      if (body.promoCode) {
+        const codes = await loadCodes();
+        const found = codes.find(c => c.code === body.promoCode.toUpperCase().trim() && !c.usedBy);
+        if (found) {
+          promoDiscount = found.discount;
+          found.usedBy = orderId;
+          await saveCodes(codes);
+        }
+      }
+
       const order = {
         id: orderId,
         items: body.items,
         customer: body.customer,
         total: parseFloat(body.total) || 0,
+        promoCode: body.promoCode || null,
+        promoDiscount,
         status: 'pending_payment',
         createdAt: new Date().toISOString(),
       };
@@ -519,6 +569,43 @@ module.exports = async (req, res) => {
         return prod && prod.downloadUrl ? { name: prod.name, url: prod.downloadUrl } : null;
       }).filter(Boolean);
       res.json({ downloads, parrainCode: order.parrainCode || null });
+      return;
+    }
+
+    // Promo codes
+    if (url === '/api/codes') {
+      if (req.method === 'GET') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        res.json(await loadCodes()); return;
+      }
+      if (req.method === 'POST') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        const body = await getBody(req);
+        let codes = await loadCodes();
+        const code = { id: codes.length > 0 ? Math.max(...codes.map(c => c.id)) + 1 : 1, code: body.code.toUpperCase().trim(), discount: parseFloat(body.discount) || 0, createdAt: new Date().toISOString(), usedBy: null };
+        codes.push(code);
+        await saveCodes(codes);
+        res.status(201).json(code); return;
+      }
+      if (req.method === 'DELETE') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        if (!query.id) { res.status(400).json({ error: 'id requis' }); return; }
+        await saveCodes((await loadCodes()).filter(c => c.id !== query.id));
+        res.json({ success: true }); return;
+      }
+    }
+
+    // Validate promo code (public)
+    if (url === '/api/validate-code' && req.method === 'GET') {
+      const codeStr = query.code ? query.code.toUpperCase().trim() : null;
+      if (!codeStr) { res.json({ valid: false }); return; }
+      const codes = await loadCodes();
+      const found = codes.find(c => c.code === codeStr && !c.usedBy);
+      if (found) {
+        res.json({ valid: true, discount: found.discount, codeId: found.id });
+      } else {
+        res.json({ valid: false });
+      }
       return;
     }
 

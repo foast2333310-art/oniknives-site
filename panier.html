@@ -97,6 +97,14 @@
             <label for="order-message">Message complémentaire (optionnel)</label>
             <textarea id="order-message" placeholder="Instructions particulières..."></textarea>
           </div>
+          <div class="form-group" style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="flex:1;">
+              <label for="order-promo">Code promo</label>
+              <input type="text" id="order-promo" placeholder="ex: PARRAIN-ABCDEF" style="text-transform:uppercase;">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="checkPromo()" style="padding:10px 16px;white-space:nowrap;height:42px;">Vérifier</button>
+          </div>
+          <div id="promoStatus" style="font-size:13px;margin-top:-8px;margin-bottom:12px;"></div>
           <p style="font-size:0.75rem;color:#666;margin-top:4px;">🔒 Paiement 100% sécurisé par Stripe. Aucune donnée bancaire stockée.</p>
           <button class="cart-btn checkout-submit" onclick="payWithStripe()" style="font-size:0.9rem;padding:12px 36px;">💳 Payer par carte</button>
         </div>
@@ -182,6 +190,26 @@
       } catch {}
     }
 
+    async function checkPromo() {
+      const input = document.getElementById('order-promo');
+      const status = document.getElementById('promoStatus');
+      const code = input.value.trim().toUpperCase();
+      if (!code) { status.innerHTML = ''; return; }
+      try {
+        const res = await fetch('/api/validate-code?code=' + encodeURIComponent(code));
+        const data = await res.json();
+        if (data.valid) {
+          status.innerHTML = '<span style="color:#27ae60;">✓ Code valide : -' + data.discount + ' €</span>';
+          status.dataset.discount = data.discount;
+        } else {
+          status.innerHTML = '<span style="color:#e74c3c;">✗ Code invalide ou déjà utilisé</span>';
+          delete status.dataset.discount;
+        }
+      } catch {
+        status.innerHTML = '<span style="color:#e74c3c;">Erreur de vérification</span>';
+      }
+    }
+
     async function payWithStripe() {
       const cart = getCart();
       if (cart.length === 0) return;
@@ -208,7 +236,8 @@
             description: desc,
             message: document.getElementById('order-message').value.trim()
           },
-          total: getCartTotal()
+          total: getCartTotal(),
+          promoCode: document.getElementById('order-promo').value.trim() || undefined
         };
         const res = await fetch('/api/create-checkout-session', {
           method: 'POST',
