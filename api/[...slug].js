@@ -223,19 +223,6 @@ module.exports = async (req, res) => {
       res.status(404).end(); return;
     }
 
-    // Upload
-    if (url === '/api/upload' && req.method === 'POST') {
-      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
-      const b = await getBody(req);
-      const ext = path.extname(b.filename).toLowerCase();
-      const safe = Date.now() + '_' + path.basename(b.filename).replace(/[^a-zA-Z0-9._-]/g, '_');
-      const isImage = ['.png','.jpg','.jpeg','.gif','.webp'].includes(ext);
-      const dir = isImage ? '/tmp/oni_images' : '/tmp/oni_files';
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, safe), Buffer.from(b.data, 'base64'));
-      res.json({ filename: safe }); return;
-    }
-
     // Products CRUD
     if (url.startsWith('/api/products')) {
       if (req.method === 'GET') {
@@ -263,11 +250,6 @@ module.exports = async (req, res) => {
 
       if (req.method === 'PUT') {
         const body = await getBody(req);
-        if (body.removeFile === '1') {
-          body.file = null;
-          body.fileName = null;
-        }
-        delete body.removeFile;
         const idx = products.findIndex(p => p.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         products[idx] = { ...products[idx], ...body };
@@ -305,7 +287,6 @@ module.exports = async (req, res) => {
         customer: body.customer,
         total: body.total,
         status: 'pending_payment',
-        downloadToken: Math.random().toString(36).slice(2) + Date.now().toString(36),
         createdAt: new Date().toISOString(),
       };
       orders.push(order);
@@ -353,12 +334,18 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
-          if (!orders[idx].downloadToken) orders[idx].downloadToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
 
-        res.json({ status: 'paid', orderId, downloadToken: orders[idx].downloadToken || null });
+        const products = await load();
+        const items = orders[idx]?.items || [];
+        const downloads = items.map(item => {
+          const prod = products.find(p => p.slug === item.slug || p.name === item.name);
+          return prod && prod.downloadUrl ? { name: prod.name, url: prod.downloadUrl } : null;
+        }).filter(Boolean);
+
+        res.json({ status: 'paid', orderId, downloads });
       } catch (e) {
         res.status(500).json({ error: e.message });
       }
@@ -387,7 +374,6 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
-          if (!orders[idx].downloadToken) orders[idx].downloadToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
@@ -482,38 +468,6 @@ module.exports = async (req, res) => {
         await saveOrders(orders);
         res.json({ success: true }); return;
       }
-    }
-
-    // Download
-    if (url === '/api/download' && req.method === 'GET') {
-      if (!query.token) { res.status(400).json({ error: 'token requis' }); return; }
-      const orders = await loadOrders();
-      const order = orders.find(o => o.downloadToken === query.token);
-      if (!order || order.status !== 'payé') { res.status(403).json({ error: 'Accès refusé' }); return; }
-      const products = await load();
-      const items = order.items || [];
-      const files = items.map(item => {
-        const prod = products.find(p => p.slug === item.slug || p.name === item.name);
-        return prod && prod.file ? { name: prod.file, originalName: prod.fileName || prod.file } : null;
-      }).filter(Boolean);
-      res.json({ files });
-      return;
-    }
-
-    // Download file
-    if (url === '/api/download-file' && req.method === 'GET') {
-      if (!query.token || !query.file) { res.status(400).json({ error: 'paramètres requis' }); return; }
-      const orders = await loadOrders();
-      const order = orders.find(o => o.downloadToken === query.token);
-      if (!order || order.status !== 'payé') { res.status(403).json({ error: 'Accès refusé' }); return; }
-      const filePath = path.join('/tmp/oni_files', query.file);
-      if (!fs.existsSync(filePath)) { res.status(404).json({ error: 'Fichier introuvable' }); return; }
-      const ext = path.extname(query.file).toLowerCase();
-      const mimeTypes = { '.pdf': 'application/pdf', '.zip': 'application/zip', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.txt': 'text/plain' };
-      res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
-      res.setHeader('Content-Disposition', 'attachment');
-      res.end(fs.readFileSync(filePath));
-      return;
     }
 
     // Contact

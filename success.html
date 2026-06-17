@@ -80,18 +80,12 @@
           if (data.status === 'paid') {
             document.querySelector('.check').textContent = '✅';
             document.querySelector('h1').textContent = 'Paiement réussi !';
-            if (data.downloadToken) {
-              fetch('/api/download?token=' + data.downloadToken)
-                .then(r => r.json())
-                .then(dl => {
-                  if (dl.files && dl.files.length > 0) {
-                    const el = document.getElementById('downloadLinks');
-                    el.innerHTML = dl.files.map(f =>
-                      `<a class="download-link" href="/api/download-file?token=${data.downloadToken}&file=${f.name}" download>📥 ${f.originalName}</a>`
-                    ).join('');
-                    document.getElementById('downloadSection').style.display = 'block';
-                  }
-                }).catch(() => {});
+            if (data.downloads && data.downloads.length > 0) {
+              const el = document.getElementById('downloadLinks');
+              el.innerHTML = data.downloads.map(d =>
+                `<a class="download-link" href="${d.url}" target="_blank" rel="noopener">📥 ${d.name}</a>`
+              ).join('');
+              document.getElementById('downloadSection').style.display = 'block';
             }
           }
         })

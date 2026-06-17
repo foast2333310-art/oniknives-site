@@ -149,16 +149,8 @@
           <input type="hidden" id="prodImageData" value="">
         </div>
         <div class="form-group">
-          <label for="prodFile">Fichier à télécharger (PDF, zip…) — optionnel</label>
-          <input type="file" id="prodFile">
-          <div id="fileInfo" style="color:#888;font-size:13px;margin-top:4px;"></div>
-          <div id="currentFileInfo" style="display:none;margin-top:4px;font-size:13px;color:#27ae60;">
-            <span id="currentFileName"></span>
-            <button type="button" onclick="removeFile()" style="background:none;border:1px solid #c0392b;color:#c0392b;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;margin-left:8px;">Supprimer</button>
-          </div>
-          <input type="hidden" id="prodFileData" value="">
-          <input type="hidden" id="prodFileName" value="">
-          <input type="hidden" id="prodRemoveFile" value="">
+          <label for="prodDownloadUrl">Lien de téléchargement (Google Drive, Mega, etc.) — optionnel</label>
+          <input type="url" id="prodDownloadUrl" placeholder="https://drive.google.com/..." style="width:100%;padding:10px 14px;background:#1a1a1a;border:1px solid #444;border-radius:6px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
         </div>
         <div class="form-group">
           <label for="prodDesc">Description</label>
@@ -212,32 +204,12 @@
       reader.readAsDataURL(file);
     });
 
-    document.getElementById('prodFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('prodFileData').value = ev.target.result.split(',')[1];
-        document.getElementById('prodFileName').value = file.name;
-        document.getElementById('fileInfo').textContent = '✓ ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
-        document.getElementById('fileInfo').style.color = '#27ae60';
-      };
-      reader.readAsDataURL(file);
-    });
-
     document.getElementById('prodPromoCheck').addEventListener('change', function() {
       document.getElementById('promoInput').style.display = this.checked ? 'inline-block' : 'none';
     });
 
     function promoBadge(v) { return v ? `<span class="badge badge-promo">-${v}%</span>` : ''; }
     function epuiseBadge(v) { return v ? `<span class="badge badge-epuise">ÉPUISÉ</span>` : ''; }
-
-    function removeFile() {
-      document.getElementById('prodRemoveFile').value = '1';
-      document.getElementById('currentFileInfo').style.display = 'none';
-      document.getElementById('fileInfo').textContent = '✓ Fichier supprimé';
-      document.getElementById('fileInfo').style.color = '#c0392b';
-    }
 
     function priceHtml(p, promo) {
       if (promo) {
@@ -265,7 +237,7 @@
             <div class="price">${priceHtml(p.price, p.promo)}</div>
             <div class="cat">${p.category}</div>
             ${p.badge ? `<div style="color:#c8a87c;font-size:12px;margin-top:4px;">Badge : ${p.badge}</div>` : ''}
-            ${p.file ? `<div style="color:#27ae60;font-size:12px;margin-top:2px;">📎 Fichier</div>` : ''}
+            ${p.downloadUrl ? `<div style="color:#27ae60;font-size:12px;margin-top:2px;">🔗 Lien DL</div>` : ''}
             <div class="desc">${p.description || ''}</div>
           </div>
           <div class="actions">
@@ -293,12 +265,7 @@
       document.getElementById('prodPromoVal').value = '';
       document.getElementById('promoInput').style.display = 'none';
       document.getElementById('prodBadge').value = '';
-      document.getElementById('prodFileData').value = '';
-      document.getElementById('prodFileName').value = '';
-      document.getElementById('prodRemoveFile').value = '';
-      document.getElementById('prodFile').value = '';
-      document.getElementById('fileInfo').textContent = '';
-      document.getElementById('currentFileInfo').style.display = 'none';
+      document.getElementById('prodDownloadUrl').value = '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -323,20 +290,7 @@
       document.getElementById('prodPromoVal').value = p.promo || '';
       document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';
       document.getElementById('prodBadge').value = p.badge || '';
-      document.getElementById('prodFileData').value = '';
-      document.getElementById('prodFileName').value = '';
-      document.getElementById('prodRemoveFile').value = '';
-      document.getElementById('prodFile').value = '';
-      const fileInfo = document.getElementById('fileInfo');
-      const currentFileInfo = document.getElementById('currentFileInfo');
-      if (p.file) {
-        fileInfo.textContent = '';
-        document.getElementById('currentFileName').textContent = '📎 ' + (p.fileName || p.file);
-        currentFileInfo.style.display = 'block';
-      } else {
-        currentFileInfo.style.display = 'none';
-        fileInfo.textContent = '';
-      }
+      document.getElementById('prodDownloadUrl').value = p.downloadUrl || '';
       document.getElementById('productModal').classList.add('active');
     }
 
@@ -370,30 +324,11 @@
         promo: document.getElementById('prodPromoCheck').checked && promoVal > 0 ? promoVal : 0,
         badge: badge || undefined,
         description: document.getElementById('prodDesc').value.trim(),
-        fileData: document.getElementById('prodFileData').value || undefined,
-        fileName: document.getElementById('prodFileName').value || undefined,
-        removeFile: document.getElementById('prodRemoveFile').value || undefined
+        downloadUrl: document.getElementById('prodDownloadUrl').value.trim() || undefined
       };
       if (editId) data.id = parseInt(editId);
-      if (!data.fileData) { delete data.fileData; delete data.fileName; }
-      if (!data.removeFile) delete data.removeFile;
 
       try {
-        if (document.getElementById('prodFileData').value) {
-          const fileRes = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
-            body: JSON.stringify({
-              filename: document.getElementById('prodFileName').value,
-              data: document.getElementById('prodFileData').value
-            })
-          });
-          const fileResult = await fileRes.json();
-          if (!fileRes.ok) throw new Error(fileResult.error);
-          data.file = fileResult.filename;
-          data.fileName = document.getElementById('prodFileName').value;
-        }
-        delete data.fileData;
         const res = await fetch(API, {
           method: editId ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
