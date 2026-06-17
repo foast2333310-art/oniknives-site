@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": 1,
+    "code": "TEST",
+    "discount": 10,
+    "createdAt": "2026-06-17T19:18:15.291Z",
+    "usedBy": null
+  }
+]
