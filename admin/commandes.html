@@ -152,7 +152,7 @@
               <div style="font-size:0.75rem;color:#666;">${escHtml(email)}</div>
             </td>
             <td><div class="order-items-list">${escHtml(itemsShort)}</div></td>
-            <td style="color:#c8a87c;font-weight:600;">${total} €</td>
+            <td style="color:#c8a87c;font-weight:600;">${total} €${o.promoDiscount ? `<br><span style="color:#e74c3c;font-size:11px;">-${o.promoDiscount} € (code)</span>` : ''}</td>
             <td><span class="order-date" title="${escHtml(date)}">${shortDate}</span></td>
             <td><span class="order-status ${o.status === 'payé' ? 'paid' : 'pending'}">${o.status === 'payé' ? '✓' : '⏳'} ${o.status}</span></td>
             <td>

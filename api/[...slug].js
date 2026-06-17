@@ -327,12 +327,25 @@ module.exports = async (req, res) => {
       }
 
       const lineItems = [];
+      let promoDiscount = 0;
+      if (body.promoCode) {
+        const codes = await loadCodes();
+        const found = codes.find(c => c.code === body.promoCode.toUpperCase().trim());
+        if (found) promoDiscount = found.discount;
+      }
+
+      let remainingDiscount = promoDiscount;
       for (const item of (body.items || [])) {
         const rawPrice = item.price ?? item.amount ?? 0;
-        const unit = parseFloat(rawPrice);
+        let unit = parseFloat(rawPrice);
         if (isNaN(unit) || unit < 0) {
           res.status(400).json({ error: `Prix invalide pour "${item.name}". Vide ton panier et réessaie.` });
           return;
+        }
+        if (remainingDiscount > 0 && unit > 0) {
+          const itemDiscount = Math.min(remainingDiscount, unit);
+          unit = parseFloat((unit - itemDiscount).toFixed(2));
+          remainingDiscount = parseFloat((remainingDiscount - itemDiscount).toFixed(2));
         }
         if (unit === 0) continue;
         lineItems.push({
@@ -348,18 +361,13 @@ module.exports = async (req, res) => {
       let orders = await loadOrders();
       const orderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
 
-      let promoDiscount = 0;
-      if (body.promoCode) {
-        const codes = await loadCodes();
-        const found = codes.find(c => c.code === body.promoCode.toUpperCase().trim());
-        if (found) promoDiscount = found.discount;
-      }
-
+      const discountedTotal = Math.max(0, (parseFloat(body.total) || 0) - promoDiscount);
       const order = {
         id: orderId,
         items: body.items,
         customer: body.customer,
         total: parseFloat(body.total) || 0,
+        totalAfterDiscount: discountedTotal,
         promoCode: body.promoCode || null,
         promoDiscount,
         status: 'pending_payment',
