@@ -107,7 +107,7 @@ async function syncToGitHub(data, token, filePath) {
     const json = JSON.stringify(data, null, 2);
     const content = Buffer.from(json).toString('base64');
     const info = await ghApi(ghPath, token);
-    await ghApi(ghPath, token, 'PUT', { message: '📦 ' + (filePath || 'data'), content, sha: info.sha });
+    await ghApi(ghPath, token, 'PUT', { message: '📦 [skip vercel]', content, sha: info.sha });
   } catch (e) {
     console.error('GitHub sync failed:', e.message);
   }
