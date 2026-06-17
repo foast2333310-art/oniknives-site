@@ -12,7 +12,7 @@ function getStripe() {
 
 function qs(url) {
   const q = urlMod.parse(url, true).query;
-  return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0 };
+  return { slug: q.slug || null, id: q.id ? parseInt(q.id) : null, seed: q.seed ? parseInt(q.seed) : 0, oid: q.oid ? parseInt(q.oid) : null };
 }
 
 async function loadOrders() {
