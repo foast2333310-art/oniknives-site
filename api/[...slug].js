@@ -239,8 +239,6 @@ async function saveCodes(data) {
   const dir = '/tmp';
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync('/tmp/oni_codes.json', JSON.stringify(data, null, 2));
-  const token = process.env.GH_TOKEN;
-  if (token) syncToGitHub(data, token, 'data/codes.json').catch(() => {});
 }
 
 module.exports = async (req, res) => {
