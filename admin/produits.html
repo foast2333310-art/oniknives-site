@@ -375,6 +375,8 @@
         removeFile: document.getElementById('prodRemoveFile').value || undefined
       };
       if (editId) data.id = parseInt(editId);
+      if (!data.fileData) { delete data.fileData; delete data.fileName; }
+      if (!data.removeFile) delete data.removeFile;
 
       try {
         if (document.getElementById('prodFileData').value) {
