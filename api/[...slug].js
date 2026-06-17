@@ -282,10 +282,11 @@ module.exports = async (req, res) => {
       const lineItems = [];
       for (const item of (body.items || [])) {
         const unit = parseFloat(item.price || item.amount);
-        if (isNaN(unit) || unit <= 0) {
+        if (isNaN(unit) || unit < 0) {
           res.status(400).json({ error: `Prix invalide pour "${item.name}". Vide ton panier et réessaie.` });
           return;
         }
+        if (unit === 0) continue;
         lineItems.push({
           price_data: {
             currency: 'eur',
@@ -308,6 +309,15 @@ module.exports = async (req, res) => {
       };
       orders.push(order);
       await saveOrders(orders);
+
+      if (lineItems.length === 0) {
+        orders[orders.length - 1].status = 'payé';
+        orders[orders.length - 1].paidAt = new Date().toISOString();
+        await saveOrders(orders);
+        await sendDiscordNotification(orders[orders.length - 1]);
+        res.json({ url: SITE_URL + '/success.html?free=1&orderId=' + orderId });
+        return;
+      }
 
       const session = await getStripe().checkout.sessions.create({
         payment_method_types: ['card'],
@@ -478,6 +488,23 @@ module.exports = async (req, res) => {
         await saveOrders(orders);
         res.json({ success: true }); return;
       }
+    }
+
+    // Public order downloads (for free orders)
+    if (url === '/api/order-downloads' && req.method === 'GET') {
+      const oid = query.oid ? parseInt(query.oid) : null;
+      if (!oid) { res.status(400).json({ error: 'oid requis' }); return; }
+      const orders = await loadOrders();
+      const order = orders.find(o => o.id === oid);
+      if (!order || order.status !== 'payé') { res.json({ downloads: [] }); return; }
+      const products = await load();
+      const items = order.items || [];
+      const downloads = items.map(item => {
+        const prod = products.find(p => p.slug === item.slug || p.name === item.name);
+        return prod && prod.downloadUrl ? { name: prod.name, url: prod.downloadUrl } : null;
+      }).filter(Boolean);
+      res.json({ downloads });
+      return;
     }
 
     // Contact

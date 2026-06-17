@@ -91,6 +91,24 @@
         })
         .catch(() => {});
     }
+    if (params.get('free') === '1') {
+      document.querySelector('.check').textContent = '✅';
+      document.querySelector('h1').textContent = 'Commande confirmée !';
+      const oid = params.get('orderId');
+      if (oid) {
+        fetch('/api/order-downloads?oid=' + oid)
+          .then(r => r.json())
+          .then(data => {
+            if (data.downloads && data.downloads.length > 0) {
+              const el = document.getElementById('downloadLinks');
+              el.innerHTML = data.downloads.map(d =>
+                `<a class="download-link" href="${d.url}" target="_blank" rel="noopener">📥 ${d.name}</a>`
+              ).join('');
+              document.getElementById('downloadSection').style.display = 'block';
+            }
+          }).catch(() => {});
+      }
+    }
   </script>
 </body>
 </html>
