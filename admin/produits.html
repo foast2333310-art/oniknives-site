@@ -161,6 +161,9 @@
             <input type="checkbox" id="prodEpuise" style="width:auto;"> Épuisé
           </label>
           <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="prodGratuit" style="width:auto;" onchange="document.getElementById('prodPrice').value=this.checked?'0.00':''"> Gratuit
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;color:#ccc;font-size:14px;cursor:pointer;">
             <input type="checkbox" id="prodPromoCheck" style="width:auto;"> Promo
           </label>
           <div id="promoInput" style="display:none;">
@@ -231,6 +234,7 @@
         <div class="product-card" style="position:relative">
           ${promoBadge(p.promo)}
           ${epuiseBadge(p.epuise)}
+          ${parseFloat(p.price) === 0 ? '<span class="badge badge-promo" style="background:#27ae60;right:8px;left:auto;">GRATUIT</span>' : ''}
           <img src="${img}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22/%3E%3C/svg%3E'">
           <div class="info">
             <h3>${p.name}</h3>
@@ -261,6 +265,7 @@
       document.getElementById('uploadProgress').style.display = 'none';
       document.getElementById('prodDesc').value = '';
       document.getElementById('prodEpuise').checked = false;
+      document.getElementById('prodGratuit').checked = false;
       document.getElementById('prodPromoCheck').checked = false;
       document.getElementById('prodPromoVal').value = '';
       document.getElementById('promoInput').style.display = 'none';
@@ -286,6 +291,7 @@
       document.getElementById('previewImg').src = img;
       document.getElementById('prodDesc').value = p.description;
       document.getElementById('prodEpuise').checked = !!p.epuise;
+      document.getElementById('prodGratuit').checked = parseFloat(p.price) === 0;
       document.getElementById('prodPromoCheck').checked = !!p.promo;
       document.getElementById('prodPromoVal').value = p.promo || '';
       document.getElementById('promoInput').style.display = p.promo ? 'inline-block' : 'none';

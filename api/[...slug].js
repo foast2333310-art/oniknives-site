@@ -281,7 +281,8 @@ module.exports = async (req, res) => {
 
       const lineItems = [];
       for (const item of (body.items || [])) {
-        const unit = parseFloat(item.price || item.amount);
+        const rawPrice = item.price ?? item.amount ?? 0;
+        const unit = parseFloat(rawPrice);
         if (isNaN(unit) || unit < 0) {
           res.status(400).json({ error: `Prix invalide pour "${item.name}". Vide ton panier et réessaie.` });
           return;

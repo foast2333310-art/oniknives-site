@@ -47,6 +47,7 @@ function renderProducts(products, containerId) {
     <div class="product-card" style="position:relative">
       <a href="produit.html?slug=${p.slug}" style="display:block;text-decoration:none;color:inherit;">
         ${badge}
+        ${parseFloat(p.price) === 0 ? '<span class="badge badge-promo" style="background:#27ae60;">GRATUIT</span>' : ''}
         <img src="${imgSrc(p.image)}" alt="${p.name}" class="product-card-img" loading="lazy"
              onerror="this.src='images/placeholder.svg'">
         <div class="product-card-body">
