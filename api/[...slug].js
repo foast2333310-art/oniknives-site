@@ -351,12 +351,8 @@ module.exports = async (req, res) => {
       let promoDiscount = 0;
       if (body.promoCode) {
         const codes = await loadCodes();
-        const found = codes.find(c => c.code === body.promoCode.toUpperCase().trim() && !c.usedBy);
-        if (found) {
-          promoDiscount = found.discount;
-          found.usedBy = orderId;
-          await saveCodes(codes);
-        }
+        const found = codes.find(c => c.code === body.promoCode.toUpperCase().trim());
+        if (found) promoDiscount = found.discount;
       }
 
       const order = {
@@ -600,7 +596,7 @@ module.exports = async (req, res) => {
       const codeStr = query.code ? query.code.toUpperCase().trim() : null;
       if (!codeStr) { res.json({ valid: false }); return; }
       const codes = await loadCodes();
-      const found = codes.find(c => c.code === codeStr && !c.usedBy);
+      const found = codes.find(c => c.code === codeStr);
       if (found) {
         res.json({ valid: true, discount: found.discount, codeId: found.id });
       } else {

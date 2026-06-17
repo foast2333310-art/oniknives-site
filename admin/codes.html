@@ -115,15 +115,14 @@
       }
       el.innerHTML = `
         <table>
-          <thead><tr><th>Code</th><th>Réduction</th><th>Créé le</th><th>Statut</th><th></th></tr></thead>
+          <thead><tr><th>Code</th><th>Réduction</th><th>Créé le</th><th></th></tr></thead>
           <tbody>
             ${codes.map(c => `
               <tr>
                 <td><span class="badge-code">${c.code}</span></td>
                 <td>-${c.discount} €</td>
                 <td>${new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
-                <td>${c.usedBy ? '<span class="badge-used">Utilisé</span>' : '<span class="badge-active">Actif</span>'}</td>
-                <td>${c.usedBy ? '' : `<button class="btn btn-danger" onclick="deleteCode(${c.id})" style="padding:4px 12px;font-size:12px;">Supprimer</button>`}</td>
+                <td><button class="btn btn-danger" onclick="deleteCode(${c.id})" style="padding:4px 12px;font-size:12px;">Supprimer</button></td>
               </tr>
             `).join('')}
           </tbody>
