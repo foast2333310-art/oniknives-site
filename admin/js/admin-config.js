@@ -1,7 +1,7 @@
 const ADMIN_CONFIG = {
-  // Mot de passe (SHA-256). Défaut: "admin123"
+  // Mot de passe (SHA-256). Défaut: "123Mat123"
   // Pour changer le mot de passe: https://www.sha256hash.com/
-  passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+  passwordHash: "4ee967a57a4505138afb5b8d8603277ee82da5d4051ad0aac27859fad6736be2",
   siteName: "LaCorpo",
   version: "1.0.0"
 };
