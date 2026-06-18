@@ -15,8 +15,8 @@ img { max-width: 100%; height: auto; display: block; }
 /* Header */
 .header { background: #0d0d0d; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 100; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 20px; }
-.logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 600; color: #d4a853; letter-spacing: 1px; text-decoration: none; }
-.logo:hover { color: #e8c06a; }
+.logo { display:flex;align-items:center;text-decoration:none; }
+.logo img { height:36px;display:block; }
 .nav { display: flex; gap: 28px; align-items: center; }
 .nav a { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #999; transition: color 0.2s; font-weight: 400; text-decoration: none; }
 .nav a:hover { color: #d4a853; }
