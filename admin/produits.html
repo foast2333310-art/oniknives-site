@@ -143,11 +143,8 @@
           <input type="text" id="prodBadge" placeholder="⭐ Populaire">
         </div>
         <div class="form-group">
-          <label for="prodImage">Image du produit</label>
-          <input type="file" id="prodImage" accept="image/png,image/jpeg,image/gif,image/webp">
-          <div id="uploadProgress" style="color:#888;font-size:13px;margin-top:4px;display:none;">Chargement...</div>
-          <div id="imagePreview" style="margin-top:8px;display:none;"><img id="previewImg" style="max-height:100px;border-radius:4px;"></div>
-          <input type="hidden" id="prodImageData" value="">
+          <label for="prodImageUrl">URL de l'image (Goopics, ImgBB, etc.)</label>
+          <input type="url" id="prodImageUrl" placeholder="https://i.goopics.net/xxxxx.png">
         </div>
         <div class="form-group">
           <label for="prodDownloadUrl">Lien de téléchargement (Google Drive, Mega, etc.) — optionnel</label>
@@ -192,22 +189,6 @@
       return localStorage.getItem('admin_api_key');
     }
 
-    document.getElementById('prodImage').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const p = document.getElementById('uploadProgress');
-      p.style.display = 'block'; p.textContent = 'Compression...';
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('previewImg').src = ev.target.result;
-        document.getElementById('imagePreview').style.display = 'block';
-        document.getElementById('prodImageData').value = ev.target.result;
-        p.textContent = '✓ Image prête';
-        p.style.color = '#27ae60';
-      };
-      reader.readAsDataURL(file);
-    });
-
     document.getElementById('prodPromoCheck').addEventListener('change', function() {
       document.getElementById('promoInput').style.display = this.checked ? 'inline-block' : 'none';
     });
@@ -230,7 +211,7 @@
         return;
       }
       grid.innerHTML = products.map(p => {
-        const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
+        const img = p.image && (p.image.startsWith('data:') || p.image.startsWith('http')) ? p.image : '/api/images/' + (p.image || '');
         return `
         <div class="product-card" style="position:relative">
           ${promoBadge(p.promo)}
@@ -260,10 +241,7 @@
       document.getElementById('prodSlug').value = '';
       document.getElementById('prodPrice').value = '';
       document.getElementById('prodCategory').value = '';
-      document.getElementById('prodImage').value = '';
-      document.getElementById('prodImageData').value = '';
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('uploadProgress').style.display = 'none';
+      document.getElementById('prodImageUrl').value = '';
       document.getElementById('prodDesc').value = '';
       document.getElementById('prodEpuise').checked = false;
       document.getElementById('prodGratuit').checked = false;
@@ -284,12 +262,7 @@
       document.getElementById('prodSlug').value = p.slug;
       document.getElementById('prodPrice').value = p.price;
       document.getElementById('prodCategory').value = p.category;
-      document.getElementById('prodImage').value = '';
-      document.getElementById('prodImageData').value = p.image || '';
-      document.getElementById('uploadProgress').style.display = 'none';
-      const img = p.image && p.image.startsWith('data:') ? p.image : '/api/images/' + (p.image || '');
-      document.getElementById('imagePreview').style.display = p.image ? 'block' : 'none';
-      document.getElementById('previewImg').src = img;
+      document.getElementById('prodImageUrl').value = p.image && (p.image.startsWith('data:') || p.image.startsWith('http')) ? p.image : '';
       document.getElementById('prodDesc').value = p.description;
       document.getElementById('prodEpuise').checked = !!p.epuise;
       document.getElementById('prodGratuit').checked = parseFloat(p.price) === 0;
@@ -318,13 +291,13 @@
     document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
-      const imgData = document.getElementById('prodImageData').value;
+      const imgData = document.getElementById('prodImageUrl').value.trim();
       const promoVal = parseInt(document.getElementById('prodPromoVal').value);
       const badge = document.getElementById('prodBadge').value.trim();
       const data = {
         name: document.getElementById('prodName').value.trim(),
         slug: document.getElementById('prodSlug').value.trim(),
-        price: parseFloat(document.getElementById('prodPrice').value).toFixed(2),
+        price: parseFloat(document.getElementById('prodPrice').value),
         category: document.getElementById('prodCategory').value,
         image: imgData,
         epuise: document.getElementById('prodEpuise').checked,

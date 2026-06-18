@@ -136,7 +136,7 @@
       document.getElementById('order-confirmation').style.display = 'none';
 
       items.innerHTML = cart.map(item => {
-        const img = item.image && item.image.startsWith('data:') ? item.image : '/api/images/' + (item.image || '');
+        const img = item.image && (item.image.startsWith('data:') || item.image.startsWith('http')) ? item.image : '/api/images/' + (item.image || '');
         return `
         <div class="cart-item">
           <img src="${img}" alt="${item.name}" onerror="this.src='images/placeholder.svg'">

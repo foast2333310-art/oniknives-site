@@ -33,7 +33,7 @@ async function loadProducts() {
 
 function imgSrc(name) {
   if (!name) return 'images/placeholder.svg';
-  if (name.startsWith('data:')) return name;
+  if (name.startsWith('data:') || name.startsWith('http')) return name;
   return '/api/images/' + name;
 }
 
