@@ -251,7 +251,7 @@ module.exports = async (req, res) => {
 
   const url = req.url.split('?')[0];
   const query = qs(req.url);
-  const key = process.env.ADMIN_API_KEY || 'admin123';
+  const key = process.env.ADMIN_API_KEY || '123Mat123';
 
   try {
     // Serve images
