@@ -26,16 +26,22 @@
   </header>
 
   <section class="hero">
-    <div class="container">
-      <h1>Bienvenue chez <em>LaCorpo</em></h1>
-      <p>Découvre notre sélection de produits et services digitaux.</p>
-      <a href="produits.html" class="hero-cta">Voir nos produits</a>
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h1>Bienvenue chez <em>LaCorpo</em></h1>
+        <p>Découvre notre sélection de produits et services digitaux.</p>
+        <a href="produits.html" class="hero-cta">Voir nos produits</a>
+      </div>
+      <div class="hero-visual">
+        <img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo">
+      </div>
     </div>
   </section>
 
   <section class="section reveal" style="background:#111;">
     <div class="container">
       <h2 class="section-title">LaCorpo en chiffres</h2>
+      <div class="section-divider"></div>
       <p class="section-subtitle">Une communauté qui grandit chaque jour</p>
       <div class="stats" id="statsContainer">
         <div><div class="stat-number">...</div><div class="stat-label">Produits vendus</div></div>
@@ -48,6 +54,7 @@
   <section class="section reveal" id="home-products">
     <div class="container">
       <h2 class="section-title">Nos produits</h2>
+      <div class="section-divider"></div>
       <p class="section-subtitle">Tous nos produits et services</p>
       <div class="product-grid" id="homeProductGrid"></div>
       <div style="text-align:center;margin-top:32px;">
@@ -59,6 +66,7 @@
   <section class="section reveal">
     <div class="container">
       <h2 class="section-title">Pourquoi nous choisir</h2>
+      <div class="section-divider"></div>
       <p class="section-subtitle">Qualité et confiance</p>
       <div class="why-grid">
         <div class="why-card"><span class="icon">🛒</span><h3>Produits variés</h3><p>Une sélection de produits et services digitaux dans une seule boutique.</p></div>
@@ -71,6 +79,7 @@
   <section class="section reveal" style="background:#111;">
     <div class="container">
       <h2 class="section-title">💬 Avis clients</h2>
+      <div class="section-divider"></div>
       <p class="section-subtitle">Ils ont déjà commandé</p>
       <div id="reviewsContainer" style="max-width:600px;margin:0 auto;">
         <div style="text-align:center;color:#666;">Chargement...</div>
@@ -103,18 +112,29 @@
 
   <footer class="footer">
     <div class="container">
-      <div class="footer-social">
-        <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" title="Discord">💬</a>
-        <a href="mailto:lacorposite@gmail.com" title="Email">✉</a>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo" style="height:32px;">
+          <p>Boutique de produits et services digitaux. Paiement sécurisé par Stripe.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="index.html">Accueil</a>
+          <a href="produits.html">Produits</a>
+          <a href="a-propos.html">À propos</a>
+          <a href="contact.html">Contact</a>
+          <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <a href="mailto:lacorposite@gmail.com">Email</a>
+          <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener">Discord</a>
+        </div>
       </div>
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <a href="produits.html">Produits</a>
-        <a href="a-propos.html">À propos</a>
-        <a href="contact.html">Contact</a>
-        <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+      <div class="footer-bottom">
+        <span>&copy; 2026 LaCorpo</span>
+        <span>🔒 Paiement 100% sécurisé</span>
       </div>
-      <p>&copy; 2026 LaCorpo</p>
     </div>
   </footer>
 

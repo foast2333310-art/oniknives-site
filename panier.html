@@ -7,37 +7,6 @@
   <meta name="description" content="Votre panier LaCorpo.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
-  <style>
-    .cart-page { padding: 40px 0; min-height: 60vh; }
-    .cart-empty { text-align: center; padding: 60px 0; color: #888; }
-    .cart-empty h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #e5e5e5; margin-bottom: 8px; }
-    .cart-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-    .cart-item { display: flex; gap: 16px; background: #1a1a1a; border-radius: 6px; padding: 16px; align-items: center; }
-    .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; background: #222; }
-    .cart-item-info { flex: 1; }
-    .cart-item-name { font-weight: 500; font-size: 0.9rem; }
-    .cart-item-price { color: #d4a853; font-size: 0.9rem; margin-top: 2px; }
-    .cart-item-actions { display: flex; align-items: center; gap: 8px; }
-    .cart-item-actions input { width: 50px; padding: 4px 8px; background: #0d0d0d; border: 1px solid #333; border-radius: 4px; color: #fff; text-align: center; font-size: 0.85rem; }
-    .cart-item-remove { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem; padding: 4px 8px; }
-    .cart-item-remove:hover { text-decoration: underline; }
-    .cart-total { text-align: right; font-size: 1.2rem; padding: 16px 0; border-top: 1px solid #222; }
-    .cart-total strong { color: #d4a853; }
-    .checkout-form { max-width: 500px; margin-top: 32px; }
-    .checkout-form h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 16px; }
-    .checkout-form .form-group { margin-bottom: 12px; }
-    .checkout-form label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 4px; }
-    .checkout-form input, .checkout-form textarea, .checkout-form select { width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 0.9rem; outline: none; font-family: Inter, sans-serif; }
-    .checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #d4a853; }
-    .checkout-form textarea { min-height: 80px; resize: vertical; }
-    .checkout-submit { margin-top: 16px; }
-    #order-confirmation { display: none; text-align: center; padding: 40px; background: #1a1a1a; border-radius: 8px; margin-top: 24px; }
-    #order-confirmation h3 { color: #27ae60; font-size: 1.2rem; margin-bottom: 8px; }
-    .payment-steps { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
-    .payment-steps h4 { color: #d4a853; margin-bottom: 12px; font-size: 0.9rem; }
-    .payment-steps ol { padding-left: 20px; color: #999; font-size: 0.85rem; line-height: 1.8; }
-    .payment-steps ol li strong { color: #e5e5e5; }
-  </style>
 </head>
 <body>
   <div class="top-banner">🔒 Paiement sécurisé Stripe · Support 24/7</div>
@@ -120,18 +89,29 @@
 
   <footer class="footer">
     <div class="container">
-      <div class="footer-social">
-        <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" title="Discord">💬</a>
-        <a href="mailto:lacorposite@gmail.com" title="Email">✉</a>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo" style="height:32px;">
+          <p>Boutique de produits et services digitaux. Paiement sécurisé par Stripe.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="index.html">Accueil</a>
+          <a href="produits.html">Produits</a>
+          <a href="a-propos.html">À propos</a>
+          <a href="contact.html">Contact</a>
+          <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <a href="mailto:lacorposite@gmail.com">Email</a>
+          <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener">Discord</a>
+        </div>
       </div>
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <a href="produits.html">Produits</a>
-        <a href="a-propos.html">À propos</a>
-        <a href="contact.html">Contact</a>
-        <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+      <div class="footer-bottom">
+        <span>&copy; 2026 LaCorpo</span>
+        <span>🔒 Paiement 100% sécurisé</span>
       </div>
-      <p>&copy; 2026 LaCorpo</p>
     </div>
   </footer>
 

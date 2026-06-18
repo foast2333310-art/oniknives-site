@@ -7,18 +7,6 @@
   <meta name="description" content="Votre commande a été confirmée.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
-  <style>
-    .success-page { text-align: center; padding: 80px 0; min-height: 60vh; }
-    .success-page .check { font-size: 64px; margin-bottom: 16px; }
-    .success-page h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #27ae60; margin-bottom: 12px; }
-    .success-page p { color: #888; font-size: 1rem; line-height: 1.6; max-width: 480px; margin: 0 auto 24px; }
-    .success-page .discord-btn { display: inline-block; background: #5865f2; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
-    .success-page .discord-btn:hover { opacity: 0.85; }
-    .download-section { margin: 24px auto; max-width: 400px; background: #1a1a1a; border-radius: 8px; padding: 20px; border: 1px solid #333; display: none; }
-    .download-section h3 { color: #f0e6d0; font-size: 14px; margin-bottom: 12px; }
-    .download-link { display: block; background: #2a2a2a; padding: 12px 16px; border-radius: 6px; color: #c8a87c; text-decoration: none; margin-bottom: 8px; border: 1px solid #333; font-size: 14px; }
-    .download-link:hover { border-color: #c8a87c; }
-  </style>
 </head>
 <body>
   <div class="top-banner">🔒 Paiement sécurisé Stripe · Support 24/7</div>
@@ -57,17 +45,29 @@
 
   <footer class="footer">
     <div class="container">
-      <div class="footer-social">
-        <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" title="Discord">💬</a>
-        <a href="mailto:lacorposite@gmail.com" title="Email">✉</a>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo" style="height:32px;">
+          <p>Boutique de produits et services digitaux. Paiement sécurisé par Stripe.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="index.html">Accueil</a>
+          <a href="produits.html">Produits</a>
+          <a href="a-propos.html">À propos</a>
+          <a href="contact.html">Contact</a>
+          <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <a href="mailto:lacorposite@gmail.com">Email</a>
+          <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener">Discord</a>
+        </div>
       </div>
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <a href="produits.html">Produits</a>
-        <a href="a-propos.html">À propos</a>
-        <a href="contact.html">Contact</a>
+      <div class="footer-bottom">
+        <span>&copy; 2026 LaCorpo</span>
+        <span>🔒 Paiement 100% sécurisé</span>
       </div>
-      <p>&copy; 2026 LaCorpo</p>
     </div>
   </footer>
 
@@ -123,5 +123,18 @@
       }
     }
   </script>
+<div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
+    <h2>Conditions Générales de Vente</h2>
+    <div class="modal-body">
+      <p>En achetant nos services ou produits, vous acceptez les conditions suivantes :</p>
+      <p>Aucun remboursement ne pourra être effectué après utilisation du produit, du service ou de la commande. Toute commande validée est considérée comme définitive.</p>
+      <p>À partir du moment où vous modifiez, touchez ou accédez au produit/service, nous ne sommes plus responsables des éventuels problèmes, dysfonctionnements ou conséquences pouvant survenir par la suite.</p>
+      <p>Le client est responsable de l'utilisation faite des produits et services fournis. Nous nous réservons le droit de refuser ou d'annuler une commande en cas d'abus ou de non-respect des règles.</p>
+      <p>Merci de votre confiance. — LaCorpo</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
