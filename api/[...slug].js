@@ -179,9 +179,6 @@ async function sendDiscordNotification(o) {
     { name: '📧 Email', value: customer.email || '—', inline: true },
     { name: '📝 Projet', value: customer.description || '—', inline: false },
   ];
-  if (o.parrainCode) {
-    fields.push({ name: '🎟 Code parrainage', value: '`' + o.parrainCode + '` (-5€ pour le prochain client)', inline: false });
-  }
   try {
     await fetch(url, {
       method: 'POST',
@@ -199,13 +196,6 @@ async function sendDiscordNotification(o) {
 }
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
-
-function genParrainCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'PARRAIN-';
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
 
 async function loadCodes() {
   try {
@@ -379,7 +369,6 @@ module.exports = async (req, res) => {
       if (lineItems.length === 0) {
         orders[orders.length - 1].status = 'payé';
         orders[orders.length - 1].paidAt = new Date().toISOString();
-        orders[orders.length - 1].parrainCode = genParrainCode();
         await saveOrders(orders);
         await sendDiscordNotification(orders[orders.length - 1]);
         res.json({ url: SITE_URL + '/success.html?free=1&orderId=' + orderId });
@@ -421,7 +410,6 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
-          if (!orders[idx].parrainCode) orders[idx].parrainCode = genParrainCode();
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
@@ -433,7 +421,7 @@ module.exports = async (req, res) => {
           return prod && prod.downloadUrl ? { name: prod.name, url: prod.downloadUrl } : null;
         }).filter(Boolean);
 
-        res.json({ status: 'paid', orderId, downloads, parrainCode: orders[idx].parrainCode || null });
+        res.json({ status: 'paid', orderId, downloads });
       } catch (e) {
         res.status(500).json({ error: e.message });
       }
@@ -462,7 +450,6 @@ module.exports = async (req, res) => {
         if (idx >= 0 && orders[idx].status !== 'payé') {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
-          if (!orders[idx].parrainCode) orders[idx].parrainCode = genParrainCode();
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
         }
@@ -572,7 +559,7 @@ module.exports = async (req, res) => {
         const prod = products.find(p => p.slug === item.slug || p.name === item.name);
         return prod && prod.downloadUrl ? { name: prod.name, url: prod.downloadUrl } : null;
       }).filter(Boolean);
-      res.json({ downloads, parrainCode: order.parrainCode || null });
+      res.json({ downloads });
       return;
     }
 
