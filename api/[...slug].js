@@ -228,9 +228,9 @@ async function sendEmail(order) {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'LaCorpo <onboarding@resend.dev>', to: [email], subject: '✅ Commande confirmée — LaCorpo', html }),
+      body: JSON.stringify({ from: 'onboarding@resend.dev', to: [email], subject: '✅ Commande confirmée — LaCorpo', html }),
     });
-  } catch {}
+  } catch (e) { console.error('Email error:', e?.message); }
 }
 
 async function loadCodes() {
