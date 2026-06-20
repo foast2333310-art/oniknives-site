@@ -197,42 +197,6 @@ async function sendDiscordNotification(o) {
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
 
-async function sendEmail(order) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return;
-  const customer = order.customer || {};
-  const email = customer.email;
-  if (!email) return;
-  const total = parseFloat(order.total || 0).toFixed(2).replace('.', ',');
-  const items = order.items.map(i => `${i.quantity}x ${i.name} — ${parseFloat(i.price).toFixed(2).replace('.', ',')}€`).join('<br>');
-  const html = `
-    <div style="max-width:560px;margin:0 auto;font-family:sans-serif;background:#0a0a0a;color:#e5e5e5;padding:32px;border-radius:8px;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo" style="height:40px;">
-      </div>
-      <h1 style="color:#c8a87c;font-size:20px;text-align:center;margin-bottom:8px;">✅ Commande confirmée !</h1>
-      <p style="color:#888;text-align:center;margin-bottom:24px;">Merci pour ta commande, elle est en cours de traitement.</p>
-      <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:20px;margin-bottom:20px;">
-        <h2 style="color:#f0e6d0;font-size:14px;margin-bottom:12px;">📦 Récapitulatif</h2>
-        <p style="color:#999;font-size:13px;">${items}</p>
-        <p style="color:#c8a87c;font-size:16px;font-weight:600;margin-top:12px;">Total : ${total} €</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:20px;margin-bottom:20px;">
-        <h2 style="color:#f0e6d0;font-size:14px;margin-bottom:8px;">💬 Besoin d'aide ?</h2>
-        <p style="color:#999;font-size:13px;">Rejoins notre serveur Discord pour suivre ta commande et obtenir du support.</p>
-        <a href="https://discord.gg/asYcBq76bm" style="display:inline-block;padding:10px 20px;background:#5865f2;color:#fff;text-decoration:none;border-radius:4px;font-size:13px;margin-top:8px;">Rejoindre le Discord</a>
-      </div>
-      <p style="color:#555;font-size:11px;text-align:center;margin-top:24px;">LaCorpo — Paiement sécurisé par Stripe</p>
-    </div>`;
-  try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'onboarding@resend.dev', to: [email], subject: '✅ Commande confirmée — LaCorpo', html }),
-    });
-  } catch (e) { console.error('Email error:', e?.message); }
-}
-
 async function loadCodes() {
   try {
     const f = '/tmp/oni_codes.json';
@@ -407,7 +371,6 @@ module.exports = async (req, res) => {
         orders[orders.length - 1].paidAt = new Date().toISOString();
         await saveOrders(orders);
         await sendDiscordNotification(orders[orders.length - 1]);
-        await sendEmail(orders[orders.length - 1]);
         res.json({ url: SITE_URL + '/success.html?free=1&orderId=' + orderId });
         return;
       }
@@ -449,7 +412,6 @@ module.exports = async (req, res) => {
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
-          await sendEmail(orders[idx]);
         }
 
         const products = await load();
@@ -490,7 +452,6 @@ module.exports = async (req, res) => {
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
           await sendDiscordNotification(orders[idx]);
-          await sendEmail(orders[idx]);
         }
       }
 
