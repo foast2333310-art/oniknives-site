@@ -74,7 +74,7 @@
   {
     "name": "Pack Facture",
     "slug": "PackFacture",
-    "price": 9.99,
+    "price": 10,
     "category": "Facture",
     "image": "https://i.goopics.net/ph3n47.png",
     "epuise": false,
