@@ -52,6 +52,45 @@ async function saveOrders(data) {
   if (token) syncToGitHub(data, token, 'data/orders.json').catch(() => {});
 }
 
+async function loadAccounts() {
+  try {
+    const f = '/tmp/oni_accounts.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/accounts.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const dir = '/tmp';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync('/tmp/oni_accounts.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
+  try {
+    const f = path.join(process.cwd(), 'data', 'accounts.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_accounts.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return [];
+}
+
+async function saveAccounts(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_accounts.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) syncToGitHub(data, token, 'data/accounts.json').catch(() => {});
+}
+
 async function load(force) {
   if (!force) {
     try {
@@ -655,14 +694,11 @@ module.exports = async (req, res) => {
       const body = await getBody(req);
       if (!body.email || !body.password) { res.status(400).json({ error: 'email et password requis' }); return; }
       const email = body.email.trim().toLowerCase();
-      let accounts = [];
-      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      let accounts = await loadAccounts();
       if (accounts.find(a => a.email === email)) { res.status(409).json({ error: 'Cet email est déjà utilisé' }); return; }
       const token = require('crypto').randomUUID();
       accounts.push({ email, password: body.password, token, createdAt: new Date().toISOString() });
-      fs.writeFileSync('/tmp/oni_accounts.json', JSON.stringify(accounts, null, 2));
-      const t = process.env.GH_TOKEN;
-      if (t) syncToGitHub(accounts, t, 'data/accounts.json').catch(() => {});
+      await saveAccounts(accounts);
       res.status(201).json({ token }); return;
     }
 
@@ -670,8 +706,7 @@ module.exports = async (req, res) => {
       const body = await getBody(req);
       if (!body.email || !body.password) { res.status(400).json({ error: 'email et password requis' }); return; }
       const email = body.email.trim().toLowerCase();
-      let accounts = [];
-      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      const accounts = await loadAccounts();
       const account = accounts.find(a => a.email === email && a.password === body.password);
       if (!account) { res.status(401).json({ error: 'Email ou mot de passe incorrect' }); return; }
       res.json({ token: account.token }); return;
@@ -681,8 +716,7 @@ module.exports = async (req, res) => {
       if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
       const token = req.headers['x-session-token'];
       if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
-      let accounts = [];
-      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      const accounts = await loadAccounts();
       const account = accounts.find(a => a.token === token);
       if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
       const orders = await loadOrders();
