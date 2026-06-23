@@ -1,0 +1,14 @@
+[
+  {
+    "email": "test@test.com",
+    "password": "abc123",
+    "token": "1ed607f9-1849-40e0-ba9f-048b60cecf7a",
+    "createdAt": "2026-06-23T20:43:53.277Z"
+  },
+  {
+    "email": "ilhanthevenin@icloud.com",
+    "password": "4ee967a57a4505138afb5b8d8603277ee82da5d4051ad0aac27859fad6736be2",
+    "token": "e3f50714-74b9-44b7-8c90-fbc567421516",
+    "createdAt": "2026-06-23T20:44:10.165Z"
+  }
+]
