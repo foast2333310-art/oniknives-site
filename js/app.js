@@ -109,3 +109,50 @@ async function initProductPage() {
     document.getElementById('product-name').textContent = 'Produit non trouvé';
   }
 }
+
+/* Theme toggle */
+function toggleTheme() {
+  const b = document.body;
+  b.classList.toggle('light-mode');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = b.classList.contains('light-mode') ? '🌙' : '☀️';
+  localStorage.setItem('oni_theme', b.classList.contains('light-mode') ? 'light' : 'dark');
+}
+(function() {
+  if (localStorage.getItem('oni_theme') === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = '🌙';
+  }
+})();
+
+async function submitSuggestion() {
+  const name = document.getElementById('suggName')?.value?.trim();
+  const msg = document.getElementById('suggMsg')?.value?.trim();
+  if (!name || !msg) { alert('Remplis tous les champs'); return; }
+  try {
+    const r = await fetch('/api/suggestions', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, message: msg, email: document.getElementById('suggEmail')?.value?.trim() || '' })
+    });
+    if (!r.ok) throw Error();
+    document.getElementById('suggName').value = '';
+    document.getElementById('suggEmail').value = '';
+    document.getElementById('suggMsg').value = '';
+    alert('✓ Suggestion envoyée !');
+  } catch { alert('Erreur'); }
+}
+
+async function subscribeNotify() {
+  const email = document.getElementById('notifEmail')?.value?.trim();
+  if (!email) { alert('Entre ton email'); return; }
+  try {
+    const r = await fetch('/api/subscribers', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
+    if (!r.ok) throw Error();
+    document.getElementById('notifEmail').value = '';
+    alert('✓ Inscrit ! Tu seras prévenu des nouveaux produits.');
+  } catch { alert('Erreur'); }
+}

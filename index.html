@@ -20,6 +20,7 @@
         <a href="contact.html">Contact</a>
       </nav>
       <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Mode clair/sombre">☀️</button>
       <a href="admin/" class="admin-icon" title="Administration" aria-label="Administration">⚙</a>
       <a href="panier.html" class="cart-icon" title="Panier">🛒<span class="cart-count">0</span></a>
     </div>
@@ -106,6 +107,30 @@
           <textarea id="reviewComment" style="width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;min-height:60px;"></textarea>
         </div>
         <button onclick="submitReview()" style="padding:10px 24px;background:#c8a87c;color:#1a1a1a;border:none;border-radius:4px;font-weight:600;cursor:pointer;">Envoyer</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" style="background:#111;">
+    <div class="container" style="max-width:600px;">
+      <h2 class="section-title">💡 Suggère un produit</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Tu veux voir un produit ou service en particulier ? Dis-le nous</p>
+      <div class="form-group"><input type="text" id="suggName" placeholder="Ton pseudo" style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;"></div>
+      <div class="form-group"><input type="email" id="suggEmail" placeholder="Ton email (optionnel)" style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;"></div>
+      <div class="form-group"><textarea id="suggMsg" placeholder="Décris le produit que tu aimerais voir..." style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;min-height:100px;"></textarea></div>
+      <button class="cart-btn" onclick="submitSuggestion()" style="width:100%;">Envoyer la suggestion</button>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="container" style="max-width:500px;text-align:center;">
+      <h2 class="section-title">🔔 Nouveautés</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Sois prévenu quand un nouveau produit sort</p>
+      <div style="display:flex;gap:8px;">
+        <input type="email" id="notifEmail" placeholder="Ton email" style="flex:1;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;">
+        <button class="cart-btn" onclick="subscribeNotify()" style="white-space:nowrap;">M'inscrire</button>
       </div>
     </div>
   </section>

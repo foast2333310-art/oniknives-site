@@ -280,3 +280,60 @@ img { max-width: 100%; height: auto; display: block; }
   .product-detail-img { width: 100%; }
   .modal { padding: 24px; }
 }
+
+/* Theme toggle */
+.theme-toggle { background:none;border:none;color:#888;font-size:1rem;cursor:pointer;padding:4px;line-height:1;transition:color 0.2s; }
+.theme-toggle:hover { color:#c8a87c; }
+
+/* Light mode */
+body.light-mode { background:#f5f0eb; color:#2a2a2a; }
+.light-mode .top-banner { background:rgba(0,0,0,0.04); color:#888; border-bottom:1px solid rgba(0,0,0,0.06); }
+.light-mode .header { background:rgba(245,240,235,0.9); border-bottom:1px solid rgba(0,0,0,0.06); }
+.light-mode .nav a { color:#888; }
+.light-mode .nav a:hover { color:#2a2a2a; }
+.light-mode .nav a::after { background:#c8a87c; }
+.light-mode .hamburger span { background:#2a2a2a; }
+.light-mode .hero::before { background:linear-gradient(135deg,rgba(245,240,235,0.95) 0%,rgba(230,220,210,0.9) 40%,rgba(245,240,235,0.95) 70%), url('https://i.goopics.net/k2n1sq.png') center/40% no-repeat; }
+.light-mode .hero::after { background:radial-gradient(ellipse at 70% 50%, rgba(200,168,124,0.06) 0%, transparent 60%); }
+.light-mode .hero-text h1 { color:#2a2a2a; }
+.light-mode .hero-text p { color:#666; }
+.light-mode .section-alt { background:rgba(0,0,0,0.02); }
+.light-mode .section-title { color:#2a2a2a; }
+.light-mode .product-card { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .product-card:hover { border-color:rgba(200,168,124,0.3); box-shadow:0 12px 40px rgba(0,0,0,0.08), 0 0 30px rgba(200,168,124,0.05); }
+.light-mode .product-card-title { color:#2a2a2a; }
+.light-mode .product-card-features li { color:#666; }
+.light-mode .why-card { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .why-card h3 { color:#2a2a2a; }
+.light-mode .testimonial-card { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .footer { background:rgba(245,240,235,0.9); border-top-color:rgba(0,0,0,0.06); }
+.light-mode .footer-col h4 { color:#2a2a2a; }
+.light-mode .footer-col a { color:#777; }
+.light-mode .footer-col a:hover { color:#c8a87c; }
+.light-mode .footer-bottom { border-top-color:rgba(0,0,0,0.06); }
+.light-mode .footer-brand p { color:#777; }
+.light-mode .form-group input, .light-mode .form-group textarea, .light-mode .form-group select { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.1); color:#2a2a2a; }
+.light-mode .checkout-form input, .light-mode .checkout-form textarea, .light-mode .checkout-form select { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.1); color:#2a2a2a; }
+.light-mode .cart-item { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode #order-confirmation { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .payment-steps { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .payment-steps h4 { color:#c8a87c; }
+.light-mode .modal { background:rgba(245,240,235,0.98); border-color:rgba(0,0,0,0.06); }
+.light-mode .modal h2 { color:#c8a87c; }
+.light-mode .modal-body h3 { color:#2a2a2a; }
+.light-mode .modal-body p { color:#666; }
+.light-mode .download-section { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.06); }
+.light-mode .download-section h3 { color:#2a2a2a; }
+.light-mode .download-link { background:rgba(0,0,0,0.03); border-color:rgba(0,0,0,0.06); }
+.light-mode .download-link:hover { border-color:#c8a87c; }
+.light-mode .success-page h1 { color:#27ae60; }
+.light-mode .about-content h2 { color:#c8a87c; }
+.light-mode .about-content p { color:#555; }
+.light-mode .contact-info p { color:#666; }
+.light-mode .cart-item-actions input { background:rgba(255,255,255,0.85); border-color:rgba(0,0,0,0.1); color:#2a2a2a; }
+.light-mode .checkout-form h3 { color:#2a2a2a; }
+.light-mode .product-detail-info h1 { color:#2a2a2a; }
+.light-mode .product-tabs-nav button.active { color:#c8a87c; border-bottom-color:#c8a87c; }
+.light-mode .product-tabs-nav button { color:#666; }
+.light-mode .product-tabs-nav button:hover { color:#2a2a2a; }
+.light-mode .product-detail-desc { color:#555; }

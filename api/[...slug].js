@@ -282,6 +282,11 @@ module.exports = async (req, res) => {
         body.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push(body);
         await save(products);
+        const wh = process.env.DISCORD_WEBHOOK_URL;
+        if (wh) {
+          const price = parseFloat(body.price || 0).toFixed(2).replace('.', ',');
+          fetch(wh, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ content:'📦 **Nouveau produit ajouté**\n**' + body.name + '** — ' + price + ' €\n🔗 ' + (process.env.VERCEL_URL || 'lacorpo.vercel.app') + '/produit.html?slug=' + body.slug }) }).catch(()=>{});
+        }
         res.status(201).json(body); return;
       }
 
@@ -584,6 +589,37 @@ module.exports = async (req, res) => {
         await saveCodes((await loadCodes()).filter(c => c.id !== query.id));
         res.json({ success: true }); return;
       }
+    }
+
+    // Suggestions
+    if (url === '/api/suggestions' && req.method === 'POST') {
+      const body = await getBody(req);
+      if (!body.name || !body.message) { res.status(400).json({ error: 'name and message required' }); return; }
+      let suggs = [];
+      try { suggs = JSON.parse(fs.readFileSync('/tmp/oni_suggestions.json', 'utf8') || '[]'); } catch { suggs = []; }
+      suggs.push({ id: suggs.length + 1, name: body.name, email: body.email || '', message: body.message, createdAt: new Date().toISOString() });
+      fs.writeFileSync('/tmp/oni_suggestions.json', JSON.stringify(suggs, null, 2));
+      const token = process.env.GH_TOKEN;
+      if (token) syncToGitHub(suggs, token, 'data/suggestions.json').catch(() => {});
+      const wh = process.env.DISCORD_WEBHOOK_URL;
+      if (wh) fetch(wh, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ content:'💡 **Nouvelle suggestion**\n**' + body.name + '** : ' + body.message + (body.email ? '\n📧 ' + body.email : '') }) }).catch(()=>{});
+      res.status(201).json({ success: true }); return;
+    }
+
+    // Subscribers
+    if (url === '/api/subscribers' && req.method === 'POST') {
+      const body = await getBody(req);
+      if (!body.email) { res.status(400).json({ error: 'email required' }); return; }
+      let subs = [];
+      try { subs = JSON.parse(fs.readFileSync('/tmp/oni_subscribers.json', 'utf8') || '[]'); } catch { subs = []; }
+      if (subs.find(s => s.email === body.email)) { res.json({ success: true, already: true }); return; }
+      subs.push({ email: body.email, createdAt: new Date().toISOString() });
+      fs.writeFileSync('/tmp/oni_subscribers.json', JSON.stringify(subs, null, 2));
+      const token = process.env.GH_TOKEN;
+      if (token) syncToGitHub(subs, token, 'data/subscribers.json').catch(() => {});
+      const wh = process.env.DISCORD_WEBHOOK_URL;
+      if (wh) fetch(wh, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ content:'🔔 **Nouvel inscrit notifications**\n📧 ' + body.email }) }).catch(()=>{});
+      res.status(201).json({ success: true }); return;
     }
 
     // Validate promo code (public)
