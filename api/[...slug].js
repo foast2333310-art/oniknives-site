@@ -650,6 +650,56 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Auth
+    if (url === '/api/auth/register' && req.method === 'POST') {
+      const body = await getBody(req);
+      if (!body.email || !body.password) { res.status(400).json({ error: 'email et password requis' }); return; }
+      const email = body.email.trim().toLowerCase();
+      let accounts = [];
+      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      if (accounts.find(a => a.email === email)) { res.status(409).json({ error: 'Cet email est déjà utilisé' }); return; }
+      const token = require('crypto').randomUUID();
+      accounts.push({ email, password: body.password, token, createdAt: new Date().toISOString() });
+      fs.writeFileSync('/tmp/oni_accounts.json', JSON.stringify(accounts, null, 2));
+      const t = process.env.GH_TOKEN;
+      if (t) syncToGitHub(accounts, t, 'data/accounts.json').catch(() => {});
+      res.status(201).json({ token }); return;
+    }
+
+    if (url === '/api/auth/login' && req.method === 'POST') {
+      const body = await getBody(req);
+      if (!body.email || !body.password) { res.status(400).json({ error: 'email et password requis' }); return; }
+      const email = body.email.trim().toLowerCase();
+      let accounts = [];
+      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      const account = accounts.find(a => a.email === email && a.password === body.password);
+      if (!account) { res.status(401).json({ error: 'Email ou mot de passe incorrect' }); return; }
+      res.json({ token: account.token }); return;
+    }
+
+    if (url === '/api/account/orders') {
+      if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
+      const token = req.headers['x-session-token'];
+      if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
+      let accounts = [];
+      try { accounts = JSON.parse(fs.readFileSync('/tmp/oni_accounts.json', 'utf8') || '[]'); } catch { accounts = []; }
+      const account = accounts.find(a => a.token === token);
+      if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
+      const orders = await loadOrders();
+      const userOrders = orders.filter(o => o.email && o.email.toLowerCase() === account.email && o.status === 'payé');
+      const products = await loadData('products');
+      res.json(userOrders.map(o => ({
+        id: o.id,
+        date: o.createdAt,
+        total: o.total,
+        items: (o.items || []).map(item => {
+          const prod = (products || []).find(p => p.id === item.id || p.slug === item.slug);
+          return { name: item.name || (prod ? prod.name : 'Produit'), downloadUrl: item.downloadUrl || (prod ? prod.downloadUrl : null) || null };
+        })
+      })));
+      return;
+    }
+
     // Contact
     if (url === '/api/contact' && req.method === 'POST') {
       const body = await getBody(req);
