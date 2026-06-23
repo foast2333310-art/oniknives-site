@@ -734,6 +734,28 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Admin accounts
+    if (url === '/api/accounts') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      if (req.method === 'GET') {
+        const accounts = await loadAccounts();
+        res.json(accounts.map(a => ({ email: a.email, role: a.role || null, createdAt: a.createdAt })));
+        return;
+      }
+      if (req.method === 'PUT') {
+        const body = await getBody(req);
+        if (!body.email) { res.status(400).json({ error: 'email requis' }); return; }
+        let accounts = await loadAccounts();
+        const idx = accounts.findIndex(a => a.email === body.email);
+        if (idx < 0) { res.status(404).json({ error: 'Compte introuvable' }); return; }
+        accounts[idx].role = body.role || null;
+        await saveAccounts(accounts);
+        res.json({ email: accounts[idx].email, role: accounts[idx].role });
+        return;
+      }
+      res.status(405).json({ error: 'Method not allowed' }); return;
+    }
+
     // Contact
     if (url === '/api/contact' && req.method === 'POST') {
       const body = await getBody(req);

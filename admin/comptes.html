@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comptes - LaCorpo Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    .header {
+      background: #2a2a2a; padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 { color: #f0e6d0; font-size: 20px; }
+    .header .links a { color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px; }
+    .header .links a:hover { color: #dbb98a; }
+    .container { max-width: 900px; margin: 0 auto; padding: 32px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .toolbar h2 { font-size: 22px; color: #f0e6d0; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; padding: 10px 12px; border-bottom: 1px solid #333; font-weight: 600; }
+    td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.85rem; vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .email-col { color: #ccc; }
+    .role-select {
+      background: #1a1a1a; border: 1px solid #444; border-radius: 6px;
+      color: #fff; font-size: 13px; padding: 6px 10px; outline: none; cursor: pointer;
+    }
+    .role-select:focus { border-color: #c8a87c; }
+    .badge-role {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-role.user { background: rgba(255,255,255,0.06); color: #888; }
+    .badge-role.ambassadeur { background: rgba(200,168,124,0.15); color: #c8a87c; }
+    .date-col { color: #666; font-size: 12px; white-space: nowrap; }
+    .count-badge {
+      background: #c8a87c; color: #1a1a1a; font-size: 12px; font-weight: 700;
+      padding: 2px 8px; border-radius: 10px; margin-left: 8px;
+    }
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
+      border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background: #27ae60; color: #fff; }
+    .toast.error { background: #e74c3c; color: #fff; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LaCorpo - Comptes</h1>
+    <div class="links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="produits.html">Produits</a>
+      <a href="commandes.html">Commandes</a>
+      <a href="codes.html">Codes promo</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="/">Voir le site</a>
+      <a href="#" id="logoutBtn">Déconnexion</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <h2>👥 Gestion des comptes <span id="countBadge" class="count-badge">0</span></h2>
+    </div>
+    <div id="accountsTableWrap">
+      <table>
+        <thead><tr><th>Email</th><th>Rôle</th><th>Inscrit le</th></tr></thead>
+        <tbody id="accountsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    if (!sessionStorage.getItem('admin_logged_in')) {
+      window.location.href = 'index.html';
+    }
+
+    function getAdminKey() { return localStorage.getItem('admin_api_key'); }
+
+    async function loadAccounts() {
+      try {
+        const res = await fetch('/api/accounts', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        const accounts = await res.json();
+        document.getElementById('countBadge').textContent = accounts.length;
+        const tbody = document.getElementById('accountsBody');
+        if (!accounts || accounts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:60px 20px;color:#666;">Aucun compte pour le moment</td></tr>';
+          return;
+        }
+        tbody.innerHTML = accounts.map(a => {
+          const date = a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR') : '—';
+          const role = a.role || 'user';
+          const roleLabel = role === 'ambassadeur' ? 'Ambassadeur' : 'Utilisateur';
+          const badgeClass = role === 'ambassadeur' ? 'ambassadeur' : 'user';
+          return `<tr>
+            <td class="email-col">${a.email}</td>
+            <td>
+              <select class="role-select" data-email="${a.email}" onchange="updateRole('${a.email}', this.value)">
+                <option value="user" ${role === 'user' ? 'selected' : ''}>Utilisateur</option>
+                <option value="ambassadeur" ${role === 'ambassadeur' ? 'selected' : ''}>Ambassadeur</option>
+              </select>
+            </td>
+            <td class="date-col">${date}</td>
+          </tr>`;
+        }).join('');
+      } catch {
+        document.getElementById('accountsBody').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:60px 20px;color:#e74c3c;">Erreur de chargement</td></tr>';
+      }
+    }
+
+    async function updateRole(email, role) {
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify({ email, role })
+        });
+        if (!res.ok) throw new Error();
+        showToast('✓ Rôle mis à jour pour ' + email);
+      } catch {
+        showToast('Erreur', true);
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + (isError ? 'error' : 'success');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('admin_api_key');
+      window.location.href = 'index.html';
+    });
+
+    loadAccounts();
+  </script>
+</body>
+</html>
