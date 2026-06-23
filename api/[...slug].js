@@ -687,7 +687,7 @@ module.exports = async (req, res) => {
       if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
       const orders = await loadOrders();
       const userOrders = orders.filter(o => o.email && o.email.toLowerCase() === account.email && o.status === 'payé');
-      const products = await loadData('products');
+      const products = await load();
       res.json(userOrders.map(o => ({
         id: o.id,
         date: o.createdAt,
