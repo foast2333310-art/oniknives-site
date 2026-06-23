@@ -592,7 +592,13 @@ module.exports = async (req, res) => {
     }
 
     // Suggestions
-    if (url === '/api/suggestions' && req.method === 'POST') {
+    if (url === '/api/suggestions') {
+      if (req.method === 'GET') {
+        if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+        try { res.json(JSON.parse(fs.readFileSync('/tmp/oni_suggestions.json', 'utf8') || '[]')); return; }
+        catch { res.json([]); return; }
+      }
+      if (req.method === 'POST') {
       const body = await getBody(req);
       if (!body.name || !body.message) { res.status(400).json({ error: 'name and message required' }); return; }
       let suggs = [];
@@ -604,6 +610,13 @@ module.exports = async (req, res) => {
       const wh = process.env.DISCORD_WEBHOOK_URL;
       if (wh) fetch(wh, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ content:'💡 **Nouvelle suggestion**\n**' + body.name + '** : ' + body.message + (body.email ? '\n📧 ' + body.email : '') }) }).catch(()=>{});
       res.status(201).json({ success: true }); return;
+    }
+    if (req.method === 'DELETE') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      fs.writeFileSync('/tmp/oni_suggestions.json', '[]');
+      const token = process.env.GH_TOKEN;
+      if (token) syncToGitHub([], token, 'data/suggestions.json').catch(() => {});
+      res.json({ success: true }); return;
     }
 
     // Subscribers
