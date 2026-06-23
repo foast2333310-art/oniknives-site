@@ -6,49 +6,163 @@
   <title>Mon compte — LaCorpo</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .auth-box {
-      max-width: 420px; margin: 40px auto; padding: 32px;
-      background: rgba(26,26,26,0.85); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+    .page-section {
+      max-width: 720px; margin: 0 auto; padding: 60px 20px;
     }
-    .auth-box h2 { color: #f0e6d0; font-size: 22px; text-align: center; margin-bottom: 4px; }
-    .auth-box .sub { color: #888; text-align: center; font-size: 13px; margin-bottom: 24px; }
-    .auth-box label { display: block; color: #ccc; font-size: 13px; margin-bottom: 4px; }
-    .auth-box input {
-      width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px; color: #e5e5e5; font-size: 14px; outline: none; box-sizing: border-box;
+    .page-title {
+      text-align: center; margin-bottom: 40px;
     }
-    .auth-box input:focus { border-color: #c8a87c; }
-    .auth-box .form-group { margin-bottom: 16px; }
-    .auth-box .error { color: #ff6b6b; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
-    .auth-box .switch { text-align: center; margin-top: 16px; font-size: 13px; color: #888; }
-    .auth-box .switch a { color: #c8a87c; cursor: pointer; text-decoration: none; }
-    .auth-box .switch a:hover { text-decoration: underline; }
-    .btn-full { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; background: #c8a87c; color: #1a1a1a; transition: opacity .2s; }
-    .btn-full:hover { opacity: .85; }
+    .page-title h1 {
+      font-size: 28px; color: #f0e6d0; margin-bottom: 6px;
+    }
+    .page-title p {
+      color: #888; font-size: 14px;
+    }
 
-    .account-section { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-    .account-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-    .account-header h1 { color: #f0e6d0; font-size: 24px; }
-    .account-header .email { color: #888; font-size: 13px; }
-    .btn-outline { padding: 8px 16px; border: 1px solid #c8a87c; background: transparent; color: #c8a87c; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
-    .btn-outline:hover { background: #c8a87c; color: #1a1a1a; }
+    /* Auth card */
+    .auth-card {
+      max-width: 400px; margin: 0 auto;
+      background: rgba(26,26,26,0.8); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
+      padding: 40px 32px; transition: all .3s;
+    }
+    .auth-card.hidden { display: none; }
+    .auth-card .icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(200,168,124,0.12); display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin: 0 auto 16px;
+    }
+    .auth-card h2 { text-align: center; color: #f0e6d0; font-size: 20px; margin-bottom: 4px; }
+    .auth-card .sub { text-align: center; color: #888; font-size: 13px; margin-bottom: 28px; }
+    .auth-card label { display: block; color: #aaa; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
+    .auth-card input {
+      width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
+      color: #e5e5e5; font-size: 14px; outline: none; box-sizing: border-box;
+      transition: border-color .2s;
+    }
+    .auth-card input:focus { border-color: #c8a87c; }
+    .auth-card .field { margin-bottom: 16px; }
+    .auth-card .error {
+      color: #ff6b6b; font-size: 13px; text-align: center;
+      margin-top: 10px; display: none;
+    }
+    .auth-card .switch {
+      text-align: center; margin-top: 20px; font-size: 13px; color: #666;
+    }
+    .auth-card .switch a {
+      color: #c8a87c; cursor: pointer; text-decoration: none; font-weight: 500;
+    }
+    .auth-card .switch a:hover { text-decoration: underline; }
+    .auth-card .divider {
+      height: 1px; background: rgba(255,255,255,0.06); margin: 28px -32px 24px;
+    }
 
+    /* Buttons */
+    .btn-primary {
+      width: 100%; padding: 13px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      background: #c8a87c; color: #1a1a1a; transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .85; }
+    .btn-secondary {
+      padding: 8px 18px; border: 1px solid #333; background: transparent;
+      color: #ccc; border-radius: 8px; cursor: pointer; font-size: 13px;
+      transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: #c8a87c; color: #c8a87c; }
+    .btn-danger {
+      padding: 8px 18px; border: 1px solid #e74c3c; background: transparent;
+      color: #e74c3c; border-radius: 8px; cursor: pointer; font-size: 13px;
+      transition: all .2s;
+    }
+    .btn-danger:hover { background: #e74c3c; color: #fff; }
+
+    /* Account header */
+    .account-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+    }
+    .account-head .greeting h1 { font-size: 24px; color: #f0e6d0; margin-bottom: 2px; }
+    .account-head .greeting .email { color: #888; font-size: 13px; }
+    .account-head .actions { display: flex; gap: 8px; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 32px;
+    }
+    .stat-item {
+      background: rgba(26,26,26,0.6); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 10px; padding: 16px; text-align: center;
+    }
+    .stat-item .num { font-size: 22px; font-weight: 700; color: #f0e6d0; }
+    .stat-item .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+    /* Orders */
+    .orders-title {
+      font-size: 15px; color: #888; letter-spacing: .5px;
+      margin-bottom: 16px; text-transform: uppercase;
+    }
     .order-card {
-      background: rgba(26,26,26,0.85); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; margin-bottom: 12px;
+      background: rgba(26,26,26,0.8); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+      margin-bottom: 12px; overflow: hidden;
     }
-    .order-card .meta { display: flex; justify-content: space-between; color: #888; font-size: 12px; margin-bottom: 8px; }
-    .order-card .item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.04); }
-    .order-card .item:first-of-type { border-top: none; }
-    .order-card .item-name { color: #e5e5e5; font-size: 14px; }
-    .order-card .item-dl a { color: #27ae60; text-decoration: none; font-size: 13px; font-weight: 600; }
-    .order-card .item-dl a:hover { text-decoration: underline; }
-    .no-orders { text-align: center; padding: 60px 20px; color: #666; }
-    .no-orders h3 { font-size: 20px; margin-bottom: 8px; color: #888; }
+    .order-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .order-head .id { font-weight: 600; color: #c8a87c; font-size: 14px; }
+    .order-head .meta { color: #666; font-size: 12px; text-align: right; }
+    .order-head .meta span { display: inline-block; margin-left: 12px; }
+    .order-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 18px;
+    }
+    .order-item + .order-item { border-top: 1px solid rgba(255,255,255,0.03); }
+    .order-item .name { color: #e5e5e5; font-size: 14px; }
+    .order-item .dl a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; background: rgba(39,174,96,0.12);
+      color: #27ae60; border-radius: 6px; text-decoration: none;
+      font-size: 13px; font-weight: 600; transition: all .2s;
+    }
+    .order-item .dl a:hover { background: rgba(39,174,96,0.2); }
+    .order-item .dl .none { color: #555; font-size: 12px; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: rgba(26,26,26,0.6); border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.06);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+    .empty-state h3 { color: #888; font-size: 18px; margin-bottom: 6px; }
+    .empty-state p { color: #555; font-size: 14px; }
 
     #accountPage, #authPage { display: none; }
     #accountPage.visible, #authPage.visible { display: block; }
+
+    .loading { text-align: center; padding: 40px; color: #666; font-size: 14px; }
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(200,168,124,0.2); border-top-color: #c8a87c; border-radius: 50%; animation: spin .6s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    body.light-mode .auth-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.06); }
+    body.light-mode .auth-card h2,
+    body.light-mode .account-head .greeting h1 { color: #1a1a1a; }
+    body.light-mode .auth-card input { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #1a1a1a; }
+    body.light-mode .auth-card input:focus { border-color: #c8a87c; }
+    body.light-mode .auth-card .icon { background: rgba(200,168,124,0.15); }
+    body.light-mode .page-title h1 { color: #1a1a1a; }
+    body.light-mode .order-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.06); }
+    body.light-mode .order-head .id { color: #8b7a5e; }
+    body.light-mode .order-head,
+    body.light-mode .order-item + .order-item { border-color: rgba(0,0,0,0.06); }
+    body.light-mode .order-item .name { color: #1a1a1a; }
+    body.light-mode .stat-item { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.04); }
+    body.light-mode .stat-item .num { color: #1a1a1a; }
+    body.light-mode .empty-state { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.06); }
+    body.light-mode .btn-secondary { border-color: rgba(0,0,0,0.15); color: #555; }
+    body.light-mode .btn-secondary:hover { border-color: #c8a87c; color: #c8a87c; }
   </style>
 </head>
 <body>
@@ -59,6 +173,7 @@
         <a href="produits.html">Produits</a>
         <a href="contact.html">Contact</a>
         <a href="a-propos.html">À propos</a>
+        <a href="compte.html">Mon compte</a>
       </nav>
       <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Mode clair/sombre">☀️</button>
@@ -66,43 +181,79 @@
     </div>
   </header>
 
-  <div class="hero" style="min-height:auto;padding:60px 20px;">
-    <div class="container">
+  <div class="page-section">
 
-      <div id="authPage" class="visible">
-        <div class="auth-box" id="loginForm">
-          <h2>Connexion</h2>
-          <p class="sub">Connecte-toi pour retrouver tes achats</p>
-          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" autocomplete="email"></div>
-          <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPassword" autocomplete="current-password"></div>
-          <div class="error" id="loginError">Identifiants incorrects</div>
-          <button class="btn-full" onclick="login()">Se connecter</button>
-          <div class="switch">Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a></div>
-        </div>
-
-        <div class="auth-box" id="registerForm" style="display:none;">
-          <h2>Créer un compte</h2>
-          <p class="sub">Inscris-toi pour lier tes achats à ton email</p>
-          <div class="form-group"><label>Email</label><input type="email" id="regEmail" autocomplete="email"></div>
-          <div class="form-group"><label>Mot de passe</label><input type="password" id="regPassword" autocomplete="new-password"></div>
-          <div class="form-group"><label>Confirmer le mot de passe</label><input type="password" id="regPassword2" autocomplete="new-password"></div>
-          <div class="error" id="regError">Erreur</div>
-          <button class="btn-full" onclick="register()">Créer mon compte</button>
-          <div class="switch">Déjà un compte ? <a onclick="showLogin()">Se connecter</a></div>
-        </div>
+    <!-- Auth forms -->
+    <div id="authPage" class="visible">
+      <div class="page-title">
+        <h1>Bienvenue</h1>
+        <p>Connecte-toi ou crée un compte pour retrouver tes achats</p>
       </div>
 
-      <div id="accountPage">
-        <div class="account-section">
-          <div class="account-header">
-            <div><h1>Mon compte</h1><div class="email" id="accountEmail"></div></div>
-            <button class="btn-outline" onclick="logout()">Déconnexion</button>
-          </div>
-          <div id="ordersList"></div>
+      <div class="auth-card" id="loginForm">
+        <div class="icon">🔐</div>
+        <h2>Connexion</h2>
+        <p class="sub">Connecte-toi pour accéder à tes téléchargements</p>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" autocomplete="email" placeholder="ton@email.com">
         </div>
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <div class="error" id="loginError">Identifiants incorrects</div>
+        <button class="btn-primary" onclick="login()">Se connecter</button>
+        <div class="switch">Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a></div>
       </div>
 
+      <div class="auth-card hidden" id="registerForm">
+        <div class="icon">📝</div>
+        <h2>Créer un compte</h2>
+        <p class="sub">Inscris-toi pour lier tes achats à ton email</p>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="regEmail" autocomplete="email" placeholder="ton@email.com">
+        </div>
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" id="regPassword" autocomplete="new-password" placeholder="Minimum 4 caractères">
+        </div>
+        <div class="field">
+          <label>Confirmer le mot de passe</label>
+          <input type="password" id="regPassword2" autocomplete="new-password" placeholder="Rentre le même mot de passe">
+        </div>
+        <div class="error" id="regError">Erreur</div>
+        <button class="btn-primary" onclick="register()">Créer mon compte</button>
+        <div class="switch">Déjà un compte ? <a onclick="showLogin()">Se connecter</a></div>
+      </div>
     </div>
+
+    <!-- Account dashboard -->
+    <div id="accountPage">
+      <div class="account-head">
+        <div class="greeting">
+          <h1>Bonjour 👋</h1>
+          <div class="email" id="accountEmail"></div>
+        </div>
+        <div class="actions">
+          <button class="btn-secondary" onclick="refreshOrders()">🔄 Actualiser</button>
+          <button class="btn-danger" onclick="logout()">Déconnexion</button>
+        </div>
+      </div>
+
+      <div class="stats-row" id="statsRow">
+        <div class="stat-item"><div class="num" id="statOrders">—</div><div class="label">Commandes</div></div>
+        <div class="stat-item"><div class="num" id="statItems">—</div><div class="label">Produits</div></div>
+        <div class="stat-item"><div class="num" id="statTotal">—</div><div class="label">Dépensé</div></div>
+      </div>
+
+      <div class="orders-title">📦 Mes achats</div>
+      <div id="ordersList">
+        <div class="loading"><span class="spinner"></span> Chargement...</div>
+      </div>
+    </div>
+
   </div>
 
   <footer class="footer">
@@ -131,13 +282,13 @@
   <script src="js/cart.js"></script>
   <script>
     function showRegister() {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('registerForm').classList.remove('hidden');
       document.getElementById('loginError').style.display = 'none';
     }
     function showLogin() {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('registerForm').classList.add('hidden');
       document.getElementById('regError').style.display = 'none';
     }
 
@@ -203,6 +354,12 @@
       showAuth();
     }
 
+    async function refreshOrders() {
+      const el = document.getElementById('ordersList');
+      el.innerHTML = '<div class="loading"><span class="spinner"></span> Chargement...</div>';
+      await loadOrders();
+    }
+
     async function loadOrders() {
       const token = localStorage.getItem('oni_token');
       if (!token) return;
@@ -211,19 +368,36 @@
         if (!r.ok) { if (r.status === 401) logout(); return; }
         const orders = await r.json();
         const el = document.getElementById('ordersList');
+        const totalOrders = orders ? orders.length : 0;
+        let totalItems = 0;
+        let totalSpent = 0;
+
+        document.getElementById('statOrders').textContent = totalOrders;
+
         if (!orders || orders.length === 0) {
-          el.innerHTML = '<div class="no-orders"><h3>Aucun achat</h3><p>Tu n\'as pas encore fait d\'achat avec cet email.</p></div>';
+          document.getElementById('statItems').textContent = '0';
+          document.getElementById('statTotal').textContent = '0 €';
+          el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><h3>Aucun achat</h3><p>Tu n\'as pas encore fait d\'achat avec cet email.</p><p style="margin-top:12px;"><a href="produits.html" style="color:#c8a87c;text-decoration:none;font-weight:600;">Voir les produits →</a></p></div>';
           return;
         }
+
         el.innerHTML = orders.map(o => {
-          const date = new Date(o.date).toLocaleDateString('fr-FR');
-          const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
-          const items = o.items.map(item => {
-            const dl = item.downloadUrl ? `<a href="${item.downloadUrl}" target="_blank">📥 Télécharger</a>` : '<span style="color:#555">Aucun lien</span>';
-            return `<div class="item"><span class="item-name">${item.name}</span><span class="item-dl">${dl}</span></div>`;
+          const date = new Date(o.date).toLocaleDateString('fr-FR', { day:'numeric',month:'long',year:'numeric' });
+          const total = parseFloat(o.total || 0);
+          totalSpent += total;
+          const items = o.items || [];
+          totalItems += items.length;
+          const itemsHtml = items.map(item => {
+            if (item.downloadUrl) {
+              return `<div class="order-item"><span class="name">${item.name}</span><span class="dl"><a href="${item.downloadUrl}" target="_blank">📥 Télécharger</a></span></div>`;
+            }
+            return `<div class="order-item"><span class="name">${item.name}</span><span class="dl"><span class="none">Aucun lien</span></span></div>`;
           }).join('');
-          return `<div class="order-card"><div class="meta"><span>Commande #${o.id}</span><span>${date} — ${total} €</span></div>${items}</div>`;
+          return `<div class="order-card"><div class="order-head"><span class="id">Commande #${o.id}</span><span class="meta"><span>${date}</span><span>${total.toFixed(2).replace('.',',')} €</span></span></div>${itemsHtml}</div>`;
         }).join('');
+
+        document.getElementById('statItems').textContent = totalItems;
+        document.getElementById('statTotal').textContent = totalSpent.toFixed(2).replace('.',',') + ' €';
       } catch {}
     }
 
