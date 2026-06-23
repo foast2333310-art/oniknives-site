@@ -618,6 +618,7 @@ module.exports = async (req, res) => {
       if (token) syncToGitHub([], token, 'data/suggestions.json').catch(() => {});
       res.json({ success: true }); return;
     }
+    }
 
     // Subscribers
     if (url === '/api/subscribers' && req.method === 'POST') {
