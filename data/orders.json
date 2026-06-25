@@ -25,7 +25,8 @@
     "totalAfterDiscount": 20,
     "promoCode": "lacorpo",
     "promoDiscount": 5,
-    "status": "pending_payment",
-    "createdAt": "2026-06-25T18:26:42.949Z"
+    "status": "payé",
+    "createdAt": "2026-06-25T18:26:42.949Z",
+    "stripeSessionId": "cs_live_a1WBWFlAxRPGdkNEAPZZcZPIoYVAwwvejfzQa0XOPFQ5aogC02FmF6mw2R"
   }
 ]
