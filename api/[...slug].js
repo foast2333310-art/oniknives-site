@@ -796,6 +796,43 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Ambassador admin stats (for admin comptes page)
+    if (url === '/api/ambassador/admin-stats') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const email = urlMod.parse(req.url, true).query.email;
+      if (!email) { res.status(400).json({ error: 'email requis' }); return; }
+      const codes = await loadCodes();
+      const myCodes = codes.filter(c => c.ambassadorEmail === email);
+      const orders = await loadOrders();
+      const paidOrders = orders.filter(o => o.status === 'payé');
+      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === o.promoCode));
+      const stats = myOrders.map(o => {
+        const code = myCodes.find(c => c.code === o.promoCode);
+        const commission = code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
+        return { orderId: o.id, date: o.createdAt, customerEmail: o.email || (o.customer ? o.customer.email : null), total: parseFloat(o.total || 0), totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0), promoCode: o.promoCode, commissionPercent: code ? (code.ambassadorPercent || 0) : 0, commission };
+      });
+      const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
+      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission });
+      return;
+    }
+
+    // Ambassador reset commissions
+    if (url === '/api/ambassador/reset') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const email = urlMod.parse(req.url, true).query.email;
+      if (!email) { res.status(400).json({ error: 'email requis' }); return; }
+      let codes = await loadCodes();
+      codes.forEach(c => {
+        if (c.ambassadorEmail === email) {
+          c.usedCount = 0;
+          c.usedBy = [];
+        }
+      });
+      await saveCodes(codes);
+      res.json({ success: true });
+      return;
+    }
+
     // Admin accounts
     if (url === '/api/accounts') {
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }

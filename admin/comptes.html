@@ -37,6 +37,7 @@
     }
     .role-select:focus { border-color: #c8a87c; }
     .date-col { color: #666; font-size: 12px; white-space: nowrap; }
+    .comm-col { font-size: 12px; line-height: 1.6; }
     .count-badge {
       background: #c8a87c; color: #1a1a1a; font-size: 12px; font-weight: 700;
       padding: 2px 8px; border-radius: 10px; margin-left: 8px;
@@ -99,10 +100,10 @@
 
   <div class="container">
     <div class="toolbar">
-      <h2>👥 Gestion des comptes <span id="countBadge" class="count-badge">0</span></h2>
+      <h2>Gestion des comptes <span id="countBadge" class="count-badge">0</span></h2>
     </div>
     <table>
-      <thead><tr><th>Email</th><th>Rôle</th><th>Inscrit le</th><th style="text-align:right;">Actions</th></tr></thead>
+      <thead><tr><th>Email</th><th>Rôle</th><th>Commissions</th><th>Inscrit le</th><th style="text-align:right;">Actions</th></tr></thead>
       <tbody id="accountsBody"></tbody>
     </table>
   </div>
@@ -148,13 +149,13 @@
         document.getElementById('countBadge').textContent = accounts.length;
         const tbody = document.getElementById('accountsBody');
         if (!accounts || accounts.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:60px 20px;color:#666;">Aucun compte pour le moment</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:60px 20px;color:#666;">Aucun compte pour le moment</td></tr>';
           return;
         }
         tbody.innerHTML = accounts.map(a => {
           const date = a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR') : '—';
           const role = a.role || 'user';
-          return `<tr>
+          return `<tr id="row-${a.email.replace(/[@.]/g, '_')}">
             <td class="email-col">${a.email}</td>
             <td>
               <select class="role-select" onchange="updateRole('${a.email.replace(/'/g, "\\'")}', this.value)">
@@ -162,15 +163,47 @@
                 <option value="ambassadeur" ${role === 'ambassadeur' ? 'selected' : ''}>Ambassadeur</option>
               </select>
             </td>
+            <td class="comm-col" style="font-size:13px;">
+              ${role === 'ambassadeur' ? '<span class="amb-loading" style="color:#888;">Chargement...</span>' : '<span style="color:#555;">—</span>'}
+            </td>
             <td class="date-col">${date}</td>
-            <td class="actions-col" style="text-align:right;">
+            <td class="actions-col" style="text-align:right;white-space:nowrap;">
               <button class="btn-sm edit" onclick="openPwdModal('${a.email.replace(/'/g, "\\'")}')">🔑 MDP</button>
+              ${role === 'ambassadeur' ? `<button class="btn-sm" style="background:#6c5ce7;color:#fff;" onclick="resetAmb('${a.email.replace(/'/g, "\\'")}')">🔄 Réinit</button>` : ''}
               <button class="btn-sm del" onclick="deleteAccount('${a.email.replace(/'/g, "\\'")}')">🗑 Suppr</button>
             </td>
           </tr>`;
         }).join('');
+        // Load ambassador stats
+        accounts.filter(a => a.role === 'ambassadeur').forEach(a => loadAmbStats(a.email));
       } catch {
-        document.getElementById('accountsBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:60px 20px;color:#e74c3c;">Erreur de chargement</td></tr>';
+        document.getElementById('accountsBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:60px 20px;color:#e74c3c;">Erreur de chargement</td></tr>';
+      }
+    }
+
+    async function loadAmbStats(email) {
+      const rowId = 'row-' + email.replace(/[@.]/g, '_');
+      const td = document.querySelector('#' + rowId + ' .comm-col');
+      if (!td) return;
+      try {
+        const res = await fetch('/api/ambassador/admin-stats?email=' + encodeURIComponent(email), { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) { td.innerHTML = '<span style="color:#e74c3c;">Erreur</span>'; return; }
+        const data = await res.json();
+        td.innerHTML = '<div><span style="color:#27ae60;font-weight:600;">' + data.totalOrders + '</span> ventes</div><div><span style="color:#c8a87c;font-weight:600;">' + data.totalCommission.toFixed(2).replace('.',',') + ' €</span></div>';
+      } catch {
+        td.innerHTML = '<span style="color:#e74c3c;">Erreur</span>';
+      }
+    }
+
+    async function resetAmb(email) {
+      if (!confirm('Réinitialiser les commissions de ' + email + ' ?')) return;
+      try {
+        const res = await fetch('/api/ambassador/reset?email=' + encodeURIComponent(email), { method: 'POST', headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        showToast('✓ Commissions réinitialisées');
+        loadAmbStats(email);
+      } catch {
+        showToast('Erreur', true);
       }
     }
 
