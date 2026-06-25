@@ -277,10 +277,71 @@ async function saveCodes(data) {
   if (token) syncToGitHub(data, token, 'data/codes.json').catch(() => {});
 }
 
+async function loadNotifications() {
+  try {
+    const f = '/tmp/oni_notifications.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/notifications.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fs.writeFileSync('/tmp/oni_notifications.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
+  try {
+    const f = path.join(process.cwd(), 'data', 'notifications.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_notifications.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return [];
+}
+async function saveNotifications(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_notifications.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) syncToGitHub(data, token, 'data/notifications.json').catch(() => {});
+}
+
+function sendAmbassadorDiscordNotification(ambassadorEmail, orderId, promoCode, commission, customerEmail) {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) return;
+  try {
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '🌟 Commission ambassadeur !',
+          color: 0xc8a87c,
+          fields: [
+            { name: '👤 Ambassadeur', value: ambassadorEmail, inline: true },
+            { name: '🆔 Commande', value: '#' + orderId, inline: true },
+            { name: '🏷 Code', value: promoCode, inline: true },
+            { name: '💰 Commission', value: commission.toFixed(2).replace('.', ',') + ' €', inline: true },
+            { name: '📧 Client', value: customerEmail || '—', inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        }]
+      }),
+    }).catch(() => {});
+  } catch {}
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-admin-key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-admin-key,x-session-token');
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   const url = req.url.split('?')[0];
@@ -468,8 +529,20 @@ module.exports = async (req, res) => {
             if (codeIdx >= 0) {
               codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
               if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
-              codes[codeIdx].usedBy.push(orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme');
+              const customerEmail = orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme';
+              codes[codeIdx].usedBy.push(customerEmail);
               await saveCodes(codes);
+
+              // Ambassador notification
+              if (codes[codeIdx].ambassadorEmail) {
+                const total = parseFloat(orders[idx].totalAfterDiscount || orders[idx].total || 0);
+                const commission = total * (codes[codeIdx].ambassadorPercent || 0) / 100;
+                const notif = { id: Date.now(), ambassadorEmail: codes[codeIdx].ambassadorEmail, orderId: orders[idx].id, message: 'Commande #' + orders[idx].id + ' avec le code ' + codes[codeIdx].code + ' — +' + commission.toFixed(2).replace('.', ',') + ' €', commission, read: false, createdAt: new Date().toISOString() };
+                let notifs = await loadNotifications();
+                notifs.push(notif);
+                await saveNotifications(notifs);
+                sendAmbassadorDiscordNotification(codes[codeIdx].ambassadorEmail, orders[idx].id, codes[codeIdx].code, commission, customerEmail);
+              }
             }
           }
 
@@ -520,8 +593,20 @@ module.exports = async (req, res) => {
             if (codeIdx >= 0) {
               codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
               if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
-              codes[codeIdx].usedBy.push(orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme');
+              const customerEmail = orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme';
+              codes[codeIdx].usedBy.push(customerEmail);
               await saveCodes(codes);
+
+              // Ambassador notification
+              if (codes[codeIdx].ambassadorEmail) {
+                const total = parseFloat(orders[idx].totalAfterDiscount || orders[idx].total || 0);
+                const commission = total * (codes[codeIdx].ambassadorPercent || 0) / 100;
+                const notif = { id: Date.now(), ambassadorEmail: codes[codeIdx].ambassadorEmail, orderId: orders[idx].id, message: 'Commande #' + orders[idx].id + ' avec le code ' + codes[codeIdx].code + ' — +' + commission.toFixed(2).replace('.', ',') + ' €', commission, read: false, createdAt: new Date().toISOString() };
+                let notifs = await loadNotifications();
+                notifs.push(notif);
+                await saveNotifications(notifs);
+                sendAmbassadorDiscordNotification(codes[codeIdx].ambassadorEmail, orders[idx].id, codes[codeIdx].code, commission, customerEmail);
+              }
             }
           }
 
@@ -831,6 +916,42 @@ module.exports = async (req, res) => {
       await saveCodes(codes);
       res.json({ success: true });
       return;
+    }
+
+    // Ambassador notifications
+    if (url === '/api/ambassador/notifications') {
+      if (req.method === 'GET') {
+        const token = req.headers['x-session-token'];
+        if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
+        const accounts = await loadAccounts();
+        const account = accounts.find(a => a.token === token);
+        if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
+        if (account.role !== 'ambassadeur') { res.status(403).json({ error: 'Accès réservé aux ambassadeurs' }); return; }
+        const notifs = await loadNotifications();
+        const myNotifs = notifs.filter(n => n.ambassadorEmail === account.email).sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
+        const unread = myNotifs.filter(n => !n.read).length;
+        res.json({ notifications: myNotifs, unread });
+        return;
+      }
+      if (req.method === 'POST') {
+        const token = req.headers['x-session-token'];
+        if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
+        const accounts = await loadAccounts();
+        const account = accounts.find(a => a.token === token);
+        if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
+        if (account.role !== 'ambassadeur') { res.status(403).json({ error: 'Accès réservé aux ambassadeurs' }); return; }
+        const body = await getBody(req);
+        let notifs = await loadNotifications();
+        if (body.markAll) {
+          notifs.forEach(n => { if (n.ambassadorEmail === account.email) n.read = true; });
+        } else if (body.id) {
+          const n = notifs.find(n => n.id === body.id && n.ambassadorEmail === account.email);
+          if (n) n.read = true;
+        }
+        await saveNotifications(notifs);
+        res.json({ success: true });
+        return;
+      }
     }
 
     // Admin accounts
