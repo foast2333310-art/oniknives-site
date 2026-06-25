@@ -248,6 +248,27 @@
         <div class="stat-item"><div class="num" id="statTotal">—</div><div class="label">Dépensé</div></div>
       </div>
 
+      <!-- Ambassador dashboard -->
+      <div id="ambassadorSection" style="display:none;">
+        <div style="background:linear-gradient(135deg,#2a2a2a,#3a3020);border-radius:10px;padding:20px;border:1px solid #c8a87c40;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <span style="font-size:28px;">🌟</span>
+            <div>
+              <h2 style="color:#c8a87c;font-size:18px;margin:0;">Espace Ambassadeur</h2>
+              <p style="color:#888;font-size:13px;margin:4px 0 0;">Vos codes promo et vos commissions</p>
+            </div>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+            <div class="stat-item"><div class="num" id="ambOrders">—</div><div class="label">Ventes</div></div>
+            <div class="stat-item"><div class="num" id="ambCommission">—</div><div class="label">Gains (€)</div></div>
+            <div class="stat-item"><div class="num" id="ambCodes">—</div><div class="label">Codes actifs</div></div>
+          </div>
+          <div id="ambassadorOrders" style="margin-top:12px;">
+            <div class="loading" style="padding:16px;"><span class="spinner"></span></div>
+          </div>
+        </div>
+      </div>
+
       <div class="orders-title">📦 Mes achats</div>
       <div id="ordersList">
         <div class="loading"><span class="spinner"></span> Chargement...</div>
@@ -401,6 +422,38 @@
       } catch {}
     }
 
+    async function loadAmbassadorStats() {
+      const token = localStorage.getItem('oni_token');
+      if (!token) return;
+      try {
+        const r = await fetch('/api/ambassador/stats', { headers: { 'x-session-token': token } });
+        if (r.status === 403 || r.status === 401) {
+          document.getElementById('ambassadorSection').style.display = 'none';
+          return;
+        }
+        if (!r.ok) return;
+        const data = await r.json();
+        document.getElementById('ambassadorSection').style.display = 'block';
+        document.getElementById('ambOrders').textContent = data.totalOrders || 0;
+        document.getElementById('ambCommission').textContent = (data.totalCommission || 0).toFixed(2).replace('.', ',');
+        document.getElementById('ambCodes').textContent = (data.codes || []).length;
+
+        const el = document.getElementById('ambassadorOrders');
+        if (!data.orders || data.orders.length === 0) {
+          el.innerHTML = '<div class="empty-state" style="padding:20px;color:#666;">Aucune vente pour le moment.</div>';
+          return;
+        }
+        el.innerHTML = '<div style="font-size:13px;color:#888;margin-bottom:8px;">Dernières ventes :</div>' +
+          data.orders.map(o => {
+            const date = new Date(o.date).toLocaleDateString('fr-FR', { day:'numeric',month:'short',year:'numeric' });
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#1a1a1a;border-radius:6px;margin-bottom:6px;">
+              <div><span style="color:#888;font-size:12px;">#${o.orderId}</span> <span style="font-size:13px;">${o.customerEmail || '?'}</span></div>
+              <div style="text-align:right;"><span style="color:#fff;">${o.commissionPercent}%</span> <span style="color:#27ae60;font-weight:600;">+${o.commission.toFixed(2).replace('.',',')} €</span></div>
+            </div>`;
+          }).join('');
+      } catch {}
+    }
+
     function showAccount() {
       document.getElementById('authPage').classList.remove('visible');
       document.getElementById('authPage').style.display = 'none';
@@ -408,6 +461,7 @@
       document.getElementById('accountPage').style.display = 'block';
       document.getElementById('accountEmail').textContent = localStorage.getItem('oni_email') || '';
       loadOrders();
+      loadAmbassadorStats();
     }
 
     function showAuth() {

@@ -460,6 +460,19 @@ module.exports = async (req, res) => {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
+
+          // Track promo code usage for ambassador commissions
+          if (orders[idx].promoCode) {
+            let codes = await loadCodes();
+            const codeIdx = codes.findIndex(c => c.code === orders[idx].promoCode);
+            if (codeIdx >= 0) {
+              codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
+              if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
+              codes[codeIdx].usedBy.push(orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme');
+              await saveCodes(codes);
+            }
+          }
+
           await sendDiscordNotification(orders[idx]);
         }
 
@@ -500,6 +513,18 @@ module.exports = async (req, res) => {
           orders[idx].status = 'payé';
           orders[idx].paidAt = new Date().toISOString();
           await saveOrders(orders);
+
+          if (orders[idx].promoCode) {
+            let codes = await loadCodes();
+            const codeIdx = codes.findIndex(c => c.code === orders[idx].promoCode);
+            if (codeIdx >= 0) {
+              codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
+              if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
+              codes[codeIdx].usedBy.push(orders[idx].email || (orders[idx].customer && orders[idx].customer.email) || 'anonyme');
+              await saveCodes(codes);
+            }
+          }
+
           await sendDiscordNotification(orders[idx]);
         }
       }
@@ -622,7 +647,7 @@ module.exports = async (req, res) => {
         if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
         const body = await getBody(req);
         let codes = await loadCodes();
-        const code = { id: codes.length > 0 ? Math.max(...codes.map(c => c.id)) + 1 : 1, code: body.code.toUpperCase().trim(), discount: parseFloat(body.discount) || 0, createdAt: new Date().toISOString(), usedBy: null };
+        const code = { id: codes.length > 0 ? Math.max(...codes.map(c => c.id)) + 1 : 1, code: body.code.toUpperCase().trim(), discount: parseFloat(body.discount) || 0, createdAt: new Date().toISOString(), usedBy: null, ambassadorEmail: body.ambassadorEmail || null, ambassadorPercent: parseFloat(body.ambassadorPercent) || 0 };
         codes.push(code);
         await saveCodes(codes);
         res.status(201).json(code); return;
@@ -736,6 +761,38 @@ module.exports = async (req, res) => {
           return { name: item.name || (prod ? prod.name : 'Produit'), downloadUrl: item.downloadUrl || (prod ? prod.downloadUrl : null) || null };
         })
       })));
+      return;
+    }
+
+    // Ambassador stats
+    if (url === '/api/ambassador/stats') {
+      const token = req.headers['x-session-token'];
+      if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
+      const accounts = await loadAccounts();
+      const account = accounts.find(a => a.token === token);
+      if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
+      if (account.role !== 'ambassadeur') { res.status(403).json({ error: 'Accès réservé aux ambassadeurs' }); return; }
+      const codes = await loadCodes();
+      const myCodes = codes.filter(c => c.ambassadorEmail === account.email);
+      const orders = await loadOrders();
+      const paidOrders = orders.filter(o => o.status === 'payé');
+      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === o.promoCode));
+      const stats = myOrders.map(o => {
+        const code = myCodes.find(c => c.code === o.promoCode);
+        const commission = code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
+        return {
+          orderId: o.id,
+          date: o.createdAt,
+          customerEmail: o.email || (o.customer ? o.customer.email : null),
+          total: parseFloat(o.total || 0),
+          totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0),
+          promoCode: o.promoCode,
+          commissionPercent: code ? (code.ambassadorPercent || 0) : 0,
+          commission
+        };
+      });
+      const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
+      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission });
       return;
     }
 
