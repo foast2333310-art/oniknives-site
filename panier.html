@@ -240,7 +240,15 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', renderCart);
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+      const stored = localStorage.getItem('oni_email');
+      if (stored) {
+        document.getElementById('order-email').value = stored;
+        document.getElementById('order-email').readOnly = true;
+        document.getElementById('order-email').style.opacity = '0.7';
+      }
+    });
   </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
