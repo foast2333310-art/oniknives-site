@@ -12,7 +12,7 @@
     .header h1 { color: #f0e6d0; font-size: 20px; }
     .header .links a { color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px; }
     .header .links a:hover { color: #dbb98a; }
-    .container { max-width: 900px; margin: 0 auto; padding: 32px; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px; }
     .toolbar { margin-bottom: 24px; }
     .toolbar h2 { font-size: 22px; color: #f0e6d0; }
     .tier-cards { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -30,9 +30,30 @@
     .rank-2 { color: #c0c0c0; }
     .rank-3 { color: #cd7f32; }
     .badge-tier { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-override { font-size: 10px; color: #888; display: block; margin-top: 2px; }
+    .btn-sm { padding: 5px 10px; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .btn-sm:hover { opacity: 0.8; }
+    .btn-sm.edit { background: rgba(200,168,124,0.15); color: #c8a87c; }
     .empty-state { text-align: center; padding: 60px 20px; color: #666; }
     .loading { text-align: center; padding: 60px; color: #666; }
     .count-badge { background: #c8a87c; color: #1a1a1a; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #2a2a2a; border-radius: 12px; padding: 24px; border: 1px solid #444; width: 90%; max-width: 380px; }
+    .modal h3 { color: #f0e6d0; font-size: 16px; margin-bottom: 16px; }
+    .modal .field { margin-bottom: 16px; }
+    .modal .field label { display: block; color: #888; font-size: 12px; margin-bottom: 4px; }
+    .modal .field select { width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 14px; outline: none; }
+    .modal .field select:focus { border-color: #c8a87c; }
+    .modal .actions { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #c8a87c; color: #1a1a1a; }
+    .btn-secondary { background: #555; color: #fff; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .toast { position: fixed; bottom: 32px; right: 32px; padding: 14px 24px; border-radius: 8px; font-size: 14px; z-index: 2000; display: none; }
+    .toast.success { background: #27ae60; color: #fff; }
+    .toast.error { background: #e74c3c; color: #fff; }
   </style>
 </head>
 <body>
@@ -53,25 +74,47 @@
 
   <div class="container">
     <div class="toolbar"><h2>🏆 Classement Ambassadeurs <span class="count-badge" id="countBadge">0</span></h2></div>
-
     <div class="tier-cards" id="tierCards"></div>
-
     <div id="loading" class="loading"><span class="spinner"></span> Chargement...</div>
     <div id="leaderboardTable" style="display:none;"></div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="tierModal">
+    <div class="modal">
+      <h3 id="modalTitle">Modifier le palier</h3>
+      <div class="field">
+        <label>Ambassadeur</label>
+        <div id="modalEmail" style="color:#c8a87c;font-size:14px;"></div>
+      </div>
+      <div class="field">
+        <label>Palier</label>
+        <select id="modalTierSelect"></select>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closeTierModal()">Annuler</button>
+        <button class="btn btn-success" onclick="saveTierOverride()">Appliquer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
     if (!sessionStorage.getItem('admin_logged_in')) window.location.href = 'index.html';
     function getAdminKey() { return localStorage.getItem('admin_api_key'); }
 
+    let tierModalEmail = '';
+    let tiersList = [];
+
     async function loadTierCards() {
       try {
         const res = await fetch('/api/admin/tiers', { headers: { 'x-admin-key': getAdminKey() } });
         if (!res.ok) throw new Error();
-        const tiers = await res.json();
-        tiers.sort((a, b) => a.minSales - b.minSales);
-        document.getElementById('tierCards').innerHTML = tiers.map((t, i) => {
-          const next = tiers[i + 1];
+        tiersList = await res.json();
+        tiersList.sort((a, b) => a.minSales - b.minSales);
+        document.getElementById('tierCards').innerHTML = tiersList.map((t, i) => {
+          const next = tiersList[i + 1];
           const reqText = next ? t.minSales + '-' + (next.minSales - 1) + ' ventes' : t.minSales + '+ ventes';
           return `<div class="tier-card"><div class="icon">${t.icon}</div><div class="name" style="color:${t.color};">${t.name}</div><div class="req">${reqText}</div><div class="comm">${t.commission}% commission</div></div>`;
         }).join('');
@@ -93,20 +136,55 @@
           return;
         }
 
-        document.getElementById('leaderboardTable').innerHTML = `<table><thead><tr><th>#</th><th>Ambassadeur</th><th>Palier</th><th>Ventes</th><th>Gains</th><th>Inscrit</th></tr></thead><tbody>
+        document.getElementById('leaderboardTable').innerHTML = `<table><thead><tr><th>#</th><th>Ambassadeur</th><th>Palier</th><th>Ventes</th><th>Gains</th><th>Inscrit</th><th style="text-align:right;">Actions</th></tr></thead><tbody>
           ${data.map((a, i) => {
             const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+            const isOverride = a.tierOverride !== null;
             return `<tr><td><span class="rank ${rankClass}">#${i + 1}</span></td>
               <td>${a.email}</td>
-              <td><span class="badge-tier" style="background:${a.tier.color}22;color:${a.tier.color};">${a.tier.icon} ${a.tier.name}</span></td>
+              <td><span class="badge-tier" style="background:${a.tier.color}22;color:${a.tier.color};">${a.tier.icon} ${a.tier.name}</span>${isOverride ? '<span class="badge-override">🔒 manuel</span>' : ''}</td>
               <td>${a.sales}</td>
               <td style="color:#27ae60;font-weight:600;">${a.totalCommission.toFixed(2).replace('.',',')} €</td>
-              <td style="color:#666;font-size:12px;">${new Date(a.joinedAt).toLocaleDateString('fr-FR')}</td></tr>`;
+              <td style="color:#666;font-size:12px;">${new Date(a.joinedAt).toLocaleDateString('fr-FR')}</td>
+              <td style="text-align:right;"><button class="btn-sm edit" onclick="openTierModal('${a.email.replace(/'/g, "\\'")}')">🎯 Palier</button></td></tr>`;
           }).join('')}
         </tbody></table>`;
       } catch {
         document.getElementById('loading').innerHTML = '<span style="color:#e74c3c;">Erreur de chargement</span>';
       }
+    }
+
+    function openTierModal(email) {
+      tierModalEmail = email;
+      document.getElementById('modalEmail').textContent = email;
+      const sel = document.getElementById('modalTierSelect');
+      sel.innerHTML = '<option value="">— Auto (suivant les ventes) —</option>' +
+        tiersList.map(t => `<option value="${t.name}">${t.icon} ${t.name}</option>`).join('');
+      document.getElementById('tierModal').classList.add('active');
+    }
+
+    function closeTierModal() {
+      document.getElementById('tierModal').classList.remove('active');
+    }
+
+    async function saveTierOverride() {
+      const tier = document.getElementById('modalTierSelect').value;
+      try {
+        const res = await fetch('/api/ambassador/set-tier', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify({ email: tierModalEmail, tier: tier || null })
+        });
+        if (!res.ok) throw new Error();
+        showToast('✓ Palier mis à jour');
+        closeTierModal();
+        loadLeaderboard();
+      } catch { showToast('Erreur', true); }
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + (isError ? 'error' : 'success');
+      t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 3000);
     }
 
     document.getElementById('logoutBtn').addEventListener('click', () => {

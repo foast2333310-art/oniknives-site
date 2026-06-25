@@ -354,8 +354,12 @@ async function saveTiers(data) {
   const token = process.env.GH_TOKEN;
   if (token) syncToGitHub(data, token, 'data/tiers.json').catch(() => {});
 }
-async function getTier(sales) {
+async function getTier(sales, overrideTier) {
   const tiers = await loadTiers();
+  if (overrideTier) {
+    const found = tiers.find(t => t.name === overrideTier);
+    if (found) return found;
+  }
   let t = tiers[0];
   for (const tier of tiers) { if (sales >= tier.minSales) t = tier; }
   return t;
@@ -964,7 +968,7 @@ module.exports = async (req, res) => {
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
       const tiers = await loadTiers();
-      const tier = await getTier(stats.length);
+      const tier = await getTier(stats.length, account.tierOverride);
       const nextTier = tiers.find(t => t.minSales > stats.length);
       const nextTierSales = nextTier ? nextTier.minSales - stats.length : 0;
       const curIdx = tiers.findIndex(t => t.name === tier.name);
@@ -979,6 +983,7 @@ module.exports = async (req, res) => {
       if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
       const email = urlMod.parse(req.url, true).query.email;
       if (!email) { res.status(400).json({ error: 'email requis' }); return; }
+      const acc = (await loadAccounts()).find(a => a.email === email);
       const codes = await loadCodes();
       const myCodes = codes.filter(c => c.ambassadorEmail === email);
       const orders = await loadOrders();
@@ -990,7 +995,7 @@ module.exports = async (req, res) => {
         return { orderId: o.id, date: o.createdAt, customerEmail: o.email || (o.customer ? o.customer.email : null), total: parseFloat(o.total || 0), totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0), promoCode: o.promoCode, commissionPercent: code ? (code.ambassadorPercent || 0) : 0, commission };
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
-      const tier = await getTier(stats.length);
+      const tier = await getTier(stats.length, acc ? acc.tierOverride : null);
       res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color } });
       return;
     }
@@ -1010,11 +1015,25 @@ module.exports = async (req, res) => {
           const code = myCodes.find(c => c.code === o.promoCode);
           totalCommission += code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
         }
-        const tier = await getTier(myOrders.length);
-        leaderboard.push({ email: acc.email, sales: myOrders.length, totalCommission: Math.round(totalCommission * 100) / 100, tier: { name: tier.name, icon: tier.icon, color: tier.color }, joinedAt: acc.createdAt });
+        const tier = await getTier(myOrders.length, acc.tierOverride);
+        leaderboard.push({ email: acc.email, sales: myOrders.length, totalCommission: Math.round(totalCommission * 100) / 100, tier: { name: tier.name, icon: tier.icon, color: tier.color }, tierOverride: acc.tierOverride || null, joinedAt: acc.createdAt });
       }
       leaderboard.sort((a, b) => b.totalCommission - a.totalCommission);
       res.json(leaderboard);
+      return;
+    }
+
+    // Ambassador set tier override (admin)
+    if (url === '/api/ambassador/set-tier') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const body = await getBody(req);
+      if (!body.email) { res.status(400).json({ error: 'email requis' }); return; }
+      let accounts = await loadAccounts();
+      const idx = accounts.findIndex(a => a.email === body.email);
+      if (idx < 0) { res.status(404).json({ error: 'Compte introuvable' }); return; }
+      accounts[idx].tierOverride = body.tier || null;
+      await saveAccounts(accounts);
+      res.json({ success: true, tierOverride: accounts[idx].tierOverride });
       return;
     }
 
