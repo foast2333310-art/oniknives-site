@@ -760,9 +760,10 @@ module.exports = async (req, res) => {
         return;
       }
       if (req.method === 'DELETE') {
-        if (!query.email) { res.status(400).json({ error: 'email requis' }); return; }
+        const delEmail = urlMod.parse(req.url, true).query.email;
+        if (!delEmail) { res.status(400).json({ error: 'email requis' }); return; }
         let accounts = await loadAccounts();
-        accounts = accounts.filter(a => a.email !== query.email);
+        accounts = accounts.filter(a => a.email !== delEmail);
         await saveAccounts(accounts);
         res.json({ success: true });
         return;
