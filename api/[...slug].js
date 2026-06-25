@@ -313,15 +313,51 @@ async function saveNotifications(data) {
   if (token) syncToGitHub(data, token, 'data/notifications.json').catch(() => {});
 }
 
-const TIERS = [
-  { name: 'Bronze', minSales: 0, commission: 5, color: '#cd7f32', icon: '🥉' },
-  { name: 'Argent', minSales: 5, commission: 8, color: '#c0c0c0', icon: '🥈' },
-  { name: 'Or', minSales: 20, commission: 12, color: '#ffd700', icon: '🥇' },
-  { name: 'Diamant', minSales: 50, commission: 15, color: '#b9f2ff', icon: '💎' },
-];
-function getTier(sales) {
-  let t = TIERS[0];
-  for (const tier of TIERS) { if (sales >= tier.minSales) t = tier; }
+async function loadTiers() {
+  const def = [
+    { name: 'Bronze', minSales: 0, commission: 5, color: '#cd7f32', icon: '🥉' },
+    { name: 'Argent', minSales: 5, commission: 8, color: '#c0c0c0', icon: '🥈' },
+    { name: 'Or', minSales: 20, commission: 12, color: '#ffd700', icon: '🥇' },
+    { name: 'Diamant', minSales: 50, commission: 15, color: '#b9f2ff', icon: '💎' },
+  ];
+  try {
+    const f = '/tmp/oni_tiers.json';
+    if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf-8'));
+  } catch {}
+  const token = process.env.GH_TOKEN;
+  if (token) {
+    try {
+      const res = await fetch('https://api.github.com/repos/foast2333310-art/oniknives-site/contents/data/tiers.json', {
+        headers: { 'Authorization': 'token ' + token, 'User-Agent': 'oniknives-api', 'Accept': 'application/vnd.github.raw' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fs.writeFileSync('/tmp/oni_tiers.json', JSON.stringify(data, null, 2));
+        return data;
+      }
+    } catch {}
+  }
+  try {
+    const f = path.join(process.cwd(), 'data', 'tiers.json');
+    if (fs.existsSync(f)) {
+      const d = JSON.parse(fs.readFileSync(f, 'utf-8'));
+      fs.writeFileSync('/tmp/oni_tiers.json', JSON.stringify(d, null, 2));
+      return d;
+    }
+  } catch {}
+  return def;
+}
+async function saveTiers(data) {
+  const dir = '/tmp';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync('/tmp/oni_tiers.json', JSON.stringify(data, null, 2));
+  const token = process.env.GH_TOKEN;
+  if (token) syncToGitHub(data, token, 'data/tiers.json').catch(() => {});
+}
+async function getTier(sales) {
+  const tiers = await loadTiers();
+  let t = tiers[0];
+  for (const tier of tiers) { if (sales >= tier.minSales) t = tier; }
   return t;
 }
 
@@ -663,6 +699,22 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Admin tiers config
+    if (url === '/api/admin/tiers') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      if (req.method === 'GET') {
+        res.json(await loadTiers());
+        return;
+      }
+      if (req.method === 'POST') {
+        const body = await getBody(req);
+        if (!body || !Array.isArray(body)) { res.status(400).json({ error: 'Tableau de paliers requis' }); return; }
+        await saveTiers(body);
+        res.json({ success: true });
+        return;
+      }
+    }
+
     // Reviews
     if (url === '/api/reviews' && req.method === 'GET') {
       const reviews = await loadReviews();
@@ -911,10 +963,13 @@ module.exports = async (req, res) => {
         };
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
-      const tier = getTier(stats.length);
-      const nextTier = TIERS.find(t => t.minSales > stats.length);
+      const tiers = await loadTiers();
+      const tier = await getTier(stats.length);
+      const nextTier = tiers.find(t => t.minSales > stats.length);
       const nextTierSales = nextTier ? nextTier.minSales - stats.length : 0;
-      const progress = nextTier ? Math.round((stats.length - getTier(stats.length).minSales) / (nextTier.minSales - getTier(stats.length).minSales) * 100) : 100;
+      const curIdx = tiers.findIndex(t => t.name === tier.name);
+      const nextIdx = tiers.findIndex(t => t.minSales > stats.length);
+      const progress = nextTier && curIdx >= 0 && nextIdx >= 0 ? Math.round((stats.length - tiers[curIdx].minSales) / (tiers[nextIdx].minSales - tiers[curIdx].minSales) * 100) : 100;
       res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color }, nextTier: nextTier ? { name: nextTier.name, icon: nextTier.icon, salesNeeded: nextTierSales } : null, progress });
       return;
     }
@@ -935,7 +990,7 @@ module.exports = async (req, res) => {
         return { orderId: o.id, date: o.createdAt, customerEmail: o.email || (o.customer ? o.customer.email : null), total: parseFloat(o.total || 0), totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0), promoCode: o.promoCode, commissionPercent: code ? (code.ambassadorPercent || 0) : 0, commission };
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
-      const tier = getTier(stats.length);
+      const tier = await getTier(stats.length);
       res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color } });
       return;
     }
@@ -946,16 +1001,18 @@ module.exports = async (req, res) => {
       const accounts = (await loadAccounts()).filter(a => a.role === 'ambassadeur');
       const codes = await loadCodes();
       const orders = (await loadOrders()).filter(o => o.status === 'payé');
-      const leaderboard = accounts.map(acc => {
+      const leaderboard = [];
+      for (const acc of accounts) {
         const myCodes = codes.filter(c => c.ambassadorEmail === acc.email);
         const myOrders = orders.filter(o => myCodes.some(c => c.code === o.promoCode));
-        const totalCommission = myOrders.reduce((s, o) => {
+        let totalCommission = 0;
+        for (const o of myOrders) {
           const code = myCodes.find(c => c.code === o.promoCode);
-          return s + (code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0);
-        }, 0);
-        const tier = getTier(myOrders.length);
-        return { email: acc.email, sales: myOrders.length, totalCommission: Math.round(totalCommission * 100) / 100, tier: { name: tier.name, icon: tier.icon, color: tier.color }, joinedAt: acc.createdAt };
-      });
+          totalCommission += code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
+        }
+        const tier = await getTier(myOrders.length);
+        leaderboard.push({ email: acc.email, sales: myOrders.length, totalCommission: Math.round(totalCommission * 100) / 100, tier: { name: tier.name, icon: tier.icon, color: tier.color }, joinedAt: acc.createdAt });
+      }
       leaderboard.sort((a, b) => b.totalCommission - a.totalCommission);
       res.json(leaderboard);
       return;

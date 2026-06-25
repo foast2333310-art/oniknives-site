@@ -1,0 +1,6 @@
+[
+  { "name": "Bronze", "minSales": 0, "commission": 5, "color": "#cd7f32", "icon": "🥉" },
+  { "name": "Argent", "minSales": 5, "commission": 8, "color": "#c0c0c0", "icon": "🥈" },
+  { "name": "Or", "minSales": 20, "commission": 12, "color": "#ffd700", "icon": "🥇" },
+  { "name": "Diamant", "minSales": 50, "commission": 15, "color": "#b9f2ff", "icon": "💎" }
+]
