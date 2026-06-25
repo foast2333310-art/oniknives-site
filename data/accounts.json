@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "email": "testpersist@test.com",
+    "password": "hash123456",
+    "token": "049f85df-8ab0-49c7-8b04-065706f6ead1",
+    "createdAt": "2026-06-25T08:30:17.705Z"
+  }
+]
