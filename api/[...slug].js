@@ -495,7 +495,7 @@ module.exports = async (req, res) => {
         customer: body.customer,
         total: parseFloat(body.total) || 0,
         totalAfterDiscount: discountedTotal,
-        promoCode: body.promoCode || null,
+        promoCode: (body.promoCode || '').toUpperCase().trim() || null,
         promoDiscount,
         status: 'pending_payment',
         createdAt: new Date().toISOString(),
@@ -552,7 +552,7 @@ module.exports = async (req, res) => {
           // Track promo code usage for ambassador commissions
           if (orders[idx].promoCode) {
             let codes = await loadCodes();
-            const codeIdx = codes.findIndex(c => c.code === orders[idx].promoCode);
+            const codeIdx = codes.findIndex(c => c.code === (orders[idx].promoCode || '').toUpperCase().trim());
             if (codeIdx >= 0) {
               codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
               if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
@@ -614,7 +614,7 @@ module.exports = async (req, res) => {
 
           if (orders[idx].promoCode) {
             let codes = await loadCodes();
-            const codeIdx = codes.findIndex(c => c.code === orders[idx].promoCode);
+            const codeIdx = codes.findIndex(c => c.code === (orders[idx].promoCode || '').toUpperCase().trim());
             if (codeIdx >= 0) {
               codes[codeIdx].usedCount = (codes[codeIdx].usedCount || 0) + 1;
               if (!codes[codeIdx].usedBy) codes[codeIdx].usedBy = [];
@@ -951,9 +951,9 @@ module.exports = async (req, res) => {
       const myCodes = codes.filter(c => c.ambassadorEmail === account.email);
       const orders = await loadOrders();
       const paidOrders = orders.filter(o => o.status === 'payé');
-      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === o.promoCode));
+      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === (o.promoCode || '').toUpperCase().trim()));
       const stats = myOrders.map(o => {
-        const code = myCodes.find(c => c.code === o.promoCode);
+        const code = myCodes.find(c => c.code === (o.promoCode || '').toUpperCase().trim());
         const commission = code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
         return {
           orderId: o.id,
@@ -988,9 +988,9 @@ module.exports = async (req, res) => {
       const myCodes = codes.filter(c => c.ambassadorEmail === email);
       const orders = await loadOrders();
       const paidOrders = orders.filter(o => o.status === 'payé');
-      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === o.promoCode));
+      const myOrders = paidOrders.filter(o => myCodes.some(c => c.code === (o.promoCode || '').toUpperCase().trim()));
       const stats = myOrders.map(o => {
-        const code = myCodes.find(c => c.code === o.promoCode);
+        const code = myCodes.find(c => c.code === (o.promoCode || '').toUpperCase().trim());
         const commission = code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
         return { orderId: o.id, date: o.createdAt, customerEmail: o.email || (o.customer ? o.customer.email : null), total: parseFloat(o.total || 0), totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0), promoCode: o.promoCode, commissionPercent: code ? (code.ambassadorPercent || 0) : 0, commission };
       });
@@ -1009,10 +1009,10 @@ module.exports = async (req, res) => {
       const leaderboard = [];
       for (const acc of accounts) {
         const myCodes = codes.filter(c => c.ambassadorEmail === acc.email);
-        const myOrders = orders.filter(o => myCodes.some(c => c.code === o.promoCode));
+        const myOrders = orders.filter(o => myCodes.some(c => c.code === (o.promoCode || '').toUpperCase().trim()));
         let totalCommission = 0;
         for (const o of myOrders) {
-          const code = myCodes.find(c => c.code === o.promoCode);
+          const code = myCodes.find(c => c.code === (o.promoCode || '').toUpperCase().trim());
           totalCommission += code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0;
         }
         const tier = await getTier(myOrders.length, acc.tierOverride);
