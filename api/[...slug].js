@@ -601,6 +601,56 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Admin analytics dashboard
+    if (url === '/api/admin/analytics') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const orders = await loadOrders();
+      const paid = orders.filter(o => o.status === 'payé');
+      const totalRevenue = paid.reduce((s, o) => s + parseFloat(o.totalAfterDiscount || o.total || 0), 0);
+      const totalOrders = paid.length;
+      const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+      // Orders by month (last 12)
+      const months = {};
+      const now = new Date();
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        months[key] = { month: key, count: 0, revenue: 0 };
+      }
+      paid.forEach(o => {
+        const d = new Date(o.paidAt || o.createdAt);
+        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (months[key]) {
+          months[key].count++;
+          months[key].revenue += parseFloat(o.totalAfterDiscount || o.total || 0);
+        }
+      });
+      const ordersByMonth = Object.values(months).reverse();
+
+      // Top products
+      const productMap = {};
+      paid.forEach(o => {
+        (o.items || []).forEach(item => {
+          const name = item.name || 'Produit';
+          if (!productMap[name]) productMap[name] = { name, count: 0, revenue: 0 };
+          productMap[name].count += item.quantity || 1;
+          productMap[name].revenue += parseFloat(item.price || item.amount || 0) * (item.quantity || 1);
+        });
+      });
+      const topProducts = Object.values(productMap).sort((a, b) => b.count - a.count).slice(0, 10);
+
+      // Recent orders
+      const recentOrders = paid.slice(-5).reverse().map(o => ({
+        id: o.id, total: parseFloat(o.totalAfterDiscount || o.total || 0), email: o.email || (o.customer ? o.customer.email : null), date: o.paidAt || o.createdAt, items: (o.items || []).map(i => i.name).join(', ')
+      }));
+
+      const revenueByMonth = ordersByMonth.map(m => ({ month: m.month, revenue: Math.round(m.revenue * 100) / 100 }));
+
+      res.json({ totalRevenue: Math.round(totalRevenue * 100) / 100, totalOrders, avgOrderValue: Math.round(avgOrderValue * 100) / 100, ordersByMonth, revenueByMonth, topProducts, recentOrders });
+      return;
+    }
+
     // Reviews
     if (url === '/api/reviews' && req.method === 'GET') {
       const reviews = await loadReviews();

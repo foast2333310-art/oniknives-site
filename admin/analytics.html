@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - LaCorpo Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; }
+    .header { background: #2a2a2a; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; }
+    .header h1 { color: #f0e6d0; font-size: 20px; }
+    .header .links a { color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px; }
+    .header .links a:hover { color: #dbb98a; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+    .toolbar { margin-bottom: 24px; }
+    .toolbar h2 { font-size: 22px; color: #f0e6d0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #2a2a2a; border-radius: 10px; padding: 20px; border: 1px solid #333; }
+    .stat-card .label { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .stat-card .value { color: #f0e6d0; font-size: 28px; font-weight: 700; }
+    .stat-card .value.gold { color: #c8a87c; }
+    .stat-card .value.green { color: #27ae60; }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .chart-card { background: #2a2a2a; border-radius: 10px; padding: 20px; border: 1px solid #333; }
+    .chart-card h3 { color: #f0e6d0; font-size: 16px; margin-bottom: 16px; }
+    .chart-card canvas { width: 100% !important; height: auto !important; max-height: 280px; }
+    .section-title { color: #f0e6d0; font-size: 18px; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th { text-align: left; color: #888; font-size: 12px; padding: 8px 12px; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 1px; }
+    td { padding: 10px 12px; border-bottom: 1px solid #222; font-size: 14px; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .rank { color: #888; font-size: 12px; font-weight: 600; }
+    .loading { text-align: center; padding: 60px; color: #666; }
+    .empty-state { text-align: center; padding: 40px; color: #666; }
+    @media (max-width: 768px) {
+      .chart-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LaCorpo - Analytics</h1>
+    <div class="links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="produits.html">Produits</a>
+      <a href="commandes.html">Commandes</a>
+      <a href="codes.html">Codes promo</a>
+      <a href="comptes.html">Comptes</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="/">Voir le site</a>
+      <a href="#" id="logoutBtn">Déconnexion</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toolbar"><h2>📊 Analytics</h2></div>
+
+    <div id="loading" class="loading"><span class="spinner"></span> Chargement...</div>
+
+    <div id="content" style="display:none;">
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Ventes par mois</h3><canvas id="ordersChart"></canvas></div>
+        <div class="chart-card"><h3>Revenus par mois</h3><canvas id="revenueChart"></canvas></div>
+      </div>
+
+      <h3 class="section-title">🏆 Produits les plus vendus</h3>
+      <div id="topProducts"><div class="loading" style="padding:20px;">Chargement...</div></div>
+
+      <h3 class="section-title">📦 Dernières commandes</h3>
+      <div id="recentOrders"><div class="loading" style="padding:20px;">Chargement...</div></div>
+    </div>
+  </div>
+
+  <script>
+    if (!sessionStorage.getItem('admin_logged_in')) window.location.href = 'index.html';
+
+    function getAdminKey() { return localStorage.getItem('admin_api_key'); }
+
+    let ordersChartInstance = null;
+    let revenueChartInstance = null;
+
+    async function loadAnalytics() {
+      try {
+        const res = await fetch('/api/admin/analytics', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        // Stats cards
+        document.getElementById('statsGrid').innerHTML = `
+          <div class="stat-card"><div class="label">Revenus totaux</div><div class="value gold">${data.totalRevenue.toFixed(2).replace('.',',')} €</div></div>
+          <div class="stat-card"><div class="label">Commandes</div><div class="value">${data.totalOrders}</div></div>
+          <div class="stat-card"><div class="label">Paniers moyens</div><div class="value green">${data.avgOrderValue.toFixed(2).replace('.',',')} €</div></div>
+        `;
+
+        // Orders chart
+        const ctx1 = document.getElementById('ordersChart').getContext('2d');
+        if (ordersChartInstance) ordersChartInstance.destroy();
+        ordersChartInstance = new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: data.ordersByMonth.map(m => m.month),
+            datasets: [{ label: 'Ventes', data: data.ordersByMonth.map(m => m.count), backgroundColor: '#c8a87c', borderRadius: 4 }]
+          },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#888' }, grid: { color: '#333' } }, x: { ticks: { color: '#888' }, grid: { display: false } } } }
+        });
+
+        // Revenue chart
+        const ctx2 = document.getElementById('revenueChart').getContext('2d');
+        if (revenueChartInstance) revenueChartInstance.destroy();
+        revenueChartInstance = new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: data.revenueByMonth.map(m => m.month),
+            datasets: [{ label: 'Revenus', data: data.revenueByMonth.map(m => m.revenue), borderColor: '#27ae60', backgroundColor: 'rgba(39,174,96,0.1)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#27ae60' }]
+          },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => v + '€', color: '#888' }, grid: { color: '#333' } }, x: { ticks: { color: '#888' }, grid: { display: false } } } }
+        });
+
+        // Top products
+        const tp = document.getElementById('topProducts');
+        if (!data.topProducts || data.topProducts.length === 0) {
+          tp.innerHTML = '<div class="empty-state">Aucune vente pour le moment.</div>';
+        } else {
+          tp.innerHTML = `<table><thead><tr><th>#</th><th>Produit</th><th>Vendus</th><th>Revenus</th></tr></thead><tbody>
+            ${data.topProducts.map((p, i) => `<tr><td><span class="rank">#${i + 1}</span></td><td>${p.name}</td><td>${p.count}</td><td>${p.revenue.toFixed(2).replace('.',',')} €</td></tr>`).join('')}
+          </tbody></table>`;
+        }
+
+        // Recent orders
+        const ro = document.getElementById('recentOrders');
+        if (!data.recentOrders || data.recentOrders.length === 0) {
+          ro.innerHTML = '<div class="empty-state">Aucune commande pour le moment.</div>';
+        } else {
+          ro.innerHTML = `<table><thead><tr><th>#</th><th>Client</th><th>Articles</th><th>Total</th><th>Date</th></tr></thead><tbody>
+            ${data.recentOrders.map(o => `<tr><td>#${o.id}</td><td>${o.email || '—'}</td><td style="font-size:12px;color:#888;">${o.items || '—'}</td><td>${o.total.toFixed(2).replace('.',',')} €</td><td style="color:#666;font-size:12px;">${new Date(o.date).toLocaleDateString('fr-FR')}</td></tr>`).join('')}
+          </tbody></table>`;
+        }
+      } catch {
+        document.getElementById('loading').innerHTML = '<span style="color:#e74c3c;">Erreur de chargement</span>';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('admin_api_key');
+      window.location.href = 'index.html';
+    });
+
+    loadAnalytics();
+  </script>
+</body>
+</html>
