@@ -313,31 +313,6 @@ async function saveNotifications(data) {
   if (token) syncToGitHub(data, token, 'data/notifications.json').catch(() => {});
 }
 
-function sendAmbassadorDiscordNotification(ambassadorEmail, orderId, promoCode, commission, customerEmail) {
-  const url = process.env.DISCORD_WEBHOOK_URL;
-  if (!url) return;
-  try {
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        embeds: [{
-          title: '🌟 Commission ambassadeur !',
-          color: 0xc8a87c,
-          fields: [
-            { name: '👤 Ambassadeur', value: ambassadorEmail, inline: true },
-            { name: '🆔 Commande', value: '#' + orderId, inline: true },
-            { name: '🏷 Code', value: promoCode, inline: true },
-            { name: '💰 Commission', value: commission.toFixed(2).replace('.', ',') + ' €', inline: true },
-            { name: '📧 Client', value: customerEmail || '—', inline: true },
-          ],
-          timestamp: new Date().toISOString(),
-        }]
-      }),
-    }).catch(() => {});
-  } catch {}
-}
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -533,7 +508,6 @@ module.exports = async (req, res) => {
               codes[codeIdx].usedBy.push(customerEmail);
               await saveCodes(codes);
 
-              // Ambassador notification
               if (codes[codeIdx].ambassadorEmail) {
                 const total = parseFloat(orders[idx].totalAfterDiscount || orders[idx].total || 0);
                 const commission = total * (codes[codeIdx].ambassadorPercent || 0) / 100;
@@ -541,7 +515,6 @@ module.exports = async (req, res) => {
                 let notifs = await loadNotifications();
                 notifs.push(notif);
                 await saveNotifications(notifs);
-                sendAmbassadorDiscordNotification(codes[codeIdx].ambassadorEmail, orders[idx].id, codes[codeIdx].code, commission, customerEmail);
               }
             }
           }
@@ -605,7 +578,6 @@ module.exports = async (req, res) => {
                 let notifs = await loadNotifications();
                 notifs.push(notif);
                 await saveNotifications(notifs);
-                sendAmbassadorDiscordNotification(codes[codeIdx].ambassadorEmail, orders[idx].id, codes[codeIdx].code, commission, customerEmail);
               }
             }
           }
