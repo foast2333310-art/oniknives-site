@@ -753,9 +753,18 @@ module.exports = async (req, res) => {
         let accounts = await loadAccounts();
         const idx = accounts.findIndex(a => a.email === body.email);
         if (idx < 0) { res.status(404).json({ error: 'Compte introuvable' }); return; }
-        accounts[idx].role = body.role || null;
+        if (body.role !== undefined) accounts[idx].role = body.role || null;
+        if (body.password) accounts[idx].password = body.password;
         await saveAccounts(accounts);
         res.json({ email: accounts[idx].email, role: accounts[idx].role });
+        return;
+      }
+      if (req.method === 'DELETE') {
+        if (!query.email) { res.status(400).json({ error: 'email requis' }); return; }
+        let accounts = await loadAccounts();
+        accounts = accounts.filter(a => a.email !== query.email);
+        await saveAccounts(accounts);
+        res.json({ success: true });
         return;
       }
       res.status(405).json({ error: 'Method not allowed' }); return;

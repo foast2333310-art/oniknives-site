@@ -21,7 +21,7 @@
     .header h1 { color: #f0e6d0; font-size: 20px; }
     .header .links a { color: #c8a87c; text-decoration: none; font-size: 14px; margin-left: 20px; }
     .header .links a:hover { color: #dbb98a; }
-    .container { max-width: 900px; margin: 0 auto; padding: 32px; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px; }
     .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .toolbar h2 { font-size: 22px; color: #f0e6d0; }
     .empty-state { text-align: center; padding: 60px 20px; color: #666; }
@@ -30,23 +30,49 @@
     th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; padding: 10px 12px; border-bottom: 1px solid #333; font-weight: 600; }
     td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.85rem; vertical-align: middle; }
     tr:hover td { background: rgba(255,255,255,0.02); }
-    .email-col { color: #ccc; }
+    .email-col { color: #ccc; font-size: 13px; }
     .role-select {
       background: #1a1a1a; border: 1px solid #444; border-radius: 6px;
       color: #fff; font-size: 13px; padding: 6px 10px; outline: none; cursor: pointer;
     }
     .role-select:focus { border-color: #c8a87c; }
-    .badge-role {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
-      font-size: 11px; font-weight: 600;
-    }
-    .badge-role.user { background: rgba(255,255,255,0.06); color: #888; }
-    .badge-role.ambassadeur { background: rgba(200,168,124,0.15); color: #c8a87c; }
     .date-col { color: #666; font-size: 12px; white-space: nowrap; }
     .count-badge {
       background: #c8a87c; color: #1a1a1a; font-size: 12px; font-weight: 700;
       padding: 2px 8px; border-radius: 10px; margin-left: 8px;
     }
+    .actions-col { white-space: nowrap; }
+    .btn-sm {
+      padding: 5px 12px; border: none; border-radius: 5px; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: opacity .2s;
+    }
+    .btn-sm:hover { opacity: .8; }
+    .btn-sm.edit { background: rgba(200,168,124,0.15); color: #c8a87c; }
+    .btn-sm.del { background: rgba(231,76,60,0.15); color: #e74c3c; }
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #2a2a2a; border-radius: 12px; width: 90%; max-width: 420px;
+      padding: 32px;
+    }
+    .modal h3 { color: #f0e6d0; font-size: 18px; margin-bottom: 4px; }
+    .modal .sub { color: #888; font-size: 13px; margin-bottom: 20px; }
+    .modal label { display: block; color: #ccc; font-size: 12px; margin-bottom: 4px; }
+    .modal input {
+      width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #444;
+      border-radius: 6px; color: #fff; font-size: 14px; outline: none; box-sizing: border-box;
+    }
+    .modal input:focus { border-color: #c8a87c; }
+    .modal .field { margin-bottom: 14px; }
+    .modal .actions { display: flex; gap: 8px; margin-top: 20px; }
+    .modal .actions .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .modal .actions .btn-primary { background: #c8a87c; color: #1a1a1a; }
+    .modal .actions .btn-primary:hover { opacity: .85; }
+    .modal .actions .btn-secondary { background: #555; color: #fff; }
+    .modal .actions .btn-secondary:hover { opacity: .85; }
     .toast {
       position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
       border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
@@ -75,11 +101,24 @@
     <div class="toolbar">
       <h2>👥 Gestion des comptes <span id="countBadge" class="count-badge">0</span></h2>
     </div>
-    <div id="accountsTableWrap">
-      <table>
-        <thead><tr><th>Email</th><th>Rôle</th><th>Inscrit le</th></tr></thead>
-        <tbody id="accountsBody"></tbody>
-      </table>
+    <table>
+      <thead><tr><th>Email</th><th>Rôle</th><th>Inscrit le</th><th style="text-align:right;">Actions</th></tr></thead>
+      <tbody id="accountsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="modal-overlay" id="pwdModal">
+    <div class="modal">
+      <h3 id="pwdModalTitle">Changer le mot de passe</h3>
+      <div class="sub" id="pwdModalEmail"></div>
+      <div class="field">
+        <label>Nouveau mot de passe</label>
+        <input type="password" id="pwdInput" placeholder="Minimum 4 caractères">
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closePwdModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="changePassword()">Appliquer</button>
+      </div>
     </div>
   </div>
 
@@ -91,6 +130,15 @@
     }
 
     function getAdminKey() { return localStorage.getItem('admin_api_key'); }
+    let pwdTargetEmail = '';
+
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     async function loadAccounts() {
       try {
@@ -100,27 +148,29 @@
         document.getElementById('countBadge').textContent = accounts.length;
         const tbody = document.getElementById('accountsBody');
         if (!accounts || accounts.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:60px 20px;color:#666;">Aucun compte pour le moment</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:60px 20px;color:#666;">Aucun compte pour le moment</td></tr>';
           return;
         }
         tbody.innerHTML = accounts.map(a => {
           const date = a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR') : '—';
           const role = a.role || 'user';
-          const roleLabel = role === 'ambassadeur' ? 'Ambassadeur' : 'Utilisateur';
-          const badgeClass = role === 'ambassadeur' ? 'ambassadeur' : 'user';
           return `<tr>
             <td class="email-col">${a.email}</td>
             <td>
-              <select class="role-select" data-email="${a.email}" onchange="updateRole('${a.email}', this.value)">
+              <select class="role-select" onchange="updateRole('${a.email.replace(/'/g, "\\'")}', this.value)">
                 <option value="user" ${role === 'user' ? 'selected' : ''}>Utilisateur</option>
                 <option value="ambassadeur" ${role === 'ambassadeur' ? 'selected' : ''}>Ambassadeur</option>
               </select>
             </td>
             <td class="date-col">${date}</td>
+            <td class="actions-col" style="text-align:right;">
+              <button class="btn-sm edit" onclick="openPwdModal('${a.email.replace(/'/g, "\\'")}')">🔑 MDP</button>
+              <button class="btn-sm del" onclick="deleteAccount('${a.email.replace(/'/g, "\\'")}')">🗑 Suppr</button>
+            </td>
           </tr>`;
         }).join('');
       } catch {
-        document.getElementById('accountsBody').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:60px 20px;color:#e74c3c;">Erreur de chargement</td></tr>';
+        document.getElementById('accountsBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:60px 20px;color:#e74c3c;">Erreur de chargement</td></tr>';
       }
     }
 
@@ -132,7 +182,50 @@
           body: JSON.stringify({ email, role })
         });
         if (!res.ok) throw new Error();
-        showToast('✓ Rôle mis à jour pour ' + email);
+        showToast('✓ Rôle mis à jour');
+      } catch {
+        showToast('Erreur', true);
+      }
+    }
+
+    function openPwdModal(email) {
+      pwdTargetEmail = email;
+      document.getElementById('pwdModalEmail').textContent = email;
+      document.getElementById('pwdInput').value = '';
+      document.getElementById('pwdModal').classList.add('active');
+    }
+    function closePwdModal() {
+      document.getElementById('pwdModal').classList.remove('active');
+    }
+
+    async function changePassword() {
+      const pwd = document.getElementById('pwdInput').value;
+      if (!pwd || pwd.length < 4) { showToast('Minimum 4 caractères', true); return; }
+      const hash = await hashPassword(pwd);
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() },
+          body: JSON.stringify({ email: pwdTargetEmail, password: hash })
+        });
+        if (!res.ok) throw new Error();
+        closePwdModal();
+        showToast('✓ Mot de passe modifié');
+      } catch {
+        showToast('Erreur', true);
+      }
+    }
+
+    async function deleteAccount(email) {
+      if (!confirm('Supprimer le compte ' + email + ' ?')) return;
+      try {
+        const res = await fetch('/api/accounts?email=' + encodeURIComponent(email), {
+          method: 'DELETE',
+          headers: { 'x-admin-key': getAdminKey() }
+        });
+        if (!res.ok) throw new Error();
+        await loadAccounts();
+        showToast('✓ Compte supprimé');
       } catch {
         showToast('Erreur', true);
       }
@@ -150,6 +243,9 @@
       sessionStorage.removeItem('admin_logged_in');
       localStorage.removeItem('admin_api_key');
       window.location.href = 'index.html';
+    });
+    document.getElementById('pwdModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closePwdModal();
     });
 
     loadAccounts();
