@@ -4,8 +4,9 @@
     "code": "LACORPO",
     "discount": 5,
     "createdAt": "2026-06-25T08:55:52.750Z",
-    "usedBy": null,
+    "usedBy": [],
     "ambassadorEmail": "ilhanthevenin@icloud.com",
-    "ambassadorPercent": 100
+    "ambassadorPercent": 100,
+    "usedCount": 0
   }
 ]
