@@ -313,6 +313,18 @@ async function saveNotifications(data) {
   if (token) syncToGitHub(data, token, 'data/notifications.json').catch(() => {});
 }
 
+const TIERS = [
+  { name: 'Bronze', minSales: 0, commission: 5, color: '#cd7f32', icon: '🥉' },
+  { name: 'Argent', minSales: 5, commission: 8, color: '#c0c0c0', icon: '🥈' },
+  { name: 'Or', minSales: 20, commission: 12, color: '#ffd700', icon: '🥇' },
+  { name: 'Diamant', minSales: 50, commission: 15, color: '#b9f2ff', icon: '💎' },
+];
+function getTier(sales) {
+  let t = TIERS[0];
+  for (const tier of TIERS) { if (sales >= tier.minSales) t = tier; }
+  return t;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -899,7 +911,11 @@ module.exports = async (req, res) => {
         };
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
-      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission });
+      const tier = getTier(stats.length);
+      const nextTier = TIERS.find(t => t.minSales > stats.length);
+      const nextTierSales = nextTier ? nextTier.minSales - stats.length : 0;
+      const progress = nextTier ? Math.round((stats.length - getTier(stats.length).minSales) / (nextTier.minSales - getTier(stats.length).minSales) * 100) : 100;
+      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color }, nextTier: nextTier ? { name: nextTier.name, icon: nextTier.icon, salesNeeded: nextTierSales } : null, progress });
       return;
     }
 
@@ -919,7 +935,29 @@ module.exports = async (req, res) => {
         return { orderId: o.id, date: o.createdAt, customerEmail: o.email || (o.customer ? o.customer.email : null), total: parseFloat(o.total || 0), totalAfterDiscount: parseFloat(o.totalAfterDiscount || o.total || 0), promoCode: o.promoCode, commissionPercent: code ? (code.ambassadorPercent || 0) : 0, commission };
       });
       const totalCommission = stats.reduce((s, o) => s + o.commission, 0);
-      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission });
+      const tier = getTier(stats.length);
+      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color } });
+      return;
+    }
+
+    // Ambassador leaderboard (admin)
+    if (url === '/api/ambassador/leaderboard') {
+      if (req.headers['x-admin-key'] !== key) { res.status(401).json({ error: 'Non autorisé' }); return; }
+      const accounts = (await loadAccounts()).filter(a => a.role === 'ambassadeur');
+      const codes = await loadCodes();
+      const orders = (await loadOrders()).filter(o => o.status === 'payé');
+      const leaderboard = accounts.map(acc => {
+        const myCodes = codes.filter(c => c.ambassadorEmail === acc.email);
+        const myOrders = orders.filter(o => myCodes.some(c => c.code === o.promoCode));
+        const totalCommission = myOrders.reduce((s, o) => {
+          const code = myCodes.find(c => c.code === o.promoCode);
+          return s + (code ? ((o.totalAfterDiscount || o.total || 0) * (code.ambassadorPercent || 0) / 100) : 0);
+        }, 0);
+        const tier = getTier(myOrders.length);
+        return { email: acc.email, sales: myOrders.length, totalCommission: Math.round(totalCommission * 100) / 100, tier: { name: tier.name, icon: tier.icon, color: tier.color }, joinedAt: acc.createdAt };
+      });
+      leaderboard.sort((a, b) => b.totalCommission - a.totalCommission);
+      res.json(leaderboard);
       return;
     }
 
