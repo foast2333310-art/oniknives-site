@@ -54,12 +54,7 @@
   <div class="container">
     <div class="toolbar"><h2>🏆 Classement Ambassadeurs <span class="count-badge" id="countBadge">0</span></h2></div>
 
-    <div class="tier-cards">
-      <div class="tier-card"><div class="icon">🥉</div><div class="name" style="color:#cd7f32;">Bronze</div><div class="req">0-4 ventes</div><div class="comm">5% commission</div></div>
-      <div class="tier-card"><div class="icon">🥈</div><div class="name" style="color:#c0c0c0;">Argent</div><div class="req">5-19 ventes</div><div class="comm">8% commission</div></div>
-      <div class="tier-card"><div class="icon">🥇</div><div class="name" style="color:#ffd700;">Or</div><div class="req">20-49 ventes</div><div class="comm">12% commission</div></div>
-      <div class="tier-card"><div class="icon">💎</div><div class="name" style="color:#b9f2ff;">Diamant</div><div class="req">50+ ventes</div><div class="comm">15% commission</div></div>
-    </div>
+    <div class="tier-cards" id="tierCards"></div>
 
     <div id="loading" class="loading"><span class="spinner"></span> Chargement...</div>
     <div id="leaderboardTable" style="display:none;"></div>
@@ -69,7 +64,22 @@
     if (!sessionStorage.getItem('admin_logged_in')) window.location.href = 'index.html';
     function getAdminKey() { return localStorage.getItem('admin_api_key'); }
 
+    async function loadTierCards() {
+      try {
+        const res = await fetch('/api/admin/tiers', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) throw new Error();
+        const tiers = await res.json();
+        tiers.sort((a, b) => a.minSales - b.minSales);
+        document.getElementById('tierCards').innerHTML = tiers.map((t, i) => {
+          const next = tiers[i + 1];
+          const reqText = next ? t.minSales + '-' + (next.minSales - 1) + ' ventes' : t.minSales + '+ ventes';
+          return `<div class="tier-card"><div class="icon">${t.icon}</div><div class="name" style="color:${t.color};">${t.name}</div><div class="req">${reqText}</div><div class="comm">${t.commission}% commission</div></div>`;
+        }).join('');
+      } catch {}
+    }
+
     async function loadLeaderboard() {
+      await loadTierCards();
       try {
         const res = await fetch('/api/ambassador/leaderboard', { headers: { 'x-admin-key': getAdminKey() } });
         if (!res.ok) throw new Error();
