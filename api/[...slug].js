@@ -213,14 +213,15 @@ async function saveReviews(data) {
 async function sendDiscordNotification(o) {
   const url = process.env.DISCORD_WEBHOOK_URL;
   if (!url) return;
-  const items = o.items.map(i => `${i.quantity}x ${i.name}${i.amount ? ' — ' + parseFloat(i.amount).toFixed(2).replace('.', ',') + '€' : ''} — ${(i.price * i.quantity).toFixed(2).replace('.', ',')}€`).join('\n');
+  const items = o.items.map(i => `${i.quantity}x ${i.name}${i.amount ? ' — ' + parseFloat(i.amount).toFixed(2).replace('.', ',') + '€' : ''}`).join('\n');
   const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
+  const afterDiscount = o.totalAfterDiscount && parseFloat(o.totalAfterDiscount) !== parseFloat(o.total) ? ' → ' + parseFloat(o.totalAfterDiscount).toFixed(2).replace('.', ',') + ' €' : '';
   const customer = o.customer || {};
   const fields = [
     { name: '📦 Articles', value: items || '—', inline: false },
-    { name: '💰 Total', value: total + ' €', inline: true },
-    { name: '👤 Client', value: customer.discord || customer.name || '—', inline: true },
-    { name: '📧 Email', value: customer.email || '—', inline: true },
+    { name: '💰 Total', value: total + ' €' + afterDiscount, inline: false },
+    { name: '👤 Client', value: customer.discord || customer.name || '—', inline: false },
+    { name: '📧 Email', value: customer.email || '—', inline: false },
     { name: '📝 Projet', value: customer.description || '—', inline: false },
   ];
   try {
