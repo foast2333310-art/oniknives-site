@@ -125,6 +125,26 @@
         <h3>Suggestions</h3>
         <p>Consulter les suggestions<br>de produits des visiteurs</p>
       </a>
+      <a href="comptes.html" class="dash-card">
+        <div class="icon">👥</div>
+        <h3>Comptes</h3>
+        <p>Gérer les comptes utilisateurs<br>et assigner des rôles</p>
+      </a>
+      <a href="analytics.html" class="dash-card">
+        <div class="icon">📊</div>
+        <h3>Analytics</h3>
+        <p>Voir les statistiques détaillées<br>ventes, revenus, top produits</p>
+      </a>
+      <a href="ambassadeurs.html" class="dash-card">
+        <div class="icon">🏆</div>
+        <h3>Ambassadeurs</h3>
+        <p>Classement des ambassadeurs<br>et gestion des paliers</p>
+      </a>
+      <a href="tiers.html" class="dash-card">
+        <div class="icon">🎯</div>
+        <h3>Paliers</h3>
+        <p>Configurer les paliers<br>et commissions ambassadeurs</p>
+      </a>
     </div>
 
     <div class="reviews-section">
@@ -215,11 +235,6 @@
               <div><span class="name">${r.name}</span> <span class="stars">${stars}</span></div>
               <div class="comment">${r.comment}</div>
               <div class="date">${date}</div>
-      <a href="comptes.html" class="dash-card">
-        <div class="icon">👥</div>
-        <h3>Comptes</h3>
-        <p>Gérer les comptes utilisateurs<br>et assigner des rôles</p>
-      </a>
     </div>
             <button class="btn-del" onclick="deleteReview(${r.id})">Supprimer</button>
           </div>`;
