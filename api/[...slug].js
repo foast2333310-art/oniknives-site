@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const urlMod = require('url');
+const bcrypt = require('bcryptjs');
 const SITE_URL = 'https://lacorpo.vercel.app';
 let _stripe = null;
 function getStripe() {
@@ -903,7 +904,8 @@ module.exports = async (req, res) => {
       let accounts = await loadAccounts();
       if (accounts.find(a => a.email === email)) { res.status(409).json({ error: 'Cet email est déjà utilisé' }); return; }
       const token = require('crypto').randomUUID();
-      accounts.push({ email, password: body.password, token, createdAt: new Date().toISOString() });
+      const hash = await bcrypt.hash(body.password, 10);
+      accounts.push({ email, password: hash, token, createdAt: new Date().toISOString() });
       await saveAccounts(accounts);
       res.status(201).json({ token }); return;
     }
@@ -913,8 +915,19 @@ module.exports = async (req, res) => {
       if (!body.email || !body.password) { res.status(400).json({ error: 'email et password requis' }); return; }
       const email = body.email.trim().toLowerCase();
       const accounts = await loadAccounts();
-      const account = accounts.find(a => a.email === email && a.password === body.password);
+      const account = accounts.find(a => a.email === email);
       if (!account) { res.status(401).json({ error: 'Email ou mot de passe incorrect' }); return; }
+      let isMatch = false;
+      if ((account.password || '').startsWith('$2')) {
+        isMatch = await bcrypt.compare(body.password, account.password);
+      } else {
+        isMatch = body.password === account.password;
+        if (isMatch) {
+          account.password = await bcrypt.hash(body.password, 10);
+          await saveAccounts(accounts);
+        }
+      }
+      if (!isMatch) { res.status(401).json({ error: 'Email ou mot de passe incorrect' }); return; }
       res.json({ token: account.token }); return;
     }
 
@@ -1106,7 +1119,7 @@ module.exports = async (req, res) => {
         const idx = accounts.findIndex(a => a.email === body.email);
         if (idx < 0) { res.status(404).json({ error: 'Compte introuvable' }); return; }
         if (body.role !== undefined) accounts[idx].role = body.role || null;
-        if (body.password) accounts[idx].password = body.password;
+        if (body.password) accounts[idx].password = await bcrypt.hash(body.password, 10);
         await saveAccounts(accounts);
         res.json({ email: accounts[idx].email, role: accounts[idx].role });
         return;

@@ -2,6 +2,7 @@
   "name": "oniknives-site",
   "private": true,
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "stripe": "^22.2.1"
   }
 }
