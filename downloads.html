@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes téléchargements — LaCorpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-section { max-width: 720px; margin: 0 auto; padding: 60px 20px; }
+    .page-title { text-align: center; margin-bottom: 40px; }
+    .page-title h1 { font-size: 28px; color: #f0e6d0; margin-bottom: 6px; }
+    .page-title p { color: #888; font-size: 14px; }
+    .page-title .count { color: #c8a87c; font-weight: 600; }
+    .dl-card { display: flex; align-items: center; justify-content: space-between; background: rgba(26,26,26,0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 20px; margin-bottom: 10px; }
+    .dl-card .info { flex: 1; }
+    .dl-card .name { color: #e5e5e5; font-size: 15px; font-weight: 500; }
+    .dl-card .meta { color: #666; font-size: 12px; margin-top: 2px; }
+    .dl-card .btn-dl { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: rgba(39,174,96,0.12); color: #27ae60; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all .2s; }
+    .dl-card .btn-dl:hover { background: rgba(39,174,96,0.2); }
+    .empty-state { text-align: center; padding: 80px 20px; background: rgba(26,26,26,0.6); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.06); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
+    .empty-state h3 { color: #888; font-size: 18px; margin-bottom: 6px; }
+    .empty-state p { color: #555; font-size: 14px; }
+    .loading { text-align: center; padding: 80px; color: #666; font-size: 14px; }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid rgba(200,168,124,0.2); border-top-color: #c8a87c; border-radius: 50%; animation: spin .6s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .back-link { display: inline-block; color: #c8a87c; text-decoration: none; font-size: 14px; margin-bottom: 24px; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="https://i.goopics.net/k2n1sq.png" alt="LaCorpo" height="32"></a>
+      <nav class="nav">
+        <a href="produits.html">Produits</a>
+        <a href="contact.html">Contact</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="compte.html">Mon compte</a>
+      </nav>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Mode clair/sombre">☀️</button>
+      <a href="panier.html" class="cart-icon" title="Panier">🛒<span class="cart-count">0</span></a>
+    </div>
+  </header>
+
+  <div class="page-section">
+    <a href="compte.html" class="back-link">← Retour au compte</a>
+    <div class="page-title">
+      <h1>📥 Mes téléchargements</h1>
+      <p>Retrouve tous tes fichiers achetés au même endroit</p>
+    </div>
+    <div id="downloadsList"><div class="loading"><span class="spinner"></span> Chargement...</div></div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>LaCorpo</h3>
+        <p>Votre source de solutions digitales premium.</p>
+      </div>
+      <div class="footer-links-column">
+        <h4>Navigation</h4>
+        <a href="produits.html">Produits</a>
+        <a href="compte.html">Mon compte</a>
+        <a href="contact.html">Contact</a>
+        <a href="a-propos.html">À propos</a>
+      </div>
+      <div class="footer-links-column">
+        <h4>Contact</h4>
+        <a href="mailto:lacorposite@gmail.com">lacorposite@gmail.com</a>
+        <a href="https://discord.gg/asYcBq76bm" target="_blank">Discord</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 LaCorpo. Tous droits réservés.</p></div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    const token = localStorage.getItem('oni_token');
+    if (!token) window.location.href = 'compte.html';
+
+    async function loadDownloads() {
+      try {
+        const r = await fetch('/api/account/downloads', { headers: { 'x-session-token': token } });
+        if (r.status === 401) { window.location.href = 'compte.html'; return; }
+        if (!r.ok) throw new Error();
+        const files = await r.json();
+        const el = document.getElementById('downloadsList');
+        if (!files || files.length === 0) {
+          el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><h3>Aucun fichier disponible</h3><p>Tu n\'as pas encore acheté de produits téléchargeables.</p></div>';
+          return;
+        }
+        document.querySelector('.page-title .count').textContent = files.length;
+        el.innerHTML = files.map(f => {
+          const date = new Date(f.date).toLocaleDateString('fr-FR', { day:'numeric',month:'short',year:'numeric' });
+          return `<div class="dl-card"><div class="info"><div class="name">${f.name}</div><div class="meta">Commande #${f.orderId} · ${date}</div></div><a href="${f.downloadUrl}" target="_blank" class="btn-dl">📥 Télécharger</a></div>`;
+        }).join('');
+      } catch {
+        document.getElementById('downloadsList').innerHTML = '<div class="empty-state"><h3>Erreur de chargement</h3><p>Impossible de récupérer tes fichiers.</p></div>';
+      }
+    }
+
+    loadDownloads();
+  </script>
+</body>
+</html>

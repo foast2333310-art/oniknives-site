@@ -953,6 +953,32 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Account downloads (all purchased files)
+    if (url === '/api/account/downloads') {
+      const token = req.headers['x-session-token'];
+      if (!token) { res.status(401).json({ error: 'Non connecté' }); return; }
+      const accounts = await loadAccounts();
+      const account = accounts.find(a => a.token === token);
+      if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
+      const orders = await loadOrders();
+      const paidOrders = orders.filter(o => o.email && o.email.toLowerCase() === account.email && o.status === 'payé');
+      const products = await load();
+      const downloads = [];
+      const seen = new Set();
+      for (const o of paidOrders) {
+        for (const item of (o.items || [])) {
+          const prod = (products || []).find(p => p.id === item.id || p.slug === item.slug);
+          const url = item.downloadUrl || (prod ? prod.downloadUrl : null);
+          if (url && !seen.has(url)) {
+            seen.add(url);
+            downloads.push({ name: item.name || (prod ? prod.name : 'Produit'), downloadUrl: url, orderId: o.id, date: o.createdAt });
+          }
+        }
+      }
+      res.json(downloads);
+      return;
+    }
+
     // Ambassador stats
     if (url === '/api/ambassador/stats') {
       const token = req.headers['x-session-token'];
