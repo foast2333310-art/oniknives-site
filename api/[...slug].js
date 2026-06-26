@@ -1014,7 +1014,7 @@ module.exports = async (req, res) => {
       const curIdx = tiers.findIndex(t => t.name === tier.name);
       const nextIdx = tiers.findIndex(t => t.minSales > stats.length);
       const progress = nextTier && curIdx >= 0 && nextIdx >= 0 ? Math.round((stats.length - tiers[curIdx].minSales) / (tiers[nextIdx].minSales - tiers[curIdx].minSales) * 100) : 100;
-      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, tier: { name: tier.name, icon: tier.icon, color: tier.color }, nextTier: nextTier ? { name: nextTier.name, icon: nextTier.icon, salesNeeded: nextTierSales } : null, progress });
+      res.json({ codes: myCodes, orders: stats, totalOrders: stats.length, totalCommission, commissionPercent: tier.commission, tier: { name: tier.name, icon: tier.icon, color: tier.color }, nextTier: nextTier ? { name: nextTier.name, icon: nextTier.icon, salesNeeded: nextTierSales } : null, progress });
       return;
     }
 

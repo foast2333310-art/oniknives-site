@@ -264,16 +264,8 @@
             <div class="stat-item"><div class="num" id="ambCodes">—</div><div class="label">Codes actifs</div></div>
           </div>
 
-          <!-- Tier badge + progress -->
-          <div id="ambTierSection" style="margin-top:16px;padding:14px;background:#1a1a1a;border-radius:8px;display:none;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><span id="ambTierIcon" style="font-size:24px;"></span> <span id="ambTierName" style="font-size:16px;font-weight:600;"></span></div>
-              <div id="ambTierNext" style="font-size:12px;color:#888;"></div>
-            </div>
-            <div id="ambTierProgressBar" style="margin-top:8px;height:6px;background:#333;border-radius:3px;overflow:hidden;">
-              <div id="ambTierProgressFill" style="height:100%;width:0%;background:linear-gradient(90deg,#c8a87c,#ffd700);border-radius:3px;transition:width 0.5s;"></div>
-            </div>
-          </div>
+          <!-- Tier badge visuel -->
+          <div id="ambTierSection" style="display:none;"></div>
 
           <!-- Notifications -->
           <div id="ambNotifications" style="margin-top:16px;display:none;">
@@ -462,19 +454,41 @@
         document.getElementById('ambCommission').textContent = (data.totalCommission || 0).toFixed(2).replace('.', ',');
         document.getElementById('ambCodes').textContent = (data.codes || []).length;
 
-        // Tier display
+        // Tier display — badge visuel
         if (data.tier) {
           const ts = document.getElementById('ambTierSection');
           ts.style.display = 'block';
-          document.getElementById('ambTierIcon').textContent = data.tier.icon;
-          document.getElementById('ambTierName').textContent = data.tier.name;
-          document.getElementById('ambTierName').style.color = data.tier.color;
-          if (data.nextTier) {
-            document.getElementById('ambTierNext').textContent = data.nextTier.icon + ' ' + data.nextTier.name + ' — ' + data.nextTier.salesNeeded + ' ventes requises';
-          } else {
-            document.getElementById('ambTierNext').textContent = '💎 Palier maximum atteint !';
-          }
-          document.getElementById('ambTierProgressFill').style.width = Math.min(data.progress || 0, 100) + '%';
+          const progress = Math.min(data.progress || 0, 100);
+          const nextHtml = data.nextTier
+            ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#888;">🔜 Prochain palier</span>
+                <span style="font-size:13px;font-weight:600;">${data.nextTier.icon} ${data.nextTier.name} <span style="color:#c8a87c;font-weight:400;">— ${data.nextTier.salesNeeded} ventes</span></span>
+               </div>`
+            : `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
+                <span style="font-size:13px;color:#ffd700;">💎 Palier maximum atteint !</span>
+               </div>`;
+          ts.innerHTML = `<div style="background:linear-gradient(135deg,${data.tier.color}15,#1a1a1a);border:1px solid ${data.tier.color}40;border-radius:12px;padding:18px;margin-top:16px;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:50%;background:${data.tier.color}22;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid ${data.tier.color}60;">${data.tier.icon}</div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:18px;font-weight:700;color:${data.tier.color};">${data.tier.name}</span>
+                  <span style="font-size:12px;background:rgba(39,174,96,0.15);color:#27ae60;padding:2px 10px;border-radius:10px;font-weight:600;">${data.commissionPercent || 0}% commission</span>
+                </div>
+                <div style="margin-top:4px;font-size:13px;color:#888;">💰 ${(data.totalCommission || 0).toFixed(2).replace('.',',')} € gagnés</div>
+              </div>
+            </div>
+            <div style="margin-top:14px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-bottom:4px;">
+                <span>📊 ${data.totalOrders || 0} ventes</span>
+                ${data.nextTier ? `<span>Objectif : ${data.nextTier.salesNeeded + (data.totalOrders || 0)} ventes</span>` : '<span>🏆 Max</span>'}
+              </div>
+              <div style="height:10px;background:#333;border-radius:5px;overflow:hidden;">
+                <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,${data.tier.color},${data.tier.color}cc);border-radius:5px;transition:width 0.8s ease;"></div>
+              </div>
+            </div>
+            ${nextHtml}
+          </div>`;
         }
 
         const el = document.getElementById('ambassadorOrders');
