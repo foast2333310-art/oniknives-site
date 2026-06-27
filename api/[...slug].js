@@ -558,6 +558,7 @@ module.exports = async (req, res) => {
         id: orderId,
         items: body.items,
         customer: body.customer,
+        email: body.customer?.email || null,
         total: parseFloat(body.total) || 0,
         totalAfterDiscount: discountedTotal,
         promoCode: (body.promoCode || '').toUpperCase().trim() || null,
@@ -987,7 +988,7 @@ module.exports = async (req, res) => {
       const account = accounts.find(a => a.token === token);
       if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
       const orders = await loadOrders();
-      const userOrders = orders.filter(o => o.email && o.email.toLowerCase() === account.email && o.status === 'payé');
+      const userOrders = orders.filter(o => (o.email || (o.customer && o.customer.email)) && (o.email || o.customer.email).toLowerCase() === account.email && o.status === 'payé');
       const products = await load();
       res.json(userOrders.map(o => ({
         id: o.id,
@@ -1009,7 +1010,7 @@ module.exports = async (req, res) => {
       const account = accounts.find(a => a.token === token);
       if (!account) { res.status(401).json({ error: 'Session invalide' }); return; }
       const orders = await loadOrders();
-      const paidOrders = orders.filter(o => o.email && o.email.toLowerCase() === account.email && o.status === 'payé');
+      const paidOrders = orders.filter(o => (o.email || (o.customer && o.customer.email)) && (o.email || o.customer.email).toLowerCase() === account.email && o.status === 'payé');
       const products = await load();
       const downloads = [];
       const seen = new Set();
