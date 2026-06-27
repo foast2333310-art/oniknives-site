@@ -75,7 +75,7 @@
           <a href="a-propos.html">À propos</a>
           <a href="contact.html">Contact</a>
           <a href="compte.html">Mon compte</a>
-          <a href="#" onclick="event.preventDefault();document.getElementById('legalModal').classList.add('active');">CGV</a>
+          <a href="cgv.html">CGV</a>
         </div>
         <div class="footer-col">
           <h4>Contact</h4>
@@ -118,18 +118,5 @@
 
     loadDownloads();
   </script>
-<div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('legalModal').classList.remove('active')">&times;</button>
-    <h2>Conditions Générales de Vente</h2>
-    <div class="modal-body">
-      <p>En achetant nos services ou produits, vous acceptez les conditions suivantes :</p>
-      <p>Aucun remboursement ne pourra être effectué après utilisation du produit, du service ou de la commande. Toute commande validée est considérée comme définitive.</p>
-      <p>À partir du moment où vous modifiez, touchez ou accédez au produit/service, nous ne sommes plus responsables des éventuels problèmes, dysfonctionnements ou conséquences pouvant survenir par la suite.</p>
-      <p>Le client est responsable de l'utilisation faite des produits et services fournis. Nous nous réservons le droit de refuser ou d'annuler une commande en cas d'abus ou de non-respect des règles.</p>
-      <p>Merci de votre confiance. — LaCorpo</p>
-    </div>
-  </div>
-</div>
 </body>
 </html>
