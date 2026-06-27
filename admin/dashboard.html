@@ -74,7 +74,8 @@
     .btn-del:hover { background: #c0392b; color: #fff; }
     .recent-sales { margin-top: 48px; text-align: left; }
     .recent-sales h3 { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-    .sale-row { background: #2a2a2a; border-radius: 8px; padding: 12px 16px; margin-bottom: 6px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+    .sale-row { background: #2a2a2a; border-radius: 8px; padding: 12px 16px; margin-bottom: 6px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; cursor: pointer; transition: all 0.2s; }
+    .sale-row:hover { border-color: #c8a87c; transform: translateX(4px); }
     .sale-row .left { display: flex; align-items: center; gap: 12px; }
     .sale-row .badge { background: #27ae60; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
     .sale-row .items { color: #ccc; font-size: 13px; }
@@ -194,7 +195,7 @@
           const total = parseFloat(o.totalAfterDiscount || o.total || 0).toFixed(2).replace('.', ',');
           const email = o.email || (o.customer ? o.customer.email : '—');
           const promo = o.promoCode ? '🎟 ' + o.promoCode : '';
-          return '<div class="sale-row"><div class="left"><span class="badge">#' + o.id + '</span><span class="items">' + items + '</span></div><div class="right"><div class="total">' + total + ' €</div><div class="email">' + email + '</div>' + (promo ? '<div class="promo">' + promo + '</div>' : '') + '<div class="time">' + time + '</div></div></div>';
+          return '<a href="commandes.html" class="sale-row"><div class="left"><span class="badge">#' + o.id + '</span><span class="items">' + items + '</span></div><div class="right"><div class="total">' + total + ' €</div><div class="email">' + email + '</div>' + (promo ? '<div class="promo">' + promo + '</div>' : '') + '<div class="time">' + time + '</div></div></a>';
         }).join('') || '<div style="color:#666;font-size:13px;">Aucune vente pour le moment.</div>';
       } catch {}
     }
