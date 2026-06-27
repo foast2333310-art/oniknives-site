@@ -21,6 +21,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Parallaxe
+function initParallax() {
+  const els = document.querySelectorAll('[data-parallax]');
+  if (!els.length) return;
+  let ticking = false;
+  function update() {
+    const sy = window.scrollY;
+    for (const el of els) {
+      const speed = parseFloat(el.dataset.parallax) || 0.1;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 100 && rect.bottom > -100) {
+        el.style.transform = `translateY(${sy * speed}px)`;
+      }
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } });
+  update();
+}
+
 // Hero particles
 function initParticles() {
   const canvas = document.getElementById('particles-canvas');
@@ -76,6 +96,7 @@ function initHeroTyping() {
   });
 }
 
+initParallax();
 initParticles();
 initHeroTyping();
 

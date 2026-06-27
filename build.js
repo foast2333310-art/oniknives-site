@@ -49,7 +49,7 @@ async function minifyDir(dir) {
       if (result.styles) fs.writeFileSync(full, result.styles);
     } else if (entry.name.endsWith('.js') && !entry.name.endsWith('.min.js') && !entry.name.startsWith('[...')) {
       const code = fs.readFileSync(full, 'utf-8');
-      const result = await Terser.minify(code, { compress: true, mangle: { reserved: ['addToCart', 'loadProducts', 'renderProducts', 'initProductPage', 'toggleTheme', 'switchTab', 'launchConfetti'] } });
+      const result = await Terser.minify(code, { compress: true, mangle: { reserved: ['addToCart', 'loadProducts', 'renderProducts', 'initProductPage', 'toggleTheme', 'switchTab', 'launchConfetti', 'initParallax'] } });
       if (result.code) fs.writeFileSync(full, result.code);
     }
   }
