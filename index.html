@@ -122,16 +122,18 @@
     </div>
   </section>
 
-  <section style="padding:40px 0;">
-    <div class="container" style="max-width:600px;">
-      <h3 style="text-align:center;color:#c8a87c;font-size:1.1rem;font-weight:500;margin-bottom:16px;letter-spacing:0.5px;">💡 Tu veux voir un produit en particulier ?</h3>
-      <div class="glass-card" style="padding:20px;">
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="suggName" placeholder="Ton pseudo" class="form-glass" style="padding:10px 14px;font-size:14px;flex:1;">
-          <input type="text" id="suggMsg" placeholder="Dis-nous ce que tu veux..." class="form-glass" style="padding:10px 14px;font-size:14px;flex:2;">
-          <button class="btn-glass" onclick="submitSuggestion()" style="padding:10px 20px;font-size:14px;">Envoyer</button>
+  <section style="padding:50px 0;">
+    <div class="container" style="max-width:700px;">
+      <h3 style="text-align:center;color:#c8a87c;font-size:1.3rem;font-weight:500;margin-bottom:20px;">💡 Tu veux voir un produit en particulier ?</h3>
+      <div class="glass-card" style="padding:28px;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <input type="text" id="suggName" placeholder="Ton pseudo" class="form-glass" style="padding:14px 18px;font-size:16px;">
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="suggMsg" placeholder="Dis-nous ce que tu veux voir comme produit..." class="form-glass" style="padding:14px 18px;font-size:16px;flex:1;">
+            <button class="btn-glass" onclick="submitSuggestion()" style="padding:14px 28px;font-size:15px;white-space:nowrap;">Envoyer</button>
+          </div>
         </div>
-        <div id="suggFeedback" style="margin-top:8px;font-size:13px;color:#27ae60;display:none;text-align:center;">✓ Merci de ta suggestion !</div>
+        <div id="suggFeedback" style="margin-top:10px;font-size:14px;color:#27ae60;display:none;text-align:center;">✓ Merci de ta suggestion !</div>
       </div>
     </div>
   </section>
