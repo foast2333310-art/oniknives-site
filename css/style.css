@@ -36,6 +36,11 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* Hero */
 .hero { padding: 80px 0; position: relative; overflow: hidden; min-height: 70vh; display: flex; align-items: center; }
+#particles-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hero::before { animation: heroGradient 12s ease infinite alternate; background-size: 200% 200% !important; }
+@keyframes heroGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.typing-cursor { color: #c8a87c; animation: blink 0.8s step-end infinite; font-weight: 300; }
+@keyframes blink { 50% { opacity: 0; } }
 .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(20,10,40,0.9) 40%, rgba(10,10,10,0.95) 70%), url('https://i.goopics.net/k2n1sq.png') center/40% no-repeat; z-index: 0; }
 .hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 70% 50%, rgba(200,168,124,0.04) 0%, transparent 60%); z-index: 0; pointer-events: none; }
 .hero > .container { position: relative; z-index: 1; width: 100%; }

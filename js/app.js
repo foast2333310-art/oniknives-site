@@ -21,6 +21,64 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Hero particles
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize() { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = 50;
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+      r: Math.random() * 2 + 1, a: Math.random() * 0.5 + 0.1
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 168, 124, ${p.a})`; ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// Typewriter
+function typeWriter(el, text, speed, cb) {
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    } else if (cb) cb();
+  }
+  el.textContent = '';
+  type();
+}
+
+function initHeroTyping() {
+  const titleEl = document.getElementById('hero-title');
+  const subEl = document.getElementById('hero-subtitle');
+  if (!titleEl || !subEl) return;
+  typeWriter(subEl, 'Boutique digitale', 60, () => {
+    setTimeout(() => {
+      typeWriter(titleEl, 'Bienvenue chez LaCorpo', 50);
+    }, 200);
+  });
+}
+
+initParticles();
+initHeroTyping();
+
 const API = '/api/products';
 
 async function loadProducts() {
