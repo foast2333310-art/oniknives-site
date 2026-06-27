@@ -101,5 +101,20 @@
     "description": "🔥 Business LEGO avec LaCorpo\n\nTout est prêt : fournisseur testé, WhatsApp direct, méthode pas à pas.\n\nPour débutants, amateurs LEGO, revenu en ligne.\n\n⏳ Gagne du temps · 🚀 Passe à l'action\n\n👉 Rejoins LaCorpo",
     "id": 6,
     "downloadUrl": "https://mega.nz/folder/kMMGyYQZ#Ms3ZL16SPNHh5CvvtazX8A"
+  },
+  {
+    "name": "Pack Site",
+    "slug": "packsite",
+    "price": 50,
+    "category": "Pack Site ",
+    "images": [
+      "https://i.goopics.net/uu44mf.png"
+    ],
+    "image": "https://i.goopics.net/uu44mf.png",
+    "epuise": false,
+    "promo": 0,
+    "badge": "🔥 Nouveau",
+    "description": "🚀 Obtenez une boutique premium moderne, performante et prête à vendre. Cette version intègre une interface haut de gamme en glassmorphism avec animations, une authentification sécurisée, des emails transactionnels via Brevo, une galerie produits avancée, un système e-commerce complet (commandes, produits gratuits, statuts), un programme d'ambassadeurs avec commissions et niveaux, des notifications Discord, ainsi qu'une optimisation complète des performances, du référencement et du déploiement. Une solution clé en main conçue pour offrir une expérience utilisateur professionnelle et maximiser vos conversions.",
+    "id": 7
   }
 ]
