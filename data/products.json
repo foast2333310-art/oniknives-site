@@ -74,7 +74,7 @@
   {
     "name": "Pack Facture",
     "slug": "PackFacture",
-    "price": 10,
+    "price": 0,
     "category": "Facture",
     "image": "https://i.goopics.net/ph3n47.png",
     "epuise": false,
@@ -84,7 +84,10 @@
     "id": 5,
     "file": null,
     "fileName": null,
-    "downloadUrl": "https://mega.nz/folder/xVEE0QJB#NSgI-fJ9mDMu16XQv3fEaA"
+    "downloadUrl": "https://mega.nz/folder/xVEE0QJB#NSgI-fJ9mDMu16XQv3fEaA",
+    "images": [
+      "https://i.goopics.net/ph3n47.png"
+    ]
   },
   {
     "name": "Pack Fournisseur Lego",
