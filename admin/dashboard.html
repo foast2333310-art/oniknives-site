@@ -72,6 +72,17 @@
     .review-row .date { color: #555; font-size: 11px; }
     .btn-del { background: none; border: 1px solid #c0392b; color: #c0392b; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .btn-del:hover { background: #c0392b; color: #fff; }
+    .recent-sales { margin-top: 48px; text-align: left; }
+    .recent-sales h3 { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .sale-row { background: #2a2a2a; border-radius: 8px; padding: 12px 16px; margin-bottom: 6px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+    .sale-row .left { display: flex; align-items: center; gap: 12px; }
+    .sale-row .badge { background: #27ae60; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .sale-row .items { color: #ccc; font-size: 13px; }
+    .sale-row .right { text-align: right; }
+    .sale-row .total { color: #c8a87c; font-weight: 600; font-size: 14px; }
+    .sale-row .email { color: #666; font-size: 11px; }
+    .sale-row .promo { color: #f39c12; font-size: 11px; }
+    .sale-row .time { color: #555; font-size: 11px; }
   </style>
   <meta property="og:title" content="Dashboard - LaCorpo Admin">
   <meta property="og:description" content="Administration LaCorpo.">
@@ -150,6 +161,11 @@
       </a>
     </div>
 
+    <div class="recent-sales">
+      <h3>🛒 Dernières ventes <span style="color:#555;font-weight:400;font-size:11px;" id="saleCount"></span></h3>
+      <div id="recentSalesList"></div>
+    </div>
+
     <div class="reviews-section">
       <h3>⭐ Avis clients</h3>
       <div id="reviewsList"></div>
@@ -162,6 +178,25 @@
     }
 
     function getAdminKey() { return localStorage.getItem('admin_api_key'); }
+
+    async function loadRecentSales() {
+      try {
+        const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
+        if (!res.ok) return;
+        const orders = await res.json();
+        const paid = orders.filter(o => o.status === 'payé').reverse().slice(0, 15);
+        document.getElementById('saleCount').textContent = '(' + paid.length + ')';
+        document.getElementById('recentSalesList').innerHTML = paid.map(o => {
+          const date = new Date(o.paidAt || o.createdAt);
+          const time = date.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+          const items = (o.items || []).map(i => i.name).join(', ');
+          const total = parseFloat(o.totalAfterDiscount || o.total || 0).toFixed(2).replace('.', ',');
+          const email = o.email || (o.customer ? o.customer.email : '—');
+          const promo = o.promoCode ? '🎟 ' + o.promoCode : '';
+          return '<div class="sale-row"><div class="left"><span class="badge">#' + o.id + '</span><span class="items">' + items + '</span></div><div class="right"><div class="total">' + total + ' €</div><div class="email">' + email + '</div>' + (promo ? '<div class="promo">' + promo + '</div>' : '') + '<div class="time">' + time + '</div></div></div>';
+        }).join('') || '<div style="color:#666;font-size:13px;">Aucune vente pour le moment.</div>';
+      } catch {}
+    }
 
     async function loadStats() {
       try {
@@ -219,6 +254,8 @@
     });
 
     loadStats();
+    loadRecentSales();
+    setInterval(loadRecentSales, 30000);
     loadReviews();
 
     async function loadReviews() {
