@@ -218,9 +218,11 @@ async function sendDiscordNotification(o) {
   const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
   const afterDiscount = o.totalAfterDiscount && parseFloat(o.totalAfterDiscount) !== parseFloat(o.total) ? ' → ' + parseFloat(o.totalAfterDiscount).toFixed(2).replace('.', ',') + ' €' : '';
   const customer = o.customer || {};
+  const promoText = o.promoCode ? 'Code promo utilisé : **' + o.promoCode + '**' : 'Aucun code promo';
   const fields = [
     { name: '📦 Articles', value: items || '—', inline: false },
     { name: '💰 Total', value: total + ' €' + afterDiscount, inline: false },
+    { name: '🎫 Promo', value: promoText, inline: false },
     { name: '👤 Client', value: customer.discord || customer.name || '—', inline: false },
     { name: '📧 Email', value: customer.email || '—', inline: false },
     { name: '📝 Projet', value: customer.description || '—', inline: false },
@@ -239,6 +241,40 @@ async function sendDiscordNotification(o) {
       }),
     });
   } catch {}
+
+  // DM au fondateur via bot Discord
+  const botToken = process.env.TOKEN;
+  const founderId = '1472535396205461554';
+  if (botToken) {
+    try {
+      const dmResp = await fetch('https://discord.com/api/v10/users/@me/channels', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bot ' + botToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipient_id: founderId })
+      });
+      const dm = await dmResp.json();
+      if (dm.id) {
+        await fetch('https://discord.com/api/v10/channels/' + dm.id + '/messages', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bot ' + botToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            embeds: [{
+              title: '🛒 Nouvelle vente #' + o.id,
+              color: 0xc8a87c,
+              fields: [
+                { name: '📦 Articles', value: items || '—', inline: false },
+                { name: '💰 Total', value: total + ' €' + afterDiscount, inline: false },
+                { name: '🎫 Code promo', value: promoText, inline: false },
+                { name: '👤 Client', value: customer.discord || customer.name || '—', inline: true },
+                { name: '📧 Email', value: customer.email || '—', inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            }]
+          })
+        });
+      }
+    } catch {}
+  }
 }
 
 const CT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml' };
