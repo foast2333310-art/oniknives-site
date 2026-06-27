@@ -123,17 +123,25 @@
   </section>
 
   <section class="section reveal" style="background:#111;">
-    <div class="container" style="max-width:600px;">
+    <div class="container" style="max-width:700px;">
       <div class="section-header">
         <div class="icon-badge">💡</div>
         <h2>Suggère un produit</h2>
-        <p>Tu veux voir un produit ou service en particulier ? Dis-le nous</p>
+        <p>Clique sur une idée ou écris la tienne</p>
       </div>
-      <div class="glass-card" style="padding:32px;">
-        <div class="form-group"><input type="text" id="suggName" placeholder="Ton pseudo" class="form-glass"></div>
-        <div class="form-group"><input type="email" id="suggEmail" placeholder="Ton email (optionnel)" class="form-glass"></div>
-        <div class="form-group"><textarea id="suggMsg" placeholder="Décris le produit que tu aimerais voir..." class="form-glass" style="min-height:100px;"></textarea></div>
-        <button class="btn-glass" onclick="submitSuggestion()">Envoyer la suggestion</button>
+      <div class="glass-card" style="padding:28px;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="suggPresets">
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Bot Discord modération premium')">🤖 Bot Discord</button>
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Compte Forza Horizon 5')">🎮 Compte Forza</button>
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Compte Netflix / Spotify')">📺 Compte streaming</button>
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Service installation Discord')">🔧 Installation</button>
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Template site web')">🌐 Template site</button>
+          <button class="btn-glass" style="font-size:13px;padding:8px 16px;" onclick="setSuggestion('Formation / Tutoriel vidéo')">🎓 Formation</button>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;"><input type="text" id="suggName" placeholder="Ton pseudo" class="form-glass"></div>
+        <div class="form-group" style="margin-bottom:10px;"><input type="text" id="suggMsg" placeholder="Écris ton idée..." class="form-glass"></div>
+        <button class="btn-glass" onclick="submitSuggestion()" style="width:100%;">Envoyer la suggestion</button>
+        <div id="suggFeedback" style="margin-top:10px;font-size:13px;color:#27ae60;display:none;">✓ Merci !</div>
       </div>
     </div>
   </section>
