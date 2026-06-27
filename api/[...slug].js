@@ -397,6 +397,7 @@ module.exports = async (req, res) => {
     // Products CRUD
     if (url.startsWith('/api/products')) {
       if (req.method === 'GET') {
+        res.setHeader('Cache-Control', 'public, max-age=60');
         const force = query.seed === 1;
         const products = await load(force);
         if (query.slug) {
@@ -646,6 +647,7 @@ module.exports = async (req, res) => {
 
     // Public stats
     if (url === '/api/stats' && req.method === 'GET') {
+      res.setHeader('Cache-Control', 'public, max-age=60');
       const orders = await loadOrders();
       const paid = orders.filter(o => o.status === 'payé');
       const totalVentes = paid.length;
@@ -723,6 +725,7 @@ module.exports = async (req, res) => {
 
     // Reviews
     if (url === '/api/reviews' && req.method === 'GET') {
+      res.setHeader('Cache-Control', 'public, max-age=60');
       const reviews = await loadReviews();
       const all = query.all === '1';
       res.json(all ? reviews : reviews.slice(-10).reverse());
