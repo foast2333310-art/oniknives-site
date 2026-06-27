@@ -43,12 +43,13 @@ function renderProducts(products, containerId) {
   container.innerHTML = products.map(p => {
     const features = p.features && p.features.length ? `<ul class="product-card-features">${p.features.map(f => '<li>' + f + '</li>').join('')}</ul>` : '';
     const badge = p.badge ? `<span class="badge badge-promo">${p.badge}</span>` : '';
+    const firstImg = p.images?.[0] || p.image;
     return `
     <div class="product-card" style="position:relative">
       <a href="produit.html?slug=${p.slug}" style="display:block;text-decoration:none;color:inherit;">
         ${badge}
         ${parseFloat(p.price) === 0 ? '<span class="badge badge-promo" style="background:#27ae60;">GRATUIT</span>' : ''}
-        <img src="${imgSrc(p.image)}" alt="${p.name}" class="product-card-img" loading="lazy"
+        <img src="${imgSrc(firstImg)}" alt="${p.name}" class="product-card-img" loading="lazy"
              onerror="this.src='images/placeholder.svg'">
         <div class="product-card-body">
           <div class="product-card-title">${p.name}</div>
@@ -56,7 +57,7 @@ function renderProducts(products, containerId) {
           ${features}
         </div>
       </a>
-      <button class="cart-btn" style="margin:0 12px 10px;width:calc(100% - 24px);" onclick="addToCart({id:${p.id},name:'${p.name.replace(/'/g, "\\'")}',price:${p.price},promo:${p.promo || 0},image:'${p.image || ''}',slug:'${p.slug}'})">Ajouter au panier</button>
+      <button class="cart-btn" style="margin:0 12px 10px;width:calc(100% - 24px);" onclick="addToCart({id:${p.id},name:'${p.name.replace(/'/g, "\\'")}',price:${p.price},promo:${p.promo || 0},image:'${firstImg || ''}',slug:'${p.slug}'})">Ajouter au panier</button>
     </div>`;
   }).join('');
 }
@@ -78,10 +79,45 @@ async function initProductPage() {
   const product = products.find(p => p.slug === slug);
   if (product) {
     document.title = `${product.name} — LaCorpo`;
-    document.getElementById('product-image').src = imgSrc(product.image);
-    document.getElementById('product-image').onerror = function() { this.src = 'images/placeholder.svg'; };
-    document.getElementById('product-image').style.display = '';
     document.getElementById('product-name').textContent = product.name;
+
+    const images = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+    const gallery = document.getElementById('product-gallery');
+    const mainImg = document.getElementById('gallery-main');
+    const thumbs = document.getElementById('gallery-thumbs');
+    const prevBtn = document.getElementById('gallery-prev');
+    const nextBtn = document.getElementById('gallery-next');
+    let currentIdx = 0;
+    const validImgs = images.map(src => imgSrc(src)).filter(s => s && s !== 'images/placeholder.svg');
+    if (validImgs.length > 0) {
+      gallery.style.display = '';
+      function showImage(idx) {
+        currentIdx = idx;
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+          mainImg.src = validImgs[currentIdx];
+          mainImg.style.opacity = '1';
+        }, 150);
+        prevBtn.disabled = currentIdx === 0;
+        nextBtn.disabled = currentIdx === validImgs.length - 1;
+        thumbs.querySelectorAll('img').forEach((t,i) => t.classList.toggle('active', i === currentIdx));
+      }
+      mainImg.onerror = function() { this.src = 'images/placeholder.svg'; };
+      showImage(0);
+      prevBtn.onclick = () => showImage(currentIdx - 1);
+      nextBtn.onclick = () => showImage(currentIdx + 1);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' && currentIdx > 0) showImage(currentIdx - 1);
+        if (e.key === 'ArrowRight' && currentIdx < validImgs.length - 1) showImage(currentIdx + 1);
+      });
+      thumbs.innerHTML = validImgs.map((src, i) =>
+        `<img src="${src}" onerror="this.style.display='none'" class="${i===0?'active':''}">`
+      ).join('');
+      thumbs.querySelectorAll('img').forEach((t, i) => {
+        t.addEventListener('click', () => showImage(i));
+      });
+      if (validImgs.length <= 1) { prevBtn.style.display = 'none'; nextBtn.style.display = 'none'; }
+    }
 
     const badges = [];
     if (product.badge) badges.push(`<span class="badge badge-promo" style="position:static;display:inline-block;margin-right:8px;">${product.badge}</span>`);

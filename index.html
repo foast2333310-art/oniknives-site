@@ -30,8 +30,9 @@
   <section class="hero">
     <div class="container hero-inner">
       <div class="hero-text">
+        <span class="hero-subtitle">Boutique digitale</span>
         <h1>Bienvenue chez <em>LaCorpo</em></h1>
-        <p>Découvre notre sélection de produits et services digitaux.</p>
+        <p>Découvre notre sélection de produits et services digitaux. Paiement sécurisé, livraison rapide.</p>
         <a href="produits.html" class="hero-cta">Voir nos produits</a>
       </div>
       <div class="hero-visual">
@@ -42,22 +43,26 @@
 
   <section class="section reveal" style="background:#111;">
     <div class="container">
-      <h2 class="section-title">LaCorpo en chiffres</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Une communauté qui grandit chaque jour</p>
+      <div class="section-header">
+        <div class="icon-badge">📊</div>
+        <h2>LaCorpo en chiffres</h2>
+        <p>Une communauté qui grandit chaque jour</p>
+      </div>
       <div class="stats" id="statsContainer">
-        <div><div class="stat-number">...</div><div class="stat-label">Produits vendus</div></div>
-        <div><div class="stat-number">4.9/5</div><div class="stat-label">Avis clients</div></div>
-        <div><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
+        <div class="glass-card gradient-top animate-in-d1" style="padding:24px 12px;"><div class="stat-number">...</div><div class="stat-label">Produits vendus</div></div>
+        <div class="glass-card gradient-top animate-in-d2" style="padding:24px 12px;"><div class="stat-number">4.9/5</div><div class="stat-label">Avis clients</div></div>
+        <div class="glass-card gradient-top animate-in-d3" style="padding:24px 12px;"><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
       </div>
     </div>
   </section>
 
   <section class="section reveal" id="home-products">
     <div class="container">
-      <h2 class="section-title">Nos produits</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Tous nos produits et services</p>
+      <div class="section-header">
+        <div class="icon-badge">🛒</div>
+        <h2>Nos produits</h2>
+        <p>Tous nos produits et services</p>
+      </div>
       <div class="product-grid" id="homeProductGrid"></div>
       <div style="text-align:center;margin-top:32px;">
         <a href="produits.html" class="hero-cta">Voir tous les produits</a>
@@ -67,30 +72,34 @@
 
   <section class="section reveal">
     <div class="container">
-      <h2 class="section-title">Pourquoi nous choisir</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Qualité et confiance</p>
+      <div class="section-header">
+        <div class="icon-badge">✨</div>
+        <h2>Pourquoi nous choisir</h2>
+        <p>Qualité et confiance</p>
+      </div>
       <div class="why-grid">
-        <div class="why-card"><span class="icon">🛒</span><h3>Produits variés</h3><p>Une sélection de produits et services digitaux dans une seule boutique.</p></div>
-        <div class="why-card"><span class="icon">⚡</span><h3>Livraison rapide</h3><p>Produits livrés sous 24h après confirmation du paiement. Support réactif 7j/7.</p></div>
-        <div class="why-card"><span class="icon">🔒</span><h3>Paiement sécurisé</h3><p>Transactions sécurisées via Stripe. Données protégées et confidentialité garantie.</p></div>
+        <div class="why-card animate-in-d1"><span class="icon">🛒</span><h3>Produits variés</h3><p>Une sélection de produits et services digitaux dans une seule boutique.</p></div>
+        <div class="why-card animate-in-d2"><span class="icon">⚡</span><h3>Livraison rapide</h3><p>Produits livrés sous 24h après confirmation du paiement. Support réactif 7j/7.</p></div>
+        <div class="why-card animate-in-d3"><span class="icon">🔒</span><h3>Paiement sécurisé</h3><p>Transactions sécurisées via Stripe. Données protégées et confidentialité garantie.</p></div>
       </div>
     </div>
   </section>
 
   <section class="section reveal" style="background:#111;">
     <div class="container">
-      <h2 class="section-title">💬 Avis clients</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Ils ont déjà commandé</p>
+      <div class="section-header">
+        <div class="icon-badge">💬</div>
+        <h2>Avis clients</h2>
+        <p>Ils ont déjà commandé</p>
+      </div>
       <div id="reviewsContainer" style="max-width:600px;margin:0 auto;">
         <div style="text-align:center;color:#666;">Chargement...</div>
       </div>
-      <div style="max-width:500px;margin:32px auto 0;background:#1a1a1a;border-radius:8px;padding:24px;border:1px solid #333;">
-        <h3 style="font-size:15px;color:#f0e6d0;margin-bottom:12px;">Laisser un avis</h3>
+      <div class="glass-card" style="max-width:500px;margin:32px auto 0;padding:28px;">
+        <h3 style="font-size:15px;color:#f0e6d0;margin-bottom:16px;">Laisser un avis</h3>
         <div class="form-group">
           <label style="color:#888;font-size:13px;">Ton nom</label>
-          <input type="text" id="reviewName" style="width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;">
+          <input type="text" id="reviewName" class="form-glass">
         </div>
         <div class="form-group">
           <label style="color:#888;font-size:13px;">Note</label>
@@ -105,33 +114,39 @@
         </div>
         <div class="form-group">
           <label style="color:#888;font-size:13px;">Ton avis</label>
-          <textarea id="reviewComment" style="width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #444;border-radius:4px;color:#fff;font-size:14px;min-height:60px;"></textarea>
+          <textarea id="reviewComment" class="form-glass" style="min-height:60px;"></textarea>
         </div>
-        <button onclick="submitReview()" style="padding:10px 24px;background:#c8a87c;color:#1a1a1a;border:none;border-radius:4px;font-weight:600;cursor:pointer;">Envoyer</button>
+        <button onclick="submitReview()" class="btn-glass" style="width:auto;padding:10px 24px;">Envoyer</button>
       </div>
     </div>
   </section>
 
   <section class="section reveal" style="background:#111;">
     <div class="container" style="max-width:600px;">
-      <h2 class="section-title">💡 Suggère un produit</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Tu veux voir un produit ou service en particulier ? Dis-le nous</p>
-      <div class="form-group"><input type="text" id="suggName" placeholder="Ton pseudo" style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;"></div>
-      <div class="form-group"><input type="email" id="suggEmail" placeholder="Ton email (optionnel)" style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;"></div>
-      <div class="form-group"><textarea id="suggMsg" placeholder="Décris le produit que tu aimerais voir..." style="width:100%;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;min-height:100px;"></textarea></div>
-      <button class="cart-btn" onclick="submitSuggestion()" style="width:100%;">Envoyer la suggestion</button>
+      <div class="section-header">
+        <div class="icon-badge">💡</div>
+        <h2>Suggère un produit</h2>
+        <p>Tu veux voir un produit ou service en particulier ? Dis-le nous</p>
+      </div>
+      <div class="glass-card" style="padding:32px;">
+        <div class="form-group"><input type="text" id="suggName" placeholder="Ton pseudo" class="form-glass"></div>
+        <div class="form-group"><input type="email" id="suggEmail" placeholder="Ton email (optionnel)" class="form-glass"></div>
+        <div class="form-group"><textarea id="suggMsg" placeholder="Décris le produit que tu aimerais voir..." class="form-glass" style="min-height:100px;"></textarea></div>
+        <button class="btn-glass" onclick="submitSuggestion()">Envoyer la suggestion</button>
+      </div>
     </div>
   </section>
 
   <section class="section reveal">
     <div class="container" style="max-width:500px;text-align:center;">
-      <h2 class="section-title">🔔 Nouveautés</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">Sois prévenu quand un nouveau produit sort</p>
-      <div style="display:flex;gap:8px;">
-        <input type="email" id="notifEmail" placeholder="Ton email" style="flex:1;padding:12px 16px;background:rgba(26,26,26,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e5e5e5;font-size:14px;">
-        <button class="cart-btn" onclick="subscribeNotify()" style="white-space:nowrap;">M'inscrire</button>
+      <div class="section-header">
+        <div class="icon-badge">🔔</div>
+        <h2>Nouveautés</h2>
+        <p>Sois prévenu quand un nouveau produit sort</p>
+      </div>
+      <div class="glass-card" style="padding:24px;display:flex;gap:8px;">
+        <input type="email" id="notifEmail" placeholder="Ton email" class="form-glass" style="flex:1;">
+        <button class="btn-glass" onclick="subscribeNotify()" style="width:auto;padding:12px 24px;white-space:nowrap;">M'inscrire</button>
       </div>
     </div>
   </section>
@@ -203,9 +218,9 @@
         if (el) {
           const rating = data.avgRating ? data.avgRating.toFixed(1).replace('.', ',') : '0.0';
           el.innerHTML = `
-            <div><div class="stat-number">+${data.totalVentes || 0}</div><div class="stat-label">Produits vendus</div></div>
-            <div><div class="stat-number">${rating}/5</div><div class="stat-label">Avis clients (${data.reviewCount || 0})</div></div>
-            <div><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
+            <div class="glass-card gradient-top animate-in-d1" style="padding:24px 12px;"><div class="stat-number">+${data.totalVentes || 0}</div><div class="stat-label">Produits vendus</div></div>
+            <div class="glass-card gradient-top animate-in-d2" style="padding:24px 12px;"><div class="stat-number">${rating}/5</div><div class="stat-label">Avis clients (${data.reviewCount || 0})</div></div>
+            <div class="glass-card gradient-top animate-in-d3" style="padding:24px 12px;"><div class="stat-number">24h</div><div class="stat-label">Support réactif</div></div>
           `;
         }
       } catch {}
@@ -229,20 +244,20 @@
         const reviews = await res.json();
         const el = document.getElementById('reviewsContainer');
         if (!reviews || reviews.length === 0) {
-          el.innerHTML = '<div style="text-align:center;color:#666;">Aucun avis pour le moment<br><span style="font-size:13px;">Sois le premier à donner ton avis !</span></div>';
+          el.innerHTML = '<div class="glass-card" style="padding:40px;text-align:center;"><div style="font-size:40px;opacity:.3;margin-bottom:12px;">💬</div><div style="color:#666;">Aucun avis pour le moment<br><span style="font-size:13px;">Sois le premier à donner ton avis !</span></div></div>';
           return;
         }
         el.innerHTML = reviews.map(r => {
           const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
           const date = new Date(r.createdAt).toLocaleDateString('fr-FR');
           return `
-          <div style="background:#1a1a1a;border-radius:6px;padding:14px 16px;margin-bottom:10px;border:1px solid #2a2a2a;">
+          <div class="glass-card gradient-top" style="padding:16px 18px;margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
               <strong style="color:#c8a87c;font-size:14px;">${r.name}</strong>
               <span style="color:#d4a853;font-size:16px;">${stars}</span>
             </div>
             <p style="color:#aaa;font-size:13px;line-height:1.5;">${r.comment}</p>
-            <div style="color:#666;font-size:11px;margin-top:4px;">${date}</div>
+            <div style="color:#555;font-size:11px;margin-top:4px;">${date}</div>
           </div>`;
         }).join('');
       } catch {}

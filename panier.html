@@ -7,6 +7,29 @@
   <meta name="description" content="Votre panier LaCorpo.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
+  <style>
+    .cart-page .section-header { margin-bottom: 32px; }
+    .cart-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .cart-item { display: flex; gap: 16px; padding: 16px 20px; align-items: center; }
+    .cart-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: #181818; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 500; font-size: 15px; color: #f0e6d0; }
+    .cart-item-price { color: #c8a87c; font-size: 14px; margin-top: 2px; }
+    .cart-total { text-align: right; font-size: 1.3rem; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 24px; }
+    .cart-total strong { color: #c8a87c; }
+    .checkout-form h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 20px; color: #f0e6d0; }
+    .checkout-form label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .checkout-form input, .checkout-form textarea, .checkout-form select { width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: #e5e5e5; font-size: 14px; font-family: Inter, sans-serif; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+    .checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #c8a87c; }
+    .checkout-form textarea { min-height: 80px; resize: vertical; }
+    #order-confirmation { display: none; text-align: center; padding: 40px; margin-top: 24px; }
+    #order-confirmation h3 { color: #27ae60; font-size: 1.2rem; margin-bottom: 8px; }
+    .light-mode .cart-item-name { color: #1a1a1a; }
+    .light-mode .checkout-form input, .light-mode .checkout-form textarea, .light-mode .checkout-form select { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.1); color: #1a1a1a; }
+    .light-mode .checkout-form input:focus, .light-mode .checkout-form textarea:focus, .light-mode .checkout-form select:focus { border-color: #c8a87c; }
+    .light-mode .checkout-form h3 { color: #1a1a1a; }
+    .light-mode .cart-total { border-top-color: rgba(0,0,0,0.06); }
+  </style>
 </head>
 <body>
   <div class="top-banner">🔒 Paiement sécurisé Stripe · Support 24/7</div>
@@ -29,28 +52,41 @@
 
   <section class="section cart-page">
     <div class="container">
-      <h2 class="section-title">Votre panier</h2>
+      <div class="section-header">
+        <div class="icon-badge">🛒</div>
+        <h2>Votre panier</h2>
+        <p>Récapitule et confirme ta commande</p>
+      </div>
 
       <div id="cart-empty" class="cart-empty" style="display:none;">
+        <div style="font-size:64px;opacity:.2;margin-bottom:16px;">🛒</div>
         <h2>Votre panier est vide</h2>
         <p>Découvrez nos produits et services.</p>
         <a href="produits.html" class="hero-cta" style="margin-top:20px;">Voir les produits</a>
       </div>
 
       <div id="cart-content" style="display:none;">
-        <div class="cart-items" id="cart-items"></div>
-        <div class="cart-total">Total : <strong id="cart-total">0,00 €</strong></div>
-        <div id="cart-suggestions" class="cart-suggestions" style="display:none;"><h3>Vous aimerez aussi</h3><div class="product-grid" id="suggestions-grid"></div></div>
+        <div class="glass-card" style="padding:20px;margin-bottom:24px;">
+          <div class="cart-items" id="cart-items"></div>
+          <div class="cart-total">Total : <strong id="cart-total">0,00 €</strong></div>
+        </div>
 
-        <div class="payment-steps">
-          <h4>💳 Paiement sécurisé Stripe</h4>
+        <div id="cart-suggestions" class="cart-suggestions" style="display:none;">
+          <div class="section-header" style="margin-bottom:20px;">
+            <h2 style="font-size:1.2rem;">Vous aimerez aussi</h2>
+          </div>
+          <div class="product-grid" id="suggestions-grid"></div>
+        </div>
+
+        <div class="glass-card" style="padding:24px;margin-bottom:20px;">
+          <h4 style="color:#c8a87c;margin-bottom:12px;font-size:14px;">💳 Paiement sécurisé Stripe</h4>
           <p style="color:#999;font-size:0.85rem;line-height:1.6;">
             Après avoir cliqué sur "Payer", tu seras redirigé·e vers Stripe pour payer par carte bancaire.<br>
             Une fois le paiement confirmé, ta commande sera traitée sous 24h.
           </p>
         </div>
 
-        <div class="checkout-form" id="checkout-form">
+        <div class="glass-card" id="checkout-form" style="padding:28px;">
           <h3>📝 Commander</h3>
           <div class="form-group">
             <label for="order-discord">Ton pseudo Discord *</label>
@@ -73,14 +109,14 @@
               <label for="order-promo">Code promo</label>
               <input type="text" id="order-promo" placeholder="ex: PARRAIN-ABCDEF" style="text-transform:uppercase;">
             </div>
-            <button type="button" class="btn btn-secondary" onclick="checkPromo()" style="padding:10px 16px;white-space:nowrap;height:42px;">Vérifier</button>
+            <button type="button" class="btn btn-secondary" onclick="checkPromo()" style="padding:10px 16px;white-space:nowrap;height:42px;border-radius:8px;">Vérifier</button>
           </div>
           <div id="promoStatus" style="font-size:13px;margin-top:-8px;margin-bottom:12px;"></div>
           <p style="font-size:0.75rem;color:#666;margin-top:4px;">🔒 Paiement 100% sécurisé par Stripe. Aucune donnée bancaire stockée.</p>
-          <button class="cart-btn checkout-submit" onclick="payWithStripe()" style="font-size:0.9rem;padding:12px 36px;">💳 Payer par carte</button>
+          <button class="cart-btn checkout-submit" onclick="payWithStripe()" style="font-size:0.9rem;padding:12px 36px;border-radius:8px;">💳 Payer par carte</button>
         </div>
 
-        <div id="order-confirmation">
+        <div id="order-confirmation" class="glass-card">
           <h3>✓ Commande envoyée !</h3>
           <p style="color:#888;">Rends-toi sur le serveur Discord et crée un ticket avec ton pseudo et ton email pour confirmer.</p>
           <a href="https://discord.gg/asYcBq76bm" target="_blank" rel="noopener" class="hero-cta" style="margin-top:20px;">→ Aller sur le serveur Discord ←</a>
@@ -141,15 +177,15 @@
       items.innerHTML = cart.map(item => {
         const img = item.image && (item.image.startsWith('data:') || item.image.startsWith('http')) ? item.image : '/api/images/' + (item.image || '');
         return `
-        <div class="cart-item">
+        <div class="cart-item glass-card" style="animation:fadeIn .3s ease;">
           <img src="${img}" alt="${item.name}" onerror="this.src='images/placeholder.svg'">
           <div class="cart-item-info">
             <div class="cart-item-name">${item.name}${item.amount ? ' — ' + item.amount.toFixed(2).replace('.', ',') + ' €' : ''}</div>
             <div class="cart-item-price">${item.price.toFixed(2).replace('.', ',')} €</div>
           </div>
-          <div class="cart-item-actions">
-            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity('${item.key}', this.value); renderCart();" style="width:50px;">
-            <button class="cart-item-remove" onclick="removeFromCart('${item.key}'); renderCart();">Supprimer</button>
+          <div class="cart-item-actions" style="display:flex;align-items:center;gap:8px;">
+            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity('${item.key}', this.value); renderCart();" style="width:50px;padding:6px 8px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.06);border-radius:6px;color:#fff;text-align:center;font-size:0.85rem;outline:none;transition:border-color .2s;">
+            <button class="cart-item-remove" onclick="removeFromCart('${item.key}'); renderCart();" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.8rem;padding:4px 8px;transition:opacity .2s;">Supprimer</button>
           </div>
         </div>`;
       }).join('');

@@ -7,6 +7,39 @@
   <meta name="description" content="Produit LaCorpo - Détails et commande.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>💻</text></svg>">
+  <style>
+    .product-detail { gap: 48px; padding: 60px 0; align-items: flex-start; }
+    .product-gallery { width: 380px; }
+    .product-gallery-main { position:relative; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); background: #181818; box-shadow: 0 8px 32px rgba(0,0,0,0.3); overflow:hidden; }
+    .product-gallery-main img { width:100%; display:block; transition: opacity 0.3s ease; }
+    .gallery-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:background 0.2s; z-index:2; }
+    .gallery-nav:hover { background:rgba(200,168,124,0.7); }
+    .gallery-nav.prev { left:8px; }
+    .gallery-nav.next { right:8px; }
+    .gallery-nav:disabled { opacity:0; pointer-events:none; }
+    .product-gallery-thumbs { display:flex; gap:6px; margin-top:8px; }
+    .product-gallery-thumbs img { width:60px; height:50px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid transparent; transition:border-color 0.2s, opacity 0.2s; opacity:0.6; }
+    .product-gallery-thumbs img:hover { opacity:1; }
+    .product-gallery-thumbs img.active { border-color:#c8a87c; opacity:1; }
+    .product-detail-info h1 { font-size: 2rem; }
+    .product-detail-price { font-size: 1.5rem; margin-bottom: 24px; }
+    .product-detail-desc { color: #999; margin-bottom: 24px; line-height: 1.7; font-size: 0.9rem; }
+    .product-detail .btn { padding: 14px 32px; font-size: 0.9rem; }
+    .product-tabs { margin-top: 32px; }
+    .product-tabs-nav { display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .product-tabs-nav button { background: rgba(26,26,26,0.4); border: 1px solid rgba(255,255,255,0.04); color: #666; padding: 10px 20px; cursor: pointer; font-size: 0.8rem; font-family: Inter, sans-serif; transition: all 0.2s; border-radius: 8px 8px 0 0; margin-bottom: -1px; }
+    .product-tabs-nav button:hover { color: #999; background: rgba(26,26,26,0.6); }
+    .product-tabs-nav button.active { color: #c8a87c; background: rgba(26,26,26,0.8); border-color: rgba(255,255,255,0.06); border-bottom-color: transparent; }
+    .product-tab-content { display: none; padding: 28px 0; font-size: 0.85rem; color: #999; line-height: 1.7; }
+    .product-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    .product-tab-content ul { padding-left: 18px; }
+    .product-tab-content li { margin-bottom: 6px; }
+    @media (max-width: 768px) {
+      .product-detail { flex-direction: column; padding: 32px 0; gap: 24px; }
+      .product-detail-img { width: 100%; }
+      .product-detail-info h1 { font-size: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
   <div class="top-banner">🔒 Paiement sécurisé Stripe · Support 24/7</div>
@@ -29,13 +62,23 @@
 
   <div class="container">
     <div class="product-detail" id="product-detail">
-      <img id="product-image" src="" alt="" class="product-detail-img" style="display:none;">
+      <div class="product-gallery" id="product-gallery" style="display:none;">
+        <div class="product-gallery-main">
+          <img id="gallery-main" src="" alt="">
+          <button class="gallery-nav prev" id="gallery-prev">‹</button>
+          <button class="gallery-nav next" id="gallery-next">›</button>
+        </div>
+        <div class="product-gallery-thumbs" id="gallery-thumbs"></div>
+      </div>
       <div class="product-detail-info">
         <h1 id="product-name">Chargement...</h1>
         <div id="product-badges" style="margin-bottom:8px;"></div>
         <div class="product-detail-price" id="product-price"></div>
-        <button id="product-cart-btn" class="cart-btn" style="font-size:1rem;padding:12px 24px;">Ajouter au panier</button>
-        <a id="product-cart-link" href="panier.html" style="display:none;margin-top:8px;font-size:0.85rem;color:#888;">Voir le panier →</a>
+        <div class="glass-card" style="padding:20px;margin-bottom:24px;">
+          <p style="color:#888;font-size:13px;margin-bottom:12px;">💳 Paiement sécurisé par Stripe — Livraison sous 24h</p>
+          <button id="product-cart-btn" class="btn-glass" style="width:auto;padding:12px 28px;font-size:15px;">Ajouter au panier</button>
+          <a id="product-cart-link" href="panier.html" style="display:none;margin-top:10px;font-size:0.85rem;color:#888;">Voir le panier →</a>
+        </div>
         <div class="product-tabs">
           <div class="product-tabs-nav">
             <button class="active" onclick="switchTab(this,'desc')">Description</button>

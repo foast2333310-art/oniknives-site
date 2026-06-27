@@ -781,7 +781,19 @@ module.exports = async (req, res) => {
         const idx = orders.findIndex(o => o.id === body.id);
         if (idx < 0) { res.status(404).json({ error: 'not found' }); return; }
         const wasPaid = orders[idx].status === 'payé';
-        orders[idx] = { ...orders[idx], ...body };
+        if (body.status) {
+          orders[idx].status = body.status;
+          orders[idx].updatedAt = new Date().toISOString();
+        }
+        if (body.addNote) {
+          if (!orders[idx].notes) orders[idx].notes = [];
+          orders[idx].notes.push({
+            text: body.addNote,
+            author: body.author || 'Admin',
+            createdAt: new Date().toISOString()
+          });
+          orders[idx].updatedAt = new Date().toISOString();
+        }
         await saveOrders(orders);
         if (!wasPaid && orders[idx].status === 'payé') {
           sendDiscordNotification(orders[idx]);
@@ -1186,6 +1198,32 @@ module.exports = async (req, res) => {
         }).catch(() => {});
       }
       res.status(200).json({ success: true });
+      return;
+    }
+
+    // Discord updates notification
+    if (url === '/api/notify-update' && req.method === 'POST') {
+      const body = await getBody(req);
+      const message = body.message || '';
+      const title = body.title || '🚀 Mise à jour LaCorpo';
+      const wh = process.env.DISCORD_UPDATES_WEBHOOK || 'https://discord.com/api/webhooks/1520157082597195936/Uz021n2pX5uxrFRqMq9xO81zEW6OpG9a9DQFDyaxwOQlhtZBxaqkI_aS6wb5rrh_gIh3';
+      if (wh) {
+        fetch(wh, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'LaCorpo Updates',
+            avatar_url: 'https://i.goopics.net/k2n1sq.png',
+            embeds: [{
+              title,
+              color: 0xc8a87c,
+              description: message,
+              timestamp: new Date().toISOString()
+            }]
+          })
+        }).catch(() => {});
+      }
+      res.json({ success: true });
       return;
     }
 

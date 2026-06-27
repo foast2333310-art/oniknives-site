@@ -9,17 +9,11 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a1a1a;
-      color: #fff;
-      min-height: 100vh;
+      background: #1a1a1a; color: #fff; min-height: 100vh;
     }
     .header {
-      background: #2a2a2a;
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #333;
+      background: #2a2a2a; padding: 16px 32px; display: flex;
+      align-items: center; justify-content: space-between; border-bottom: 1px solid #333;
     }
     .header h1 { color: #f0e6d0; font-size: 20px; }
     .header .links a {
@@ -40,31 +34,64 @@
     .btn-danger { background: #e74c3c; color: #fff; }
     .btn-success { background: #27ae60; color: #fff; }
     .btn-secondary { background: #555; color: #fff; }
-    .order-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .btn-info { background: #3498db; color: #fff; }
+
+    .order-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
     .order-stat-card { background: #2a2a2a; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #333; }
     .order-stat-card .stat-num { font-size: 1.6rem; font-weight: 700; }
     .order-stat-card .stat-label { font-size: 0.75rem; color: #888; margin-top: 2px; }
     .order-stat-card.total .stat-num { color: #c8a87c; }
     .order-stat-card.pending .stat-num { color: #f39c12; }
-    .order-stat-card.paid .stat-num { color: #27ae60; }
+    .order-stat-card.progress .stat-num { color: #3498db; }
+    .order-stat-card.done .stat-num { color: #27ae60; }
+
     .order-table { width: 100%; border-collapse: collapse; }
     .order-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; padding: 8px 12px; border-bottom: 1px solid #333; font-weight: 600; }
     .order-table td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.85rem; vertical-align: top; }
     .order-table tr:hover td { background: rgba(255,255,255,0.02); }
     .order-details { display: none; padding: 12px; background: #1a1a1a; border-radius: 6px; margin-top: 8px; }
     .order-details.open { display: block; }
-    .order-details h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 6px; }
+    .order-details h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 6px; margin-top: 12px; }
+    .order-details h4:first-child { margin-top: 0; }
     .order-details .detail-row { display: flex; gap: 8px; font-size: 0.82rem; color: #ccc; padding: 3px 0; }
     .order-details .detail-row strong { color: #aaa; min-width: 80px; }
-    .order-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
+
+    .order-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
     .order-status.pending { background: rgba(243,156,18,0.15); color: #f39c12; }
     .order-status.paid { background: rgba(39,174,96,0.15); color: #27ae60; }
-    .order-actions { display: flex; gap: 4px; }
+    .order-status.en-cours { background: rgba(52,152,219,0.15); color: #3498db; }
+    .order-status.livre { background: rgba(39,174,96,0.15); color: #27ae60; }
+
+    .order-actions { display: flex; gap: 4px; align-items: center; }
     .order-actions .btn { padding: 4px 10px; font-size: 0.7rem; border-radius: 4px; }
     .order-id { font-weight: 600; color: #e5e5e5; font-size: 0.85rem; }
     .order-customer-name { color: #c8a87c; font-weight: 500; }
     .order-items-list { font-size: 0.78rem; color: #999; line-height: 1.5; }
     .order-date { font-size: 0.78rem; color: #666; }
+
+    .status-select {
+      padding: 4px 8px; border-radius: 6px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 0.75rem; cursor: pointer; outline: none;
+    }
+    .status-select:focus { border-color: #c8a87c; }
+
+    .note-input-group { display: flex; gap: 8px; margin-top: 8px; }
+    .note-input-group input { flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; font-size: 0.8rem; outline: none; }
+    .note-input-group input:focus { border-color: #c8a87c; }
+    .note-input-group .btn { padding: 6px 14px; font-size: 0.7rem; white-space: nowrap; }
+    .note-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .note-item:last-child { border-bottom: none; }
+    .note-item .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #c8a87c;
+      margin-top: 6px; flex-shrink: 0;
+    }
+    .note-item .note-body { flex: 1; }
+    .note-item .note-text { color: #ccc; font-size: 0.82rem; }
+    .note-item .note-meta { color: #555; font-size: 0.7rem; margin-top: 2px; }
+
     .toast {
       position: fixed; bottom: 32px; right: 32px; padding: 14px 24px;
       border-radius: 8px; font-size: 14px; z-index: 2000; display: none;
@@ -96,7 +123,7 @@
 
   <div class="container">
     <div class="toolbar">
-      <h2>Commandes reçues</h2>
+      <h2>Gestion des commandes</h2>
       <button class="btn btn-secondary" onclick="loadOrders()">⟳ Rafraîchir</button>
     </div>
     <div id="ordersGrid"></div>
@@ -113,6 +140,19 @@
       return localStorage.getItem('admin_api_key');
     }
 
+    function statusBadge(status) {
+      const map = {
+        'pending': ['⏳', 'En attente', 'pending'],
+        'pending_payment': ['⏳', 'Paiement en cours', 'pending'],
+        'payé': ['✓', 'Payé', 'paid'],
+        'en attente': ['⏳', 'En attente', 'pending'],
+        'en cours': ['🔄', 'En cours', 'en-cours'],
+        'livré': ['✓', 'Livré', 'livre']
+      };
+      const s = map[status] || ['⏳', status, 'pending'];
+      return `<span class="order-status ${s[2]}">${s[0]} ${s[1]}</span>`;
+    }
+
     async function loadOrders() {
       try {
         const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
@@ -124,18 +164,21 @@
           return;
         }
         const sorted = orders.sort((a, b) => b.id - a.id);
-        const totalCount = sorted.length;
-        const pendingCount = sorted.filter(o => o.status !== 'payé').length;
-        const paidCount = sorted.filter(o => o.status === 'payé').length;
+        const total = sorted.length;
+        const pending = sorted.filter(o => o.status === 'pending' || o.status === 'pending_payment' || o.status === 'en attente' || o.status === 'payé').length;
+        const inProgress = sorted.filter(o => o.status === 'en cours').length;
+        const delivered = sorted.filter(o => o.status === 'livré').length;
+
         grid.innerHTML = `
           <div class="order-stats">
-            <div class="order-stat-card total"><div class="stat-num">${totalCount}</div><div class="stat-label">Total commandes</div></div>
-            <div class="order-stat-card pending"><div class="stat-num">${pendingCount}</div><div class="stat-label">En attente</div></div>
-            <div class="order-stat-card paid"><div class="stat-num">${paidCount}</div><div class="stat-label">Payées</div></div>
+            <div class="order-stat-card total"><div class="stat-num">${total}</div><div class="stat-label">Total</div></div>
+            <div class="order-stat-card pending"><div class="stat-num">${pending}</div><div class="stat-label">En attente</div></div>
+            <div class="order-stat-card progress"><div class="stat-num">${inProgress}</div><div class="stat-label">En cours</div></div>
+            <div class="order-stat-card done"><div class="stat-num">${delivered}</div><div class="stat-label">Livrées</div></div>
           </div>
           <table class="order-table">
             <thead><tr>
-              <th>#</th><th>Client</th><th>Articles</th><th>Total</th><th>Date</th><th>Statut</th><th></th>
+              <th>#</th><th>Client</th><th>Articles</th><th>Total</th><th>Date</th><th>Statut</th><th>Actions</th>
             </tr></thead>
             <tbody>${sorted.map(o => {
           const total = parseFloat(o.total || 0).toFixed(2).replace('.', ',');
@@ -150,6 +193,8 @@
           const desc = o.customer.description || '';
           const addr = o.customer.address || '';
           const msg = o.customer.message || '';
+          const notes = o.notes || [];
+          const statusOpts = ['pending_payment', 'pending', 'en attente', 'en cours', 'livré'];
           return `<tr>
             <td><span class="order-id">#${o.id}</span></td>
             <td>
@@ -159,11 +204,10 @@
             <td><div class="order-items-list">${escHtml(itemsShort)}</div></td>
             <td style="color:#c8a87c;font-weight:600;">${total} €${o.promoDiscount ? `<br><span style="color:#e74c3c;font-size:11px;">-${o.promoDiscount} € (code)</span>` : ''}</td>
             <td><span class="order-date" title="${escHtml(date)}">${shortDate}</span></td>
-            <td><span class="order-status ${o.status === 'payé' ? 'paid' : 'pending'}">${o.status === 'payé' ? '✓' : '⏳'} ${o.status}</span></td>
+            <td><span id="status-badge-${o.id}">${statusBadge(o.status)}</span></td>
             <td>
               <div class="order-actions">
                 <button class="btn btn-secondary" onclick="toggleOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">Détails</button>
-                ${o.status !== 'payé' ? `<button class="btn btn-success" onclick="payOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">✓</button>` : ''}
                 <button class="btn btn-danger" onclick="deleteOrder(${o.id})" style="font-size:0.65rem;padding:3px 8px;">✕</button>
               </div>
             </td>
@@ -178,6 +222,36 @@
                 ${msg ? `<div class="detail-row"><strong>Message :</strong><span>${escHtml(msg)}</span></div>` : ''}
                 ${o.promoCode ? `<div class="detail-row"><strong>🎟 Code promo :</strong><span style="color:#c8a87c;">${escHtml(o.promoCode)} ${o.promoDiscount ? '(-' + o.promoDiscount + ' €)' : ''}</span></div>` : ''}
                 <div class="detail-row" style="margin-top:4px;color:#666;font-size:0.75rem;">Commande passée le ${escHtml(date)}</div>
+
+                <h4>Statut</h4>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <select class="status-select" id="status-select-${o.id}" onchange="updateStatus(${o.id})">
+                    ${statusOpts.map(s => {
+                      const labels = { 'pending_payment':'En attente (paiement)', 'pending':'En attente', 'en attente':'En attente', 'en cours':'En cours', 'livré':'Livré' };
+                      return `<option value="${s}" ${(o.status === s) ? 'selected' : ''}>${labels[s] || s}</option>`;
+                    }).join('')}
+                  </select>
+                  <span id="status-saved-${o.id}" style="font-size:0.7rem;color:#27ae60;display:none;">✓</span>
+                </div>
+
+                <h4>Notes internes</h4>
+                <div id="notes-list-${o.id}">
+                  ${notes.length === 0 ? '<div style="color:#555;font-size:0.8rem;">Aucune note</div>' :
+                    notes.map(n => `
+                      <div class="note-item">
+                        <div class="dot"></div>
+                        <div class="note-body">
+                          <div class="note-text">${escHtml(n.text)}</div>
+                          <div class="note-meta">${escHtml(n.author)} · ${new Date(n.createdAt).toLocaleString('fr-FR')}</div>
+                        </div>
+                      </div>
+                    `).join('')
+                  }
+                </div>
+                <div class="note-input-group">
+                  <input type="text" id="note-input-${o.id}" placeholder="Ajouter une note..." onkeydown="if(event.key==='Enter')addNote(${o.id})">
+                  <button class="btn btn-info" onclick="addNote(${o.id})">Ajouter</button>
+                </div>
               </div>
             </td>
           </tr>`;
@@ -195,6 +269,50 @@
       t.className = 'toast ' + (isError ? 'error' : 'success');
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    async function updateStatus(id) {
+      const select = document.getElementById('status-select-' + id);
+      const status = select.value;
+      try {
+        const res = await fetch('/api/orders', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }, body: JSON.stringify({ id, status }) });
+        if (!res.ok) throw new Error();
+        const order = await res.json();
+        document.getElementById('status-badge-' + id).innerHTML = statusBadge(order.status);
+        const saved = document.getElementById('status-saved-' + id);
+        saved.style.display = 'inline';
+        setTimeout(() => saved.style.display = 'none', 2000);
+        loadOrders();
+        showToast('✓ Statut mis à jour');
+      } catch { showToast('Erreur statut', true); }
+    }
+
+    async function addNote(id) {
+      const input = document.getElementById('note-input-' + id);
+      const text = input.value.trim();
+      if (!text) return;
+      try {
+        const res = await fetch('/api/orders', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }, body: JSON.stringify({ id, addNote: text, author: 'Admin' }) });
+        if (!res.ok) throw new Error();
+        input.value = '';
+        showToast('✓ Note ajoutée');
+        const order = await res.json();
+        renderNotes(id, order.notes || []);
+      } catch { showToast('Erreur note', true); }
+    }
+
+    function renderNotes(id, notes) {
+      const el = document.getElementById('notes-list-' + id);
+      el.innerHTML = notes.length === 0 ? '<div style="color:#555;font-size:0.8rem;">Aucune note</div>' :
+        notes.map(n => `
+          <div class="note-item">
+            <div class="dot"></div>
+            <div class="note-body">
+              <div class="note-text">${escHtml(n.text)}</div>
+              <div class="note-meta">${escHtml(n.author)} · ${new Date(n.createdAt).toLocaleString('fr-FR')}</div>
+            </div>
+          </div>
+        `).join('');
     }
 
     async function payOrder(id) {

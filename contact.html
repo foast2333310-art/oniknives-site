@@ -29,28 +29,33 @@
 
   <section class="section">
     <div class="container">
-      <h2 class="section-title">Contactez-nous</h2>
-      <p class="section-subtitle">Une question ? Un projet ? Parlons-en.</p>
-      <div class="contact-info">
-        <p>📧 <strong>Email :</strong> lacorposite@gmail.com</p>
-        <p>💳 <strong>Paiement :</strong> PayPal · RIB</p>
+      <div class="section-header">
+        <div class="icon-badge">📧</div>
+        <h2>Contactez-nous</h2>
+        <p>Une question ? Un projet ? Parlons-en.</p>
       </div>
-      <form class="contact-form" id="contactForm">
-        <div class="form-group">
-          <label for="name">Pseudo / Nom</label>
-          <input type="text" id="name" name="nom" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Envoyer</button>
-        <div id="contactSuccess" style="display:none;text-align:center;padding:20px;color:#27ae60;">✓ Message envoyé !</div>
-      </form>
+      <div class="contact-info" style="margin-bottom:32px;">
+        <p>📧 <strong style="color:#c8a87c;">Email :</strong> lacorposite@gmail.com</p>
+        <p>💳 <strong style="color:#c8a87c;">Paiement :</strong> PayPal · RIB</p>
+      </div>
+      <div class="glass-card" style="max-width:460px;margin:0 auto;padding:32px;">
+        <form id="contactForm">
+          <div class="form-group">
+            <label for="name" style="color:#999;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;">Pseudo / Nom</label>
+            <input type="text" id="name" name="nom" class="form-glass" required>
+          </div>
+          <div class="form-group">
+            <label for="email" style="color:#999;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;">Email</label>
+            <input type="email" id="email" name="email" class="form-glass" required>
+          </div>
+          <div class="form-group">
+            <label for="message" style="color:#999;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;">Message</label>
+            <textarea id="message" name="message" class="form-glass" required></textarea>
+          </div>
+          <button type="submit" class="btn-glass">Envoyer</button>
+          <div id="contactSuccess" style="display:none;text-align:center;padding:20px;color:#27ae60;">✓ Message envoyé !</div>
+        </form>
+      </div>
     </div>
   </section>
 

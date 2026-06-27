@@ -29,8 +29,11 @@
 
   <section class="section">
     <div class="container">
-      <h2 class="section-title">Tous les produits</h2>
-      <p class="section-subtitle">Découvrez tous nos produits</p>
+      <div class="section-header">
+        <div class="icon-badge">🛒</div>
+        <h2>Tous les produits</h2>
+        <p>Découvrez tous nos produits</p>
+      </div>
       <div class="product-grid" id="all-products"></div>
     </div>
   </section>
@@ -67,16 +70,10 @@
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>
-    loadProducts().then(products => {
-      const params = new URLSearchParams(window.location.search);
-      const cat = params.get('categorie');
-      const filtered = cat ? products.filter(p => p.category.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-') === cat) : products;
-      if (filtered.length === 0) {
-        document.getElementById('all-products').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#888;">Aucun produit trouvé.</p>';
-      } else {
-        renderProducts(filtered, 'all-products');
-      }
-    });
+    (async function() {
+      const products = await loadProducts();
+      renderProducts(products, 'all-products');
+    })();
   </script>
 <div class="modal-overlay" id="legalModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal">
