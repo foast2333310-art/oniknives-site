@@ -126,17 +126,9 @@
     <div class="container" style="max-width:500px;">
       <h3 style="text-align:center;color:#888;font-size:0.85rem;font-weight:400;margin-bottom:10px;letter-spacing:0.5px;">💡 Une idée de produit ?</h3>
       <div class="glass-card" style="padding:12px;">
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;" id="suggPresets">
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Bot Discord modération premium')">🤖 Bot Discord</button>
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Compte Forza Horizon 5')">🎮 Compte Forza</button>
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Compte Netflix / Spotify')">📺 Compte streaming</button>
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Service installation Discord')">🔧 Installation</button>
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Template site web')">🌐 Template site</button>
-          <button class="btn-glass" style="font-size:10px;padding:3px 8px;" onclick="setSuggestion('Formation / Tutoriel vidéo')">🎓 Formation</button>
-        </div>
         <div style="display:flex;gap:6px;">
           <input type="text" id="suggName" placeholder="Pseudo" class="form-glass" style="padding:6px 10px;font-size:12px;flex:1;">
-          <input type="text" id="suggMsg" placeholder="Ton idée..." class="form-glass" style="padding:6px 10px;font-size:12px;flex:2;">
+          <input type="text" id="suggMsg" placeholder="Quel produit veux-tu voir ?" class="form-glass" style="padding:6px 10px;font-size:12px;flex:2;">
           <button class="btn-glass" onclick="submitSuggestion()" style="padding:6px 12px;font-size:12px;">→</button>
         </div>
         <div id="suggFeedback" style="margin-top:6px;font-size:11px;color:#27ae60;display:none;text-align:center;">✓ Merci !</div>
