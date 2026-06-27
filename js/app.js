@@ -162,27 +162,6 @@ function toggleTheme() {
   }
 })();
 
-function setSuggestion(msg) {
-  const el = document.getElementById('suggMsg');
-  if (el) el.value = msg;
-}
-async function submitSuggestion() {
-  const name = document.getElementById('suggName')?.value?.trim();
-  const msg = document.getElementById('suggMsg')?.value?.trim();
-  if (!name || !msg) { alert('Remplis les champs'); return; }
-  try {
-    const r = await fetch('/api/suggestions', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name, message: msg, email: '' })
-    });
-    if (!r.ok) throw Error();
-    document.getElementById('suggName').value = '';
-    document.getElementById('suggMsg').value = '';
-    document.getElementById('suggFeedback').style.display = '';
-    setTimeout(() => { document.getElementById('suggFeedback').style.display = 'none'; }, 2500);
-  } catch { alert('Erreur'); }
-}
-
 async function subscribeNotify() {
   const email = document.getElementById('notifEmail')?.value?.trim();
   if (!email) { alert('Entre ton email'); return; }
