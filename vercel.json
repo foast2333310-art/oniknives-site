@@ -4,6 +4,7 @@
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/[...slug].js" }
+    { "source": "/api/:path*", "destination": "/api/[...slug].js" },
+    { "source": "/p/:slug", "destination": "/api/[...slug].js" }
   ]
 }

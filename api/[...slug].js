@@ -378,6 +378,32 @@ module.exports = async (req, res) => {
   const key = process.env.ADMIN_API_KEY || '123Mat123';
 
   try {
+    // OG tags for product sharing (/p/slug-name)
+    if (url.startsWith('/p/')) {
+      const slug = url.replace('/p/', '').split('?')[0];
+      if (slug) {
+        const products = await load();
+        const product = products.find(p => p.slug === slug);
+        if (product) {
+          const img = product.images?.[0] || product.image || 'https://i.goopics.net/k2n1sq.png';
+          const price = product.promo ? (product.price * (100 - product.promo) / 100).toFixed(2) : product.price.toFixed(2);
+          const redirectUrl = 'https://lacorpo.vercel.app/produit.html?slug=' + slug;
+          res.setHeader('Content-Type', 'text/html');
+          res.end(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${product.name} — LaCorpo</title>
+<meta property="og:title" content="${product.name} — ${price} €">
+<meta property="og:description" content="${(product.description || 'Produit LaCorpo').substring(0, 200).replace(/["\n]/g, ' ')}">
+<meta property="og:image" content="${img}">
+<meta property="og:url" content="${redirectUrl}">
+<meta property="og:site_name" content="LaCorpo">
+<meta property="og:type" content="product">
+<meta name="twitter:card" content="summary_large_image">
+<meta http-equiv="refresh" content="0;url=${redirectUrl}"></head><body><script>location.href="${redirectUrl}"</script></body></html>`);
+          return;
+        }
+      }
+      res.status(404).end('Not found'); return;
+    }
+
     // Serve images
     if (url.startsWith('/api/images/')) {
       const name = path.basename(url.replace('/api/images/', ''));
