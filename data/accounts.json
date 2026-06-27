@@ -5,6 +5,8 @@
     "token": "66caccff-78e1-45d8-b179-8f3316852658",
     "createdAt": "2026-06-25T08:35:23.014Z",
     "role": "ambassadeur",
-    "tierOverride": "Diamant"
+    "tierOverride": "Diamant",
+    "resetToken": "d34c84ad3dded8e66f25457b157e651ca384207f87705060f4b41d5f852ba2c7",
+    "resetTokenExpiry": 1782570636690
   }
 ]
