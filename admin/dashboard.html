@@ -184,7 +184,8 @@
         const res = await fetch('/api/orders', { headers: { 'x-admin-key': getAdminKey() } });
         if (!res.ok) return;
         const orders = await res.json();
-        const paid = orders.filter(o => o.status === 'payé').reverse().slice(0, 15);
+        const paidStatuses = ['payé', 'paye', 'en cours', 'livré', 'livree', 'livré'];
+        const paid = orders.filter(o => paidStatuses.includes(o.status)).reverse().slice(0, 15);
         document.getElementById('saleCount').textContent = '(' + paid.length + ')';
         document.getElementById('recentSalesList').innerHTML = paid.map(o => {
           const date = new Date(o.paidAt || o.createdAt);
@@ -204,7 +205,8 @@
         if (!res.ok) return;
         const orders = await res.json();
         const list = orders || [];
-        const paid = list.filter(o => o.status === 'payé');
+        const paidStatuses = ['payé', 'paye', 'en cours', 'livré', 'livree', 'livré'];
+        const paid = list.filter(o => paidStatuses.includes(o.status));
         const totalVentes = paid.length;
         const totalRevenu = paid.reduce((s, o) => s + parseFloat(o.total || 0), 0);
 
@@ -225,7 +227,7 @@
         `;
 
         const months = {};
-        paid.forEach(o => {
+        list.filter(o => paidStatuses.includes(o.status)).forEach(o => {
           const d = new Date(o.createdAt);
           const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
           if (!months[key]) { months[key] = { count: 0, total: 0, key }; }
