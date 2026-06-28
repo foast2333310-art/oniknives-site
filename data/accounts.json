@@ -8,5 +8,13 @@
     "tierOverride": "Diamant",
     "resetToken": "52197030816ea5af7237997b6427f9e0f70eafe7a2bad089dd5ed6692767742d",
     "resetTokenExpiry": 1782572042986
+  },
+  {
+    "discordId": "1472535396205461554",
+    "discordUsername": "ilhanthvn",
+    "email": "discord_1472535396205461554@lacorpo.app",
+    "password": "",
+    "token": "3ecbed65-2656-45a9-a862-9b654f11c61a",
+    "createdAt": "2026-06-28T09:36:48.115Z"
   }
 ]
