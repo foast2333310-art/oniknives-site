@@ -59,7 +59,8 @@
     "totalAfterDiscount": 10,
     "promoCode": null,
     "promoDiscount": 0,
-    "status": "pending_payment",
-    "createdAt": "2026-06-28T11:44:43.489Z"
+    "status": "en cours",
+    "createdAt": "2026-06-28T11:44:43.489Z",
+    "updatedAt": "2026-06-28T11:44:59.434Z"
   }
 ]
