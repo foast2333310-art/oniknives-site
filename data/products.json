@@ -57,7 +57,7 @@
     "id": 4,
     "name": "🔥 Compte Mod Forza 6",
     "slug": "compte-mod-forza-6",
-    "price": 10,
+    "price": 0,
     "description": "Toutes les voitures débloquées, crédits max, niveau max. info compte a donne sur discord !",
     "category": "Comptes Forza",
     "features": [
@@ -69,7 +69,11 @@
     "badge": "🚗",
     "image": "https://i.goopics.net/j17hl9.png",
     "epuise": false,
-    "promo": 0
+    "promo": 0,
+    "images": [
+      "https://i.goopics.net/j17hl9.png"
+    ],
+    "stock": null
   },
   {
     "name": "Pack Facture",
