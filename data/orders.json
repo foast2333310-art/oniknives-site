@@ -31,36 +31,5 @@
     "updatedAt": "2026-06-28T11:42:19.286Z",
     "trackingNumber": "dfdsfedfgdgd",
     "trackingUrl": "https://foot-store.fr/ib5381-010-maillot-exterieur-norvege-coupe-du-monde-2026-black-black-black?variant=12834928&gad_source=1&gad_campaignid=22148164554&gclid=CjwKCAjw6f3RBhApEiwAMaCqWWQ4yLGACBE4isg_1OSjw1Ch5Xfw5xX_D2PX3VQo6nUjM-OFEx6LfhoC34oQAvD_BwE"
-  },
-  {
-    "id": 2,
-    "items": [
-      {
-        "key": "4",
-        "productId": 4,
-        "name": "🔥 Compte Mod Forza 6",
-        "price": 10,
-        "originalPrice": 10,
-        "promo": 0,
-        "image": "https://i.goopics.net/j17hl9.png",
-        "slug": "compte-mod-forza-6",
-        "amount": null,
-        "quantity": 1
-      }
-    ],
-    "customer": {
-      "discord": "dsqdSQDD",
-      "email": "ilhanthevenin@icloud.com",
-      "description": "dsfs",
-      "message": "SDfS"
-    },
-    "email": "ilhanthevenin@icloud.com",
-    "total": 10,
-    "totalAfterDiscount": 10,
-    "promoCode": null,
-    "promoDiscount": 0,
-    "status": "en cours",
-    "createdAt": "2026-06-28T11:44:43.489Z",
-    "updatedAt": "2026-06-28T11:44:59.434Z"
   }
 ]
